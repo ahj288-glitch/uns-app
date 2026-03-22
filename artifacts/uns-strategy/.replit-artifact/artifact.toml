@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "UNS | أُنس — Venture Strategy"
+version = "1.0.0"
+id = "artifacts/uns-strategy"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23420
+
+[services.development]
+run = "pnpm --filter @workspace/uns-strategy run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/uns-strategy", "run", "build" ]
+publicDir = "artifacts/uns-strategy/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23420"
+BASE_PATH = "/"
