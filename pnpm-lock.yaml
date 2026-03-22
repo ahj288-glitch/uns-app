@@ -592,6 +592,10 @@ importers:
         version: 3.25.76
 
   artifacts/uns-app:
+    dependencies:
+      '@expo-google-fonts/amiri':
+        specifier: ^0.4.1
+        version: 0.4.1
     devDependencies:
       '@babel/core':
         specifier: ^7.25.2
@@ -1695,6 +1699,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
+
+  '@expo-google-fonts/amiri@0.4.1':
+    resolution: {integrity: sha512-JTZUZ4olyqGeXu5UBWVEerrbym/MD9U3wU8qzSg8z4qEtHFKAI3uPg2DuytfeRmJ6EppaHLYsYqpGerMOrpJeA==}
 
   '@expo-google-fonts/inter@0.4.2':
     resolution: {integrity: sha512-syfiImMaDmq7cFi0of+waE2M4uSCyd16zgyWxdPOY7fN2VBmSLKEzkfbZgeOjJq61kSqPBNNtXjggiQiSD6gMQ==}
@@ -6876,6 +6883,8 @@ snapshots:
 
   '@esbuild/linux-x64@0.27.3':
     optional: true
+
+  '@expo-google-fonts/amiri@0.4.1': {}
 
   '@expo-google-fonts/inter@0.4.2': {}
 

@@ -2,7 +2,7 @@ import { Shield } from "lucide-react";
 
 export function Privacy() {
   return (
-    <section className="py-20 bg-background border-t border-white/5">
+    <section className="py-20 bg-background border-t border-white/5" dir="rtl">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-card border border-white/5 flex items-center justify-center mx-auto mb-8 shadow-lg">
           <Shield className="w-8 h-8 text-primary" />
@@ -11,19 +11,32 @@ export function Privacy() {
         <h2 className="arabic-text text-3xl md:text-4xl font-bold text-foreground mb-4">
           نحن لا نبيع مشاعرك.
         </h2>
-        <p className="text-xl text-muted-foreground font-medium mb-12">
-          We do not sell your feelings.
+        <p className="text-sm text-muted-foreground/70 font-medium mb-12 tracking-widest uppercase">
+          We do not sell your feelings. Ever.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-right">
           {[
-            { title: "Zero-Knowledge", desc: "Your journal entries are encrypted on your device. We don't hold the keys." },
-            { title: "No Ads, Ever", desc: "Our business model is simple: you pay for premium features. We never sell your data to advertisers." },
-            { title: "Regional Data", desc: "Data residency in MENA ensures compliance with UAE and KSA PDPL frameworks." },
+            { 
+              titleAr: "معرفة صفرية", 
+              titleEn: "Zero-Knowledge",
+              desc: "يومياتك مشفّرة على جهازك. نحن لا نحتفظ بالمفاتيح — ولا نستطيع قراءتها حتى لو أردنا." 
+            },
+            { 
+              titleAr: "لا إعلانات أبداً", 
+              titleEn: "No Ads, Ever",
+              desc: "نموذج عملنا بسيط: تدفع مقابل الميزات المميزة. لن نبيع بياناتك للمعلنين أبداً." 
+            },
+            { 
+              titleAr: "بيانات إقليمية", 
+              titleEn: "Regional Data",
+              desc: "إقامة البيانات في منطقة الشرق الأوسط وشمال أفريقيا تضمن الامتثال لأنظمة حماية البيانات في الإمارات والسعودية." 
+            },
           ].map((item, i) => (
-            <div key={i} className="border-l-2 border-primary/30 pl-4">
-              <h4 className="text-base font-semibold text-foreground mb-2">{item.title}</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+            <div key={i} className="border-r-2 border-primary/30 pr-4 py-1">
+              <h4 className="text-base font-bold text-foreground mb-1 font-arabic">{item.titleAr}</h4>
+              <p className="text-xs text-primary/60 uppercase tracking-widest mb-3">{item.titleEn}</p>
+              <p className="text-sm text-muted-foreground leading-loose arabic-text">{item.desc}</p>
             </div>
           ))}
         </div>

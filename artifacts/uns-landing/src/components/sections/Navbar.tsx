@@ -28,11 +28,17 @@ export function Navbar() {
         scrolled ? "glass-panel py-3 border-white/5" : "bg-transparent py-5"
       )}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between" dir="rtl">
+        {/* Logo — Arabic-first */}
         <div className="flex items-center gap-3">
-          <span className="text-xl font-bold tracking-widest uppercase">UNS</span>
-          <span className="w-px h-4 bg-white/20"></span>
-          <span className="text-2xl arabic-calligraphy text-gradient-gold pb-1">أُنس</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
+            <span className="font-arabic font-bold text-background text-lg leading-none">أ</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl arabic-calligraphy text-gradient-gold pb-1">أُنس</span>
+            <span className="w-px h-4 bg-white/20"></span>
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">UNS</span>
+          </div>
         </div>
         
         <div className="flex items-center gap-4">
@@ -43,15 +49,15 @@ export function Navbar() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
               >
-                <Button onClick={scrollToWaitlist} size="sm" className="hidden sm:flex">
-                  Join Waitlist
+                <Button onClick={scrollToWaitlist} size="sm" className="hidden sm:flex font-arabic">
+                  انضم للقائمة
                 </Button>
               </motion.div>
             )}
           </AnimatePresence>
           {!scrolled && (
-             <Button variant="ghost" onClick={scrollToWaitlist} className="text-muted-foreground hover:text-primary">
-               Join Waitlist
+             <Button variant="ghost" onClick={scrollToWaitlist} className="text-muted-foreground hover:text-primary font-arabic">
+               احجز مكانك
              </Button>
           )}
         </div>

@@ -6,43 +6,43 @@ const features = [
     icon: Mic2,
     titleAr: "يفهم لغتك",
     titleEn: "Speaks Your Dialect",
-    desc: "Whether Gulf, Levant, Egyptian, or Maghrebi. The AI understands the cultural nuance behind your specific words."
+    desc: "سواء كنت خليجيًا أو شاميًا أو مصريًا أو مغاربيًا — أُنس يفهم التفاصيل الثقافية الخاصة بك وراء كل كلمة."
   },
   {
     icon: BrainCircuit,
     titleAr: "يتذكر قصتك",
     titleEn: "Remembers Your Story",
-    desc: "A proprietary emotional memory engine means you never have to start from scratch. Your companion knows what happened yesterday."
+    desc: "محرك ذاكرة عاطفية خاص يعني أنك لن تبدأ من جديد أبدًا. رفيقك يعرف ما حدث بالأمس."
   },
   {
     icon: ShieldCheck,
     titleAr: "يحمي سريتك",
     titleEn: "Privacy Vault",
-    desc: "Zero-knowledge architecture. Your journal entries and emotional data are encrypted. We cannot read them even if we tried."
+    desc: "بنية معرفة صفرية. يومياتك وبياناتك العاطفية مشفّرة بالكامل — حتى نحن لا نستطيع قراءتها."
   },
   {
     icon: Heart,
     titleAr: "يشعر بك",
     titleEn: "Emotionally Calibrated",
-    desc: "Never sounds like a clinical therapist. Always responds with the warmth, dignity, and care of a true friend."
+    desc: "لا يبدو أبدًا كمعالج نفسي بارد. يرد دائمًا بدفء وكرامة ورعاية صديق حقيقي يفهمك."
   },
   {
     icon: Moon,
     titleAr: "رمضان معك",
     titleEn: "Cultural Integration",
-    desc: "Programs built specifically for moments like Ramadan, acknowledging the spiritual dimension of mental wellness."
+    desc: "برامج مبنية خصيصًا لمواسم مثل رمضان — تعترف بالبُعد الروحي لصحتك النفسية."
   },
   {
     icon: PhoneCall,
     titleAr: "آمن تماماً",
     titleEn: "Crisis Support",
-    desc: "Real-time safety classifiers detect distress and seamlessly connect you to local MENA crisis resources when needed."
+    desc: "مصنفات أمان آنية ترصد الضائقة وتوصلك بموارد دعم الأزمات المحلية في منطقة الشرق الأوسط وشمال أفريقيا عند الحاجة."
   }
 ];
 
 export function Features() {
   return (
-    <section className="py-32 bg-[#0B0D14] border-y border-white/5 relative">
+    <section className="py-32 bg-[#0B0D14] border-y border-white/5 relative" dir="rtl">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="text-center mb-20">
@@ -50,17 +50,17 @@ export function Features() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-bold tracking-widest uppercase mb-4 block"
+            className="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
           >
-            The Difference
+            The Difference — ما يميزنا
           </motion.span>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold text-foreground"
+            className="text-4xl md:text-5xl font-bold arabic-text text-foreground"
           >
-            Built from the inside out.
+            مبني من الداخل للخارج
           </motion.h2>
         </div>
 
@@ -78,8 +78,8 @@ export function Features() {
                 <f.icon className="w-6 h-6" />
               </div>
               <h3 className="arabic-text text-2xl font-bold text-foreground mb-1">{f.titleAr}</h3>
-              <h4 className="text-sm font-semibold text-primary/80 uppercase tracking-wider mb-4">{f.titleEn}</h4>
-              <p className="text-muted-foreground leading-relaxed text-sm">
+              <h4 className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-4">{f.titleEn}</h4>
+              <p className="text-muted-foreground leading-loose text-sm arabic-text">
                 {f.desc}
               </p>
             </motion.div>

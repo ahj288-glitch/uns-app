@@ -32,12 +32,12 @@ export default function Dashboard() {
   if (!overview) return null;
 
   const stats = [
-    { label: "Total Users", value: overview.totalUsers.toLocaleString(), icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "Active Today", value: overview.activeToday.toLocaleString(), icon: Activity, color: "text-green-500", bg: "bg-green-500/10" },
-    { label: "Waitlist Size", value: overview.waitlistCount.toLocaleString(), icon: Clock, color: "text-primary", bg: "bg-primary/10" },
-    { label: "Premium Users", value: overview.premiumUsers.toLocaleString(), icon: Award, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "Avg Session", value: `${overview.avgSessionLength}m`, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
-    { label: "D7 Retention", value: `${(overview.d7Retention * 100).toFixed(1)}%`, icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
+    { label: "إجمالي المستخدمين", value: overview.totalUsers.toLocaleString("ar-SA"), icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { label: "نشطون اليوم", value: overview.activeToday.toLocaleString("ar-SA"), icon: Activity, color: "text-green-500", bg: "bg-green-500/10" },
+    { label: "قائمة الانتظار", value: overview.waitlistCount.toLocaleString("ar-SA"), icon: Clock, color: "text-primary", bg: "bg-primary/10" },
+    { label: "المستخدمون المدفوعون", value: overview.premiumUsers.toLocaleString("ar-SA"), icon: Award, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { label: "متوسط الجلسة", value: `${overview.avgSessionLength}د`, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
+    { label: "الاحتفاظ ٧ أيام", value: `${(overview.d7Retention * 100).toFixed(1)}%`, icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
   ];
 
   const chartData = overview.recentGrowth.map(d => ({
@@ -64,8 +64,8 @@ export default function Dashboard() {
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-destructive font-bold text-lg">Safety Alert</h3>
-            <p className="text-destructive/80 mt-1">There have been {overview.crisisEventsThisWeek} crisis events detected this week. Please review the safety monitor.</p>
+            <h3 className="text-destructive font-bold text-lg font-arabic">تنبيه السلامة</h3>
+            <p className="text-destructive/80 mt-1 font-arabic">تم رصد {overview.crisisEventsThisWeek} أحداث أزمة هذا الأسبوع. يرجى مراجعة مراقب السلامة.</p>
           </div>
         </motion.div>
       )}
@@ -102,8 +102,8 @@ export default function Dashboard() {
         >
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold">Growth Momentum</h3>
-              <p className="text-muted-foreground text-sm mt-1">Daily active users vs sessions</p>
+              <h3 className="text-xl font-bold font-arabic">نمو المستخدمين</h3>
+              <p className="text-muted-foreground text-sm mt-1 font-arabic">المستخدمون النشطون يومياً مقابل الجلسات</p>
             </div>
             <div className="text-right">
               <div className="text-sm font-medium text-primary">NPS Score: <span className="text-lg font-bold">{overview.npsScore}</span></div>
@@ -133,8 +133,8 @@ export default function Dashboard() {
           className="bg-card border border-border rounded-2xl p-6 shadow-lg shadow-black/5 flex flex-col"
         >
           <div className="mb-2">
-            <h3 className="text-xl font-bold">Mood Distribution</h3>
-            <p className="text-muted-foreground text-sm mt-1 font-arabic">توزيع الحالة المزاجية</p>
+            <h3 className="text-xl font-bold font-arabic">توزيع الحالات المزاجية</h3>
+            <p className="text-muted-foreground text-sm mt-1 text-xs">Mood Distribution</p>
           </div>
           <div className="flex-1 min-h-[250px] w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
