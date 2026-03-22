@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For premium, smooth scroll animations and micro-interactions"
+  "react-hook-form": "For robust waitlist form state management"
+  "@hookform/resolvers": "For Zod validation integration with the form"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to merge tailwind classes without style conflicts"
+
+images:
+  - path: "artifacts/uns-landing/public/images/hero-bg.png"
+    description: "Abstract cinematic background in deep navy blue and charcoal with very soft, out-of-focus glowing warm gold orbs and elegant light leaks, premium, minimalist, emotional"
+    aspect_ratio: "16:9"
+  - path: "artifacts/uns-landing/public/images/arabic-pattern.png"
+    description: "Very subtle, premium dark geometric Arabic pattern overlay on a deep navy background, extremely low opacity, elegant, luxury aesthetic"
+    aspect_ratio: "16:9"
+
+notes:
+  - Waitlist form submits to /api/waitlist using generated hooks
+  - Using framer-motion for all scroll reveals
+  - Assuming English base with RTL dedicated classes for Arabic text segments

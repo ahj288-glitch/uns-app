@@ -1,0 +1,19 @@
+packages:
+  "recharts": "For dashboard and analytics data visualization"
+  "framer-motion": "For page transitions and micro-interactions"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For Zod form validation"
+  "clsx": "For class name merging"
+  "tailwind-merge": "For tailwind class merging"
+  "lucide-react": "For UI icons"
+  "date-fns": "For date formatting"
+
+images:
+  - path: "artifacts/uns-admin/public/images/auth-bg.png"
+    description: "Abstract dark cinematic background with subtle gold dust and deep charcoal gradients"
+    aspect_ratio: "16:9"
+
+notes:
+  - Base URL configuration is handled in App.tsx via wouter base prop
+  - Backend API requests use absolute paths (/api/*) and the proxy will route them
+  - Defaulting to a dark mode theme as requested for the premium aesthetic

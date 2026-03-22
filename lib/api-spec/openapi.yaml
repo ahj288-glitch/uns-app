@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 0.2.0
+  description: UNS | أُنس — API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: waitlist
+    description: Waitlist operations
+  - name: companion
+    description: AI companion operations
+  - name: moods
+    description: Mood tracking operations
+  - name: insights
+    description: Emotional insights
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,293 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /waitlist:
+    post:
+      operationId: joinWaitlist
+      tags: [waitlist]
+      summary: Join the waitlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WaitlistJoinRequest"
+      responses:
+        "201":
+          description: Successfully joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaitlistEntry"
+        "409":
+          description: Already on waitlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /waitlist/count:
+    get:
+      operationId: getWaitlistCount
+      tags: [waitlist]
+      summary: Get waitlist count (social proof)
+      responses:
+        "200":
+          description: Count returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaitlistCount"
+
+  /companion/session:
+    post:
+      operationId: createCompanionSession
+      tags: [companion]
+      summary: Create anonymous companion session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanionSession"
+
+  /companion/chat:
+    post:
+      operationId: sendCompanionMessage
+      tags: [companion]
+      summary: Send message to companion and receive response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanionChatRequest"
+      responses:
+        "200":
+          description: Companion response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanionChatResponse"
+
+  /companion/history:
+    get:
+      operationId: getCompanionHistory
+      tags: [companion]
+      summary: Get recent conversation history
+      parameters:
+        - in: query
+          name: sessionId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: History returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationHistoryResponse"
+
+  /moods/checkin:
+    post:
+      operationId: recordMoodCheckin
+      tags: [moods]
+      summary: Record a daily mood check-in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoodCheckinRequest"
+      responses:
+        "201":
+          description: Mood recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoodEntry"
+
+  /moods/history:
+    get:
+      operationId: getMoodHistory
+      tags: [moods]
+      summary: Get mood history for a session
+      parameters:
+        - in: query
+          name: sessionId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: days
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Mood history returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoodHistoryResponse"
+
+  /insights:
+    get:
+      operationId: getInsights
+      tags: [insights]
+      summary: Get emotional insights for a session
+      parameters:
+        - in: query
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Insights returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InsightsResponse"
+
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      summary: Get admin dashboard overview stats
+      responses:
+        "200":
+          description: Overview returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+
+  /admin/programs:
+    get:
+      operationId: getAdminPrograms
+      tags: [admin]
+      summary: List all wellness programs
+      responses:
+        "200":
+          description: Programs returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgramListResponse"
+    post:
+      operationId: createAdminProgram
+      tags: [admin]
+      summary: Create a wellness program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramRequest"
+      responses:
+        "201":
+          description: Program created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Program"
+
+  /admin/programs/{id}:
+    put:
+      operationId: updateAdminProgram
+      tags: [admin]
+      summary: Update a wellness program
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Program"
+    delete:
+      operationId: deleteAdminProgram
+      tags: [admin]
+      summary: Delete a wellness program
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /admin/safety:
+    get:
+      operationId: getAdminSafety
+      tags: [admin]
+      summary: Get aggregated safety events
+      responses:
+        "200":
+          description: Safety data returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafetyOverview"
+
+  /admin/ai-config:
+    get:
+      operationId: getAiConfig
+      tags: [admin]
+      summary: Get AI companion configuration
+      responses:
+        "200":
+          description: Config returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiConfig"
+    put:
+      operationId: updateAiConfig
+      tags: [admin]
+      summary: Update AI companion configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiConfig"
+      responses:
+        "200":
+          description: Config updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiConfig"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +326,420 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error, message]
+
+    WaitlistJoinRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        dialect:
+          type: string
+          enum: [gulf, levant, egyptian, maghrebi, msa]
+        source:
+          type: string
+      required: [email]
+
+    WaitlistEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        dialect:
+          type: string
+        position:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, email, position, createdAt]
+
+    WaitlistCount:
+      type: object
+      properties:
+        count:
+          type: integer
+        message:
+          type: string
+      required: [count, message]
+
+    CreateSessionRequest:
+      type: object
+      properties:
+        dialect:
+          type: string
+          enum: [gulf, levant, egyptian, maghrebi, msa]
+          default: gulf
+        emotionalProfile:
+          type: object
+          additionalProperties: true
+      required: []
+
+    CompanionSession:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        dialect:
+          type: string
+        greeting:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [sessionId, dialect, greeting, createdAt]
+
+    CompanionChatRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        message:
+          type: string
+        messageType:
+          type: string
+          enum: [text, voice]
+          default: text
+      required: [sessionId, message]
+
+    CompanionChatResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        emotion:
+          type: string
+        crisisDetected:
+          type: boolean
+        crisisResources:
+          type: array
+          items:
+            $ref: "#/components/schemas/CrisisResource"
+        messageId:
+          type: string
+      required: [response, crisisDetected, messageId]
+
+    CrisisResource:
+      type: object
+      properties:
+        country:
+          type: string
+        name:
+          type: string
+        number:
+          type: string
+      required: [country, name, number]
+
+    ConversationHistoryResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+        total:
+          type: integer
+      required: [messages, total]
+
+    ConversationMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, companion]
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        emotion:
+          type: string
+      required: [id, role, content, createdAt]
+
+    MoodCheckinRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        moodWord:
+          type: string
+        moodWordArabic:
+          type: string
+        intensity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        notes:
+          type: string
+      required: [sessionId, moodWord, intensity]
+
+    MoodEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        moodWord:
+          type: string
+        moodWordArabic:
+          type: string
+        intensity:
+          type: integer
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, sessionId, moodWord, intensity, createdAt]
+
+    MoodHistoryResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodEntry"
+        summary:
+          type: object
+          properties:
+            dominantMood:
+              type: string
+            averageIntensity:
+              type: number
+            streakDays:
+              type: integer
+          required: [dominantMood, averageIntensity, streakDays]
+      required: [entries, summary]
+
+    InsightsResponse:
+      type: object
+      properties:
+        weeklyPattern:
+          type: string
+        topMoods:
+          type: array
+          items:
+            type: object
+            properties:
+              mood:
+                type: string
+              moodArabic:
+                type: string
+              count:
+                type: integer
+            required: [mood, count]
+        message:
+          type: string
+        streakDays:
+          type: integer
+      required: [weeklyPattern, topMoods, message, streakDays]
+
+    AdminOverview:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        activeToday:
+          type: integer
+        waitlistCount:
+          type: integer
+        premiumUsers:
+          type: integer
+        avgSessionLength:
+          type: number
+        d7Retention:
+          type: number
+        npsScore:
+          type: number
+        moodCheckins:
+          type: integer
+        crisisEventsThisWeek:
+          type: integer
+        topDialect:
+          type: string
+        recentGrowth:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrowthDataPoint"
+        moodDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodDistributionPoint"
+      required: [totalUsers, activeToday, waitlistCount, premiumUsers, avgSessionLength, d7Retention, npsScore, moodCheckins, crisisEventsThisWeek, topDialect, recentGrowth, moodDistribution]
+
+    GrowthDataPoint:
+      type: object
+      properties:
+        date:
+          type: string
+        users:
+          type: integer
+        sessions:
+          type: integer
+      required: [date, users, sessions]
+
+    MoodDistributionPoint:
+      type: object
+      properties:
+        mood:
+          type: string
+        moodArabic:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+      required: [mood, count, percentage]
+
+    Program:
+      type: object
+      properties:
+        id:
+          type: string
+        titleAr:
+          type: string
+        titleEn:
+          type: string
+        descriptionAr:
+          type: string
+        descriptionEn:
+          type: string
+        durationDays:
+          type: integer
+        category:
+          type: string
+          enum: [anxiety, grief, sleep, ramadan, general, spiritual]
+        tier:
+          type: string
+          enum: [free, premium]
+        active:
+          type: boolean
+        enrolledCount:
+          type: integer
+        completionRate:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, titleAr, titleEn, durationDays, category, tier, active, enrolledCount, completionRate, createdAt]
+
+    CreateProgramRequest:
+      type: object
+      properties:
+        titleAr:
+          type: string
+        titleEn:
+          type: string
+        descriptionAr:
+          type: string
+        descriptionEn:
+          type: string
+        durationDays:
+          type: integer
+        category:
+          type: string
+          enum: [anxiety, grief, sleep, ramadan, general, spiritual]
+        tier:
+          type: string
+          enum: [free, premium]
+        active:
+          type: boolean
+      required: [titleAr, titleEn, durationDays, category, tier]
+
+    ProgramListResponse:
+      type: object
+      properties:
+        programs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Program"
+        total:
+          type: integer
+      required: [programs, total]
+
+    SafetyOverview:
+      type: object
+      properties:
+        eventsThisWeek:
+          type: integer
+        eventsThisMonth:
+          type: integer
+        crisisResponseRate:
+          type: number
+        regionBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              region:
+                type: string
+              count:
+                type: integer
+            required: [region, count]
+        recentEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafetyEvent"
+      required: [eventsThisWeek, eventsThisMonth, crisisResponseRate, regionBreakdown, recentEvents]
+
+    SafetyEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high]
+        region:
+          type: string
+        resolvedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, type, severity, region, createdAt]
+
+    AiConfig:
+      type: object
+      properties:
+        defaultDialect:
+          type: string
+          enum: [gulf, levant, egyptian, maghrebi, msa]
+        toneIntensity:
+          type: string
+          enum: [formal, semi-formal, casual]
+        spiritualLayerEnabled:
+          type: boolean
+        crisisThreshold:
+          type: string
+          enum: [conservative, standard, sensitive]
+        familyModeEnabled:
+          type: boolean
+        modelTier:
+          type: string
+          enum: [gpt-4o, gpt-4o-mini]
+        systemPromptSuffix:
+          type: string
+      required: [defaultDialect, toneIntensity, spiritualLayerEnabled, crisisThreshold, familyModeEnabled, modelTier]

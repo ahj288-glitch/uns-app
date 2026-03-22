@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/uns-admin/"
+title = "UNS Admin Panel"
+version = "1.0.0"
+id = "artifacts/uns-admin"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/uns-admin/" ]
+localPort = 25927
+
+[services.development]
+run = "pnpm --filter @workspace/uns-admin run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/uns-admin", "run", "build" ]
+publicDir = "artifacts/uns-admin/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25927"
+BASE_PATH = "/uns-admin/"

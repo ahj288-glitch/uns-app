@@ -1,0 +1,61 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+
+export function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToWaitlist = () => {
+    document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <motion.nav 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
+        scrolled ? "glass-panel py-3 border-white/5" : "bg-transparent py-5"
+      )}
+    >
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-xl font-bold tracking-widest uppercase">UNS</span>
+          <span className="w-px h-4 bg-white/20"></span>
+          <span className="text-2xl arabic-calligraphy text-gradient-gold pb-1">أُنس</span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <AnimatePresence>
+            {scrolled && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <Button onClick={scrollToWaitlist} size="sm" className="hidden sm:flex">
+                  Join Waitlist
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!scrolled && (
+             <Button variant="ghost" onClick={scrollToWaitlist} className="text-muted-foreground hover:text-primary">
+               Join Waitlist
+             </Button>
+          )}
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
