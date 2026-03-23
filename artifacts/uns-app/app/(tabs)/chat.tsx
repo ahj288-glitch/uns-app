@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -15,6 +15,7 @@ import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import { router } from "expo-router";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import * as Haptics from "expo-haptics";
@@ -24,7 +25,6 @@ interface Message {
   role: "user" | "companion";
   content: string;
   createdAt: Date;
-  emotion?: string;
   crisisDetected?: boolean;
 }
 
@@ -35,6 +35,14 @@ const CRISIS_RESOURCES = [
 ];
 
 const QUICK_REPLIES = ["أحتاج هدوء", "تفريغ", "تعزيز الطاقة"];
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
 
 function TimestampPill({ date }: { date: Date }) {
   const label = date.toLocaleDateString("ar-SA", {
@@ -99,7 +107,12 @@ export default function ChatScreen() {
     setShowWelcome(false);
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: msg, createdAt: new Date() };
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: msg,
+      createdAt: new Date(),
+    };
     setMessages(prev => [userMsg, ...prev]);
     setIsSending(true);
 
@@ -115,13 +128,20 @@ export default function ChatScreen() {
         role: "companion",
         content: data.response,
         createdAt: new Date(),
-        emotion: data.emotion,
         crisisDetected: data.crisisDetected,
       };
       setMessages(prev => [companionMsg, ...prev]);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
-      setMessages(prev => [{ id: (Date.now() + 1).toString(), role: "companion", content: "عذراً، حدث خطأ. حاول مرة أخرى.", createdAt: new Date() }, ...prev]);
+      setMessages(prev => [
+        {
+          id: (Date.now() + 1).toString(),
+          role: "companion",
+          content: "عذراً، حدث خطأ. حاول مرة أخرى.",
+          createdAt: new Date(),
+        },
+        ...prev,
+      ]);
     } finally {
       setIsSending(false);
     }
@@ -132,9 +152,11 @@ export default function ChatScreen() {
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
-        <View style={styles.headerOnlineDot} />
+        <Pressable onPress={() => router.push("/(tabs)/community")} style={styles.headerBtn}>
+          <Feather name="users" size={18} color={Colors.muted} />
+        </Pressable>
         <Text style={styles.headerTitle}>أُنْس</Text>
-        <Feather name="menu" size={20} color={Colors.muted} />
+        <View style={styles.headerOnlineDot} />
       </View>
 
       <KeyboardAvoidingView style={styles.flex} behavior="padding" keyboardVerticalOffset={0}>
@@ -146,7 +168,9 @@ export default function ChatScreen() {
                 <Text style={styles.avatarText}>أ</Text>
               </View>
               <View style={styles.welcomeBubble}>
-                <Text style={styles.welcomeText}>{greeting || "أهلاً بك في مساحتك الهادئة."}</Text>
+                <Text style={styles.welcomeText}>
+                  {greeting || "أهلاً بك في مساحتك الهادئة."}
+                </Text>
               </View>
             </View>
           </Animated.View>
@@ -154,13 +178,23 @@ export default function ChatScreen() {
           <FlatList
             data={messages}
             keyExtractor={m => m.id}
-            renderItem={({ item }) => <MessageBubble message={item} />}
+            renderItem={({ item, index }) => {
+              const olderMsg = messages[index + 1];
+              const showSep =
+                olderMsg && !isSameDay(new Date(item.createdAt), new Date(olderMsg.createdAt));
+              return (
+                <>
+                  <MessageBubble message={item} />
+                  {showSep && <TimestampPill date={new Date(olderMsg.createdAt)} />}
+                </>
+              );
+            }}
             inverted
             contentContainerStyle={[styles.messageList, { paddingBottom: 16 }]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
-            ListFooterComponent={
+            ListHeaderComponent={
               isSending ? (
                 <View style={styles.typingRow}>
                   <View style={styles.avatarDot}>
@@ -170,6 +204,11 @@ export default function ChatScreen() {
                     <ActivityIndicator size="small" color={Colors.accent} />
                   </View>
                 </View>
+              ) : null
+            }
+            ListFooterComponent={
+              messages.length > 0 ? (
+                <TimestampPill date={new Date(messages[messages.length - 1].createdAt)} />
               ) : null
             }
           />
@@ -186,7 +225,11 @@ export default function ChatScreen() {
         )}
 
         <View style={[styles.inputContainer, { paddingBottom: Math.max(webBottom + 72, 80) }]}>
-          <View style={styles.inputBar}>
+          <BlurView
+            intensity={Platform.OS === "ios" ? 40 : 0}
+            tint="dark"
+            style={styles.inputBar}
+          >
             <Pressable style={styles.attachBtn}>
               <Feather name="plus" size={20} color={Colors.muted} />
             </Pressable>
@@ -200,7 +243,7 @@ export default function ChatScreen() {
               maxLength={500}
               textAlign="right"
             />
-          </View>
+          </BlurView>
           <Pressable
             style={{ borderRadius: 21, overflow: "hidden", opacity: canSend ? 1 : 0.45 }}
             onPress={() => sendMessage()}
@@ -231,6 +274,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
   },
+  headerBtn: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerOnlineDot: {
     width: 8,
     height: 8,
@@ -251,7 +300,7 @@ const styles = StyleSheet.create({
   },
   timestampPillWrap: {
     alignItems: "center",
-    marginVertical: 8,
+    marginVertical: 10,
   },
   timestampPill: {
     backgroundColor: Colors.surfaceContainer,
@@ -400,11 +449,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: Platform.OS === "ios" ? "rgba(26,46,38,0.85)" : Colors.surfaceContainerHigh,
     borderRadius: 22,
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 6,
+    overflow: "hidden",
   },
   attachBtn: {
     width: 32,

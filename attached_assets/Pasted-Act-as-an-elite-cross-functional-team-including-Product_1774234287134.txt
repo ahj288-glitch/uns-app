@@ -1,0 +1,96 @@
+Act as an elite cross-functional team including:
+
+* Product Design Director
+* UX/UI Designer (Emotional & Adaptive Systems)
+* Motion Designer (Living UI)
+* Behavioral Psychologist
+* AI Personalization Engineer
+* Data Scientist
+* Growth & Viral Product Strategist
+* Mobile App Designer (Top-tier apps)
+* Copywriting Specialist (deep emotional tone)
+* Cybersecurity & Privacy Expert
+
+I will share with you a set of redesigned screens that represent the NEW approved visual identity and experience direction of the app.
+
+These screens are NOT inspiration.
+They are the OFFICIAL benchmark and must be treated as the governing design system and product DNA.
+
+Your mission is to:
+
+1. Extract the full Design DNA
+2. Build a complete Design System
+3. Design an Emotional Viral Sharing System
+4. Create a Personalization Engine
+5. Define interaction patterns (including breathing & adaptive UI)
+6. Design shareable assets (cards)
+7. Build a viral growth loop
+8. Ensure privacy, safety, and trust
+9. Apply everything consistently across the product
+
+---
+
+# 1. DESIGN DNA & SYSTEM
+
+Deeply analyze the provided screens and extract:
+
+* Visual identity (colors, gradients, mood)
+* Typography hierarchy (especially Arabic support)
+* Spacing & layout rhythm
+* Component system (cards, buttons, inputs)
+* Motion & animation direction
+* Emotional tone of the UI
+* Trust-building elements
+* Data storytelling approach
+
+Then define:
+
+* Design principles
+* UI rules
+* Do’s & Don’ts
+* Consistency system
+* Accessibility considerations
+* Emotional UX standards
+
+---
+
+# 2. LIVING UI & ADAPTIVE INTERACTION
+
+Design a next-generation “Living UI” system that:
+
+* Feels alive (subtle motion, breathing elements)
+* Adapts to user emotional state
+* Changes based on:
+
+  * mood
+  * time of day
+  * behavior patterns
+  * engagement level
+
+Include:
+
+* breathing animations (expand/contract)
+* calming motion patterns
+* dynamic gradients
+* smooth transitions between states
+* haptic feedback suggestions
+
+---
+
+# 3. EMOTIONAL PERSONALIZATION ENGINE
+
+Design a system where each user gets a unique experience:
+
+Define:
+
+* How user emotional profiles are built
+* What inputs are used:
+
+  * mood
+  * usage behavior
+  * session types (breathing, reflection, etc.)
+  * trends over time
+
+Design logic such as:
+
+* stressed → calming UI + soft messaging

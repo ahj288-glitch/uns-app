@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
@@ -158,6 +158,12 @@ export default function ProfileScreen() {
                 thumbColor={Colors.onSurface}
               />
             }
+          />
+          <SettingRow
+            icon="book-open"
+            title="برامج الرعاية"
+            subtitle="استكشف جلسات وبرامج التطوير"
+            onPress={() => router.push("/(tabs)/programs")}
           />
           <SettingRow
             icon="help-circle"

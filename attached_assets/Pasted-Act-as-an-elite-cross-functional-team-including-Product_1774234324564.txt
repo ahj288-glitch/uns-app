@@ -1,0 +1,311 @@
+Act as an elite cross-functional team including:
+
+* Product Design Director
+* UX/UI Designer (Emotional & Adaptive Systems)
+* Motion Designer (Living UI)
+* Behavioral Psychologist
+* AI Personalization Engineer
+* Data Scientist
+* Growth & Viral Product Strategist
+* Mobile App Designer (Top-tier apps)
+* Copywriting Specialist (deep emotional tone)
+* Cybersecurity & Privacy Expert
+
+I will share with you a set of redesigned screens that represent the NEW approved visual identity and experience direction of the app.
+
+These screens are NOT inspiration.
+They are the OFFICIAL benchmark and must be treated as the governing design system and product DNA.
+
+Your mission is to:
+
+1. Extract the full Design DNA
+2. Build a complete Design System
+3. Design an Emotional Viral Sharing System
+4. Create a Personalization Engine
+5. Define interaction patterns (including breathing & adaptive UI)
+6. Design shareable assets (cards)
+7. Build a viral growth loop
+8. Ensure privacy, safety, and trust
+9. Apply everything consistently across the product
+
+---
+
+# 1. DESIGN DNA & SYSTEM
+
+Deeply analyze the provided screens and extract:
+
+* Visual identity (colors, gradients, mood)
+* Typography hierarchy (especially Arabic support)
+* Spacing & layout rhythm
+* Component system (cards, buttons, inputs)
+* Motion & animation direction
+* Emotional tone of the UI
+* Trust-building elements
+* Data storytelling approach
+
+Then define:
+
+* Design principles
+* UI rules
+* Do’s & Don’ts
+* Consistency system
+* Accessibility considerations
+* Emotional UX standards
+
+---
+
+# 2. LIVING UI & ADAPTIVE INTERACTION
+
+Design a next-generation “Living UI” system that:
+
+* Feels alive (subtle motion, breathing elements)
+* Adapts to user emotional state
+* Changes based on:
+
+  * mood
+  * time of day
+  * behavior patterns
+  * engagement level
+
+Include:
+
+* breathing animations (expand/contract)
+* calming motion patterns
+* dynamic gradients
+* smooth transitions between states
+* haptic feedback suggestions
+
+---
+
+# 3. EMOTIONAL PERSONALIZATION ENGINE
+
+Design a system where each user gets a unique experience:
+
+Define:
+
+* How user emotional profiles are built
+* What inputs are used:
+
+  * mood
+  * usage behavior
+  * session types (breathing, reflection, etc.)
+  * trends over time
+
+Design logic such as:
+
+* stressed → calming UI + soft messaging
+* stable → reflective insights
+* active → motivating tone
+
+Output should include:
+
+* decision engine logic (rules + AI)
+* personalization layers (UI + content + tone)
+* privacy-safe personalization approach
+
+---
+
+# 4. EMOTIONAL FINGERPRINT SYSTEM (CORE VIRAL FEATURE)
+
+Design a system where each user has a unique shareable “emotional fingerprint”:
+
+Examples:
+
+* daily emotional aura
+* insight of the day
+* personal reflection snapshot
+* progress identity (e.g., 7 days of calm)
+
+Requirements:
+
+* visually minimal & premium
+* meaningful but not exposing sensitive data
+* instantly shareable
+* emotionally resonant
+
+---
+
+# 5. SHAREABLE CARD DESIGN SYSTEM
+
+Create a full system of shareable cards:
+
+Types:
+
+1. Aura Card (breathing sphere + color state)
+2. Insight Card (deep quote)
+3. Daily Summary Card
+4. Progress / Streak Card
+
+For each:
+
+* define layout
+* typography
+* color system
+* animation behavior (if applicable)
+* branding placement (subtle “via app”)
+
+Design must:
+
+* look premium
+* be social-media ready (Instagram, Snapchat, WhatsApp)
+* be instantly eye-catching but calm
+
+---
+
+# 6. COPYWRITING SYSTEM (CRITICAL)
+
+Define a complete tone system:
+
+Tone must be:
+
+* deep
+* emotionally intelligent
+* slightly mysterious
+* calm and reassuring
+* non-cheesy
+
+Create a content generation framework for:
+
+* daily insights
+* calming phrases
+* motivational lines
+* reflective statements
+
+Examples tone (do not repeat exactly):
+
+* “Today, I chose calm over chaos.”
+* “Some days, surviving is enough.”
+
+---
+
+# 7. LOGIC ENGINE (AUTO GENERATION)
+
+Design a system that generates the user’s shareable output automatically:
+
+Define:
+
+INPUTS:
+
+* mood
+* behavior
+* time
+* sessions completed
+* emotional trends
+
+PROCESS:
+
+* classify user state (e.g., overwhelmed, calm, unstable)
+* map to tone + UI style
+* select appropriate content
+
+OUTPUT:
+
+* aura color
+* insight text
+* card type
+* share format
+
+Provide:
+
+* structured logic
+* JSON examples
+* rule-based + AI hybrid approach
+
+---
+
+# 8. VIRAL LOOP SYSTEM
+
+Design a full organic growth engine:
+
+Flow:
+
+1. user experiences insight
+2. app suggests sharing (non-intrusive)
+3. user shares emotional fingerprint
+4. viewer feels curiosity
+5. viewer clicks link
+6. landing page reflects same emotional tone
+7. onboarding connects emotionally
+8. new user generates own fingerprint
+9. loop repeats
+
+Define:
+
+* trigger moments (when to suggest sharing)
+* psychological drivers (identity, curiosity, relatability)
+* non-spammy growth strategy
+
+---
+
+# 9. ADVANCED VIRAL FEATURES
+
+Propose additional features such as:
+
+* weekly emotional report (shareable)
+* streak identity (“7 days of calm”)
+* anonymous community highlights
+* emotional trends (aggregated)
+* compare journeys (optional & safe)
+
+---
+
+# 10. PRIVACY & TRUST
+
+Define strict rules:
+
+* what can be shared
+* what must never be shared
+* user control levels
+* anonymization methods
+
+Ensure:
+
+* no sensitive exposure
+* user feels safe sharing
+
+---
+
+# 11. UX MICRO-INTERACTIONS
+
+Define:
+
+* button feedback
+* loading states (calm, not stressful)
+* confirmation UX
+* error handling (gentle tone)
+* transitions between emotional states
+
+---
+
+# 12. OUTPUT REQUIRED
+
+Provide a structured output:
+
+A) Design DNA
+B) Design System
+C) Living UI & Interaction System
+D) Personalization Engine
+E) Emotional Fingerprint System
+F) Shareable Card Designs (detailed)
+G) Copywriting Framework
+H) Logic Engine (with examples)
+I) Viral Loop Architecture
+J) Privacy Model
+K) UX Micro-interactions
+L) Final Product Consistency Strategy
+
+---
+
+# IMPORTANT CONSTRAINTS
+
+* Do NOT create generic app design
+* Do NOT break consistency
+* Do NOT overcomplicate UI
+* Do NOT use forced growth tactics
+* Maintain emotional depth + premium simplicity
+* Ensure every element feels intentional
+
+---
+
+The final result should feel like:
+A premium, emotionally intelligent, adaptive system that behaves differently per user, and spreads organically because users want to share their experience—not because they are asked to.
