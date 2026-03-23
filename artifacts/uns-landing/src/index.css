@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -21,61 +21,69 @@
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
 
-  --font-sans: 'Inter', sans-serif;
-  --font-arabic: 'Amiri', serif;
-  --font-calligraphy: 'Aref Ruqaa', serif;
+  --font-sans: 'Be Vietnam Pro', sans-serif;
+  --font-arabic: 'Tajawal', sans-serif;
 
   --animate-fade-in: fade-in 0.5s ease-out;
   --animate-slide-up: slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pulse-slow: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-breathe: breathe 4s ease-in-out infinite;
 }
 
 :root {
-  /* Deep Navy / Charcoal Base */
-  --background: 225 20% 8%;
-  --foreground: 40 20% 92%;
+  /* Midnight Garden — Forest Green Sanctuary */
+  --background: 158 70% 5%;
+  --foreground: 147 40% 93%;
   
-  /* Subtle Dark Borders/Inputs */
-  --border: 225 15% 18%;
-  --input: 225 15% 18%;
+  --border: 156 28% 14%;
+  --input: 156 28% 14%;
   
-  /* Warm Gold */
-  --primary: 43 60% 55%;
-  --primary-foreground: 225 30% 8%;
-  --ring: 43 60% 55%;
+  /* Mint Primary */
+  --primary: 150 42% 62%;
+  --primary-foreground: 158 70% 5%;
+  --ring: 150 42% 62%;
   
-  /* Slightly lighter dark for cards */
-  --card: 228 22% 12%;
-  --card-foreground: 40 20% 92%;
-  --card-border: 225 15% 20%;
+  /* Surface Container */
+  --card: 158 37% 10%;
+  --card-foreground: 147 40% 93%;
+  --card-border: 156 28% 14%;
   
-  /* Terracotta / Amber Accent */
-  --accent: 25 65% 55%;
-  --accent-foreground: 40 20% 92%;
+  /* Secondary Mint Accent */
+  --accent: 149 51% 68%;
+  --accent-foreground: 158 70% 5%;
 
-  /* Muted Text */
-  --muted: 225 18% 14%;
-  --muted-foreground: 225 10% 65%;
+  /* Muted */
+  --muted: 156 28% 14%;
+  --muted-foreground: 145 24% 38%;
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30 selection:text-primary;
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 }
 
 @layer utilities {
+  .text-gradient-mint {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] via-[#a5d0b9] to-[#74C69D];
+  }
+
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#C9A84C] via-[#E8C97A] to-[#C9A84C];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] via-[#a5d0b9] to-[#74C69D];
   }
   
+  .bg-gradient-mint {
+    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332];
+  }
+
   .bg-gradient-gold {
-    @apply bg-gradient-to-r from-[#C9A84C] via-[#E8C97A] to-[#C9A84C];
+    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332];
   }
 
   .glass-panel {
-    @apply bg-card/60 backdrop-blur-xl border border-white/5 shadow-2xl;
+    @apply bg-card/70 backdrop-blur-xl border border-[#74C69D]/10 shadow-2xl;
   }
 
   .arabic-text {
@@ -85,8 +93,13 @@
   }
 
   .arabic-calligraphy {
-    font-family: var(--font-calligraphy);
+    font-family: var(--font-arabic);
     direction: rtl;
+    font-weight: 700;
+  }
+
+  .mint-glow {
+    box-shadow: 0 0 32px rgba(116, 198, 157, 0.18);
   }
 }
 
@@ -105,16 +118,12 @@
   50% { opacity: 0.7; }
 }
 
-/* Custom Scrollbar for a premium feel */
-::-webkit-scrollbar {
-  width: 8px;
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.08); opacity: 1; }
 }
-::-webkit-scrollbar-track {
-  @apply bg-background;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary/50;
-}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #041710; }
+::-webkit-scrollbar-thumb { background: #1B4332; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #74C69D; }

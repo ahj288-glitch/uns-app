@@ -99,7 +99,17 @@ Utility scripts package. Each script is a `.ts` file in `src/` with a correspond
 
 ## UNS | أُنس — Product Architecture
 
-**Brand**: UNS | أُنس — "warmth of companionship." Navy bg (#0B0E18), Gold primary (#C9A84C), Terracotta accent (#D97757). All interfaces are Arabic-first, RTL.
+**Brand**: UNS | أُنس — "warmth of companionship." Midnight Garden palette — surface `#041710`, accent `#74C69D` (mint), primary `#a5d0b9`. All interfaces are Arabic-first, RTL. GOLD IS ABOLISHED.
+
+**Midnight Garden Design System**:
+- Surface: `#041710` (background), `#10231c` (cards), `#1a2e26` (elevated), `#1B4332` (CTA)
+- Accent: `#74C69D` (mint) — buttons, active states, CTA
+- Primary: `#a5d0b9` — text, icons
+- Muted: `#4a7a5e` — secondary text
+- On Surface: `#e8f5ee` — headings
+- No-Line Rule: never use 1px borders; use tonal depth or ghost border `rgba(116,198,157,0.15)`
+- Round Eight Rule: min borderRadius 8px, cards 16–20px, buttons borderRadius 999 (pill)
+- Fonts: `Tajawal_400Regular` / `Tajawal_700Bold` (Arabic), `BeVietnamPro_400Regular` / `BeVietnamPro_500Medium` (Latin)
 
 ### Artifacts
 
@@ -143,17 +153,21 @@ Utility scripts package. Each script is a `.ts` file in `src/` with a correspond
 
 ### Mobile App (`artifacts/uns-app/`)
 
-5-tab layout: **رفيقي** (companion) | **مشاعري** (mood) | **رحلتي** (journey/evolution) | **مجتمع** (community) | **أنا** (profile)
+4-tab layout: **Journey** (رحلة) | **Insights** (رؤى) | **Chat** (أُنس) | **Home** (الرئيسية)
+Hidden tabs (href: null): mood, community, programs, profile (accessible via navigation)
 
 Key screens:
-- `app/onboarding/index.tsx` — 3-step: welcome, dialect selection, intention
-- `app/(tabs)/index.tsx` — AI companion chat
-- `app/(tabs)/mood.tsx` — Mood check-in (8 moods, intensity) + MicroWin modal after save
-- `app/(tabs)/journey.tsx` — Evolution Map: level card (XP bar), streak stats, milestones
+- `app/onboarding/index.tsx` — 3-step: welcome, dialect selection, intention (Midnight Garden)
+- `app/(tabs)/index.tsx` — Home dashboard: breathing orb, greeting, mood chips, featured card, metrics
+- `app/(tabs)/chat.tsx` — AI companion chat (redesigned Midnight Garden)
+- `app/(tabs)/insights.tsx` — Insights: mood bar chart, key insights, emotion pattern
+- `app/(tabs)/journey.tsx` — Journey: 3 stages (إدراك/توازن/طمأنينة), XP bar, quote
+- `app/(tabs)/mood.tsx` — Mood check-in (8 moods, intensity, notes) + MicroWin modal
 - `app/(tabs)/community.tsx` — Safe community circles + in-session anonymous post feed
-- `app/(tabs)/profile.tsx` — User profile
-- `constants/colors.ts` — Includes `navyDeep` (#08090F), `navy`, `gold`, `terracotta`, `sage`
-- Fonts: `Amiri_400Regular`, `Amiri_700Bold`, `Inter_*`
+- `app/(tabs)/profile.tsx` — Profile: dialect selector, settings, privacy, crisis hotlines
+- `app/(tabs)/programs.tsx` — Welfare programs catalogue
+- `constants/colors.ts` — Midnight Garden palette (see Brand section above)
+- Fonts: `Tajawal_400Regular`, `Tajawal_700Bold`, `BeVietnamPro_400Regular`, `BeVietnamPro_500Medium`
 
 ### Gamification System
 

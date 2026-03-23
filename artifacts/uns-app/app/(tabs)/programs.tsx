@@ -16,12 +16,12 @@ import Colors from "@/constants/colors";
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
 const CATEGORY_CONFIG: Record<string, { ar: string; color: string }> = {
-  anxiety: { ar: "القلق", color: Colors.terracotta },
-  grief: { ar: "الحزن", color: "#7C6D9B" },
-  sleep: { ar: "النوم", color: "#3A7BD5" },
-  ramadan: { ar: "رمضان", color: Colors.gold },
-  general: { ar: "عام", color: Colors.sage },
-  spiritual: { ar: "روحاني", color: "#2ECC71" },
+  anxiety: { ar: "القلق", color: "#6B7FD7" },
+  grief: { ar: "الحزن", color: "#8E7BB5" },
+  sleep: { ar: "النوم", color: "#4A9EDD" },
+  ramadan: { ar: "رمضان", color: Colors.accent },
+  general: { ar: "عام", color: Colors.secondary },
+  spiritual: { ar: "روحاني", color: Colors.primary },
 };
 
 interface Program {
@@ -38,24 +38,22 @@ interface Program {
 }
 
 function ProgramCard({ program, index }: { program: Program; index: number }) {
-  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: Colors.gold };
+  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: Colors.accent };
   const isPremium = program.tier === "premium";
+  const completion = Math.round(program.completionRate * 100);
 
   return (
     <Animated.View entering={FadeInDown.delay(index * 80).duration(400)}>
-      <Pressable
-        style={styles.card}
-        onPress={() => {}}
-      >
+      <Pressable style={styles.card} onPress={() => {}}>
         <View style={styles.cardTop}>
-          <View style={[styles.categoryBadge, { backgroundColor: cat.color + "20", borderColor: cat.color + "50" }]}>
+          <View style={[styles.categoryBadge, { backgroundColor: cat.color + "18" }]}>
             <View style={[styles.categoryDot, { backgroundColor: cat.color }]} />
             <Text style={[styles.categoryText, { color: cat.color }]}>{cat.ar}</Text>
           </View>
           {isPremium && (
             <View style={styles.premiumBadge}>
-              <Feather name="star" size={10} color={Colors.gold} />
-              <Text style={styles.premiumText}>Premium</Text>
+              <Feather name="star" size={10} color={Colors.accent} />
+              <Text style={styles.premiumText}>متقدم</Text>
             </View>
           )}
         </View>
@@ -75,20 +73,14 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
             <Text style={styles.statText}>{program.enrolledCount.toLocaleString()}</Text>
           </View>
           <View style={styles.stat}>
-            <Feather name="check-circle" size={12} color={Colors.muted} />
-            <Text style={styles.statText}>{Math.round(program.completionRate * 100)}%</Text>
+            <Feather name="check-circle" size={12} color={Colors.accent} />
+            <Text style={[styles.statText, { color: Colors.accent }]}>{completion}%</Text>
           </View>
         </View>
 
-        <View style={styles.progressBar}>
+        <View style={styles.progressBarBg}>
           <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${program.completionRate * 100}%` as any,
-                backgroundColor: cat.color,
-              },
-            ]}
+            style={[styles.progressBarFill, { width: `${completion}%` as any, backgroundColor: cat.color }]}
           />
         </View>
       </Pressable>
@@ -102,16 +94,14 @@ export default function ProgramsScreen() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    loadPrograms();
-  }, []);
+  React.useEffect(() => { loadPrograms(); }, []);
 
   async function loadPrograms() {
     try {
       const res = await fetch(`${BASE}/api/admin/programs`);
       const data = await res.json();
       setPrograms(data.programs ?? []);
-    } catch (e) {
+    } catch {
       setError("تعذر تحميل البرامج");
     } finally {
       setIsLoading(false);
@@ -123,7 +113,7 @@ export default function ProgramsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.navy }]}
+      style={[styles.container, { backgroundColor: Colors.surface }]}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
@@ -144,7 +134,7 @@ export default function ProgramsScreen() {
       <View style={styles.list}>
         {isLoading ? (
           <View style={styles.loadingState}>
-            <ActivityIndicator color={Colors.gold} />
+            <ActivityIndicator color={Colors.accent} />
             <Text style={styles.loadingText}>جاري التحميل...</Text>
           </View>
         ) : error ? (
@@ -169,20 +159,19 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
     paddingHorizontal: 24,
-    paddingBottom: 20,
+    paddingBottom: 16,
     alignItems: "flex-end",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
   },
   headerTitle: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 28,
-    color: Colors.nearWhite,
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 32,
+    color: Colors.onSurface,
     textAlign: "right",
+    letterSpacing: -0.5,
   },
   headerSub: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 13,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
     color: Colors.muted,
     marginTop: 4,
   },
@@ -191,47 +180,32 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     justifyContent: "flex-end",
   },
   filterChip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: Colors.navyCard,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
+    backgroundColor: Colors.surfaceContainer,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  filterDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
+  filterDot: { width: 6, height: 6, borderRadius: 3 },
   filterText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: Colors.primary,
   },
-  list: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
+  list: { paddingHorizontal: 16, gap: 12 },
   card: {
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 20,
     padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
     gap: 10,
   },
-  cardTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   categoryBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -239,42 +213,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
-    borderWidth: 1,
   },
-  categoryDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  categoryText: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 11,
-  },
+  categoryDot: { width: 6, height: 6, borderRadius: 3 },
+  categoryText: { fontFamily: "Tajawal_400Regular", fontSize: 11 },
   premiumBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: Colors.gold + "20",
+    backgroundColor: Colors.accent + "18",
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.gold + "40",
   },
   premiumText: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 10,
-    color: Colors.gold,
+    color: Colors.accent,
   },
   cardTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 22,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
     textAlign: "right",
+    lineHeight: 32,
   },
   cardDesc: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 15,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
     color: Colors.muted,
     textAlign: "right",
     lineHeight: 22,
@@ -284,53 +249,34 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: "flex-end",
   },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
+  stat: { flexDirection: "row", alignItems: "center", gap: 4 },
   statText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
     color: Colors.muted,
   },
-  progressBar: {
+  progressBarBg: {
     height: 3,
-    backgroundColor: Colors.dark.border,
+    backgroundColor: Colors.surfaceContainerHigh,
     borderRadius: 2,
     overflow: "hidden",
   },
-  progressFill: {
-    height: "100%",
-    borderRadius: 2,
-  },
-  loadingState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    gap: 12,
-  },
+  progressBarFill: { height: "100%", borderRadius: 2 },
+  loadingState: { alignItems: "center", paddingVertical: 60, gap: 12 },
   loadingText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: Colors.muted,
   },
-  errorState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    gap: 12,
-  },
+  errorState: { alignItems: "center", paddingVertical: 60, gap: 12 },
   errorText: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.terracotta,
+    color: Colors.error,
   },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    gap: 12,
-  },
+  emptyState: { alignItems: "center", paddingVertical: 60, gap: 12 },
   emptyText: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 18,
     color: Colors.muted,
   },

@@ -23,22 +23,22 @@ import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
 const MOODS = [
-  { word: "سعيد", en: "happy", color: Colors.gold, intensity: 4 },
-  { word: "هادئ", en: "calm", color: Colors.sage, intensity: 3 },
+  { word: "سعيد", en: "happy", color: Colors.accent, intensity: 4 },
+  { word: "هادئ", en: "calm", color: Colors.secondary, intensity: 3 },
   { word: "ممتنّ", en: "grateful", color: "#9B59B6", intensity: 4 },
   { word: "متعب", en: "tired", color: Colors.muted, intensity: 2 },
-  { word: "قلق", en: "anxious", color: Colors.terracotta, intensity: 3 },
+  { word: "قلق", en: "anxious", color: "#6B7FD7", intensity: 3 },
   { word: "حزين", en: "sad", color: "#5D6D8A", intensity: 2 },
-  { word: "غاضب", en: "angry", color: "#C0392B", intensity: 2 },
-  { word: "متفائل", en: "hopeful", color: "#27AE60", intensity: 4 },
+  { word: "غاضب", en: "angry", color: Colors.error, intensity: 2 },
+  { word: "متفائل", en: "hopeful", color: Colors.accent, intensity: 4 },
 ];
 
 const MICRO_WIN_LABELS: Record<string, string> = {
   first_checkin: "تسجيل المشاعر للمرة الأولى اليوم ✨",
-  streak_3: "٣ أيام متتالية من الرعاية الذاتية 🔥",
-  streak_7: "أسبوع كامل من الاهتمام بنفسك 💎",
-  streak_14: "أسبوعان من الاستمرارية 🌟",
-  streak_30: "شهر من التحول العاطفي 🏆",
+  streak_3: "٣ أيام متتالية من الرعاية الذاتية 🌿",
+  streak_7: "أسبوع كامل من الاهتمام بنفسك 💚",
+  streak_14: "أسبوعان من الاستمرارية 🌱",
+  streak_30: "شهر من التحول العاطفي 🏡",
 };
 
 function MoodChip({
@@ -51,14 +51,10 @@ function MoodChip({
   onPress: () => void;
 }) {
   const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   function handlePress() {
-    scale.value = withSpring(0.92, {}, () => {
-      scale.value = withSpring(1);
-    });
+    scale.value = withSpring(0.93, {}, () => { scale.value = withSpring(1); });
     onPress();
     if (Platform.OS !== "web") Haptics.selectionAsync();
   }
@@ -70,24 +66,14 @@ function MoodChip({
         style={[
           styles.moodChip,
           {
-            backgroundColor: selected ? mood.color + "30" : Colors.navyCard,
-            borderColor: selected ? mood.color : Colors.dark.border,
-            borderWidth: selected ? 2 : 1,
+            backgroundColor: selected ? mood.color + "25" : Colors.surfaceContainer,
+            borderColor: selected ? mood.color + "80" : "transparent",
+            borderWidth: selected ? 1.5 : 0,
           },
         ]}
       >
-        <View
-          style={[
-            styles.moodDot,
-            { backgroundColor: mood.color, opacity: selected ? 1 : 0.4 },
-          ]}
-        />
-        <Text
-          style={[
-            styles.moodWord,
-            { color: selected ? mood.color : Colors.nearWhite },
-          ]}
-        >
+        <View style={[styles.moodDot, { backgroundColor: mood.color, opacity: selected ? 1 : 0.5 }]} />
+        <Text style={[styles.moodWord, { color: selected ? mood.color : Colors.primary }]}>
           {mood.word}
         </Text>
       </Pressable>
@@ -104,9 +90,8 @@ interface WinResult {
 
 function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => void }) {
   const isLevelUp = !!result?.levelUp;
-
   const LEVEL_NAMES: Record<string, string> = {
-    awareness: "الوعي",
+    awareness: "الإدراك",
     balance: "التوازن",
     tranquility: "الطمأنينة",
   };
@@ -127,24 +112,18 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
               <Text style={styles.winTitle}>+{result.xpEarned} نقطة</Text>
             </>
           )}
-
           {result.streakDays > 0 && (
             <View style={styles.streakBadge}>
-              <Text style={styles.streakBadgeText}>🔥 {result.streakDays} أيام متتالية</Text>
+              <Text style={styles.streakBadgeText}>🌿 {result.streakDays} أيام متتالية</Text>
             </View>
           )}
-
           {result.newWins?.map((win) => (
             <View key={win.type} style={styles.winRow}>
               <Text style={styles.winRowLabel}>{MICRO_WIN_LABELS[win.type] ?? win.type}</Text>
               <Text style={styles.winRowPoints}>+{win.points}</Text>
             </View>
           ))}
-
-          <Text style={styles.winEncouragement}>
-            استمر في رحلتك — كل يوم يُحدث فرقاً 🌱
-          </Text>
-
+          <Text style={styles.winEncouragement}>استمر في رحلتك — كل يوم يُحدث فرقاً 🌱</Text>
           <Pressable style={styles.winCloseBtn} onPress={onClose}>
             <Text style={styles.winCloseBtnText}>شكراً ←</Text>
           </Pressable>
@@ -165,6 +144,8 @@ export default function MoodScreen() {
   const [winResult, setWinResult] = useState<WinResult | null>(null);
 
   const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+  const webTop = Platform.OS === "web" ? 67 : insets.top;
+  const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
   async function saveCheckin() {
     if (!selectedMood || !sessionId) return;
@@ -181,21 +162,17 @@ export default function MoodScreen() {
           notes: notes.trim() || undefined,
         }),
       });
-
       const progressRes = await fetch(`${BASE}/api/gamification/checkin-complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, moodWord: selectedMood.en }),
       });
       const progressData = await progressRes.json();
-
       setSaved(true);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
       if (progressData.xpEarned > 0 || progressData.newWins?.length > 0) {
         setTimeout(() => setWinResult(progressData), 800);
       }
-
       setTimeout(() => {
         setSaved(false);
         setSelectedMood(null);
@@ -209,13 +186,10 @@ export default function MoodScreen() {
     }
   }
 
-  const webTop = Platform.OS === "web" ? 67 : insets.top;
-  const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
-
   return (
     <>
       <ScrollView
-        style={[styles.container, { backgroundColor: Colors.navy }]}
+        style={[styles.container, { backgroundColor: Colors.surface }]}
         contentContainerStyle={{ paddingBottom: webBottom + 80 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -234,7 +208,7 @@ export default function MoodScreen() {
         ) : (
           <>
             <View style={styles.moodGrid}>
-              {MOODS.map((mood) => (
+              {MOODS.map(mood => (
                 <MoodChip
                   key={mood.en}
                   mood={mood}
@@ -248,7 +222,7 @@ export default function MoodScreen() {
               <Animated.View entering={FadeInDown.duration(400)} style={styles.intensitySection}>
                 <Text style={styles.sectionLabel}>شدة الشعور</Text>
                 <View style={styles.intensityRow}>
-                  {[1, 2, 3, 4, 5].map((i) => (
+                  {[1, 2, 3, 4, 5].map(i => (
                     <Pressable
                       key={i}
                       onPress={() => {
@@ -258,10 +232,7 @@ export default function MoodScreen() {
                       style={[
                         styles.intensityDot,
                         {
-                          backgroundColor:
-                            i <= intensity
-                              ? selectedMood.color
-                              : Colors.dark.border,
+                          backgroundColor: i <= intensity ? Colors.accent : Colors.surfaceContainerHigh,
                           transform: [{ scale: i <= intensity ? 1 : 0.8 }],
                         },
                       ]}
@@ -294,15 +265,12 @@ export default function MoodScreen() {
             {selectedMood && (
               <Animated.View entering={FadeInDown.duration(600)} style={styles.saveSection}>
                 <Pressable
-                  style={[
-                    styles.saveBtn,
-                    { backgroundColor: selectedMood.color, opacity: isSaving ? 0.7 : 1 },
-                  ]}
+                  style={[styles.saveBtn, { opacity: isSaving ? 0.7 : 1 }]}
                   onPress={saveCheckin}
                   disabled={isSaving}
                 >
                   {isSaving ? (
-                    <ActivityIndicator color={Colors.navy} />
+                    <ActivityIndicator color={Colors.surface} />
                   ) : (
                     <Text style={styles.saveBtnText}>حفظ المشاعر ✨</Text>
                   )}
@@ -315,15 +283,12 @@ export default function MoodScreen() {
         <View style={styles.historySection}>
           <View style={styles.infoCard}>
             <Text style={styles.infoText}>
-              تتبع مشاعرك اليومي يكسبك نقاطاً ويبني سلسلتك. كل يوم تسجّل فيه مشاعرك هو انتصار صغير.
+              تتبع مشاعرك اليومي يبني رحلتك العاطفية ويساعدك على فهم نفسك أعمق.
             </Text>
           </View>
         </View>
       </ScrollView>
-
-      {winResult && (
-        <MicroWinModal result={winResult} onClose={() => setWinResult(null)} />
-      )}
+      {winResult && <MicroWinModal result={winResult} onClose={() => setWinResult(null)} />}
     </>
   );
 }
@@ -332,45 +297,39 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
     paddingHorizontal: 24,
-    paddingBottom: 24,
+    paddingBottom: 20,
     alignItems: "flex-end",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
   },
   headerTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 28,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
     textAlign: "right",
+    letterSpacing: -0.3,
   },
   headerSub: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 13,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
     color: Colors.muted,
     marginTop: 4,
     textAlign: "right",
   },
   savedCard: {
     margin: 24,
-    backgroundColor: Colors.sage + "20",
+    backgroundColor: Colors.primaryContainer,
     borderRadius: 20,
     padding: 32,
     alignItems: "center",
     gap: 8,
-    borderWidth: 1,
-    borderColor: Colors.sage + "50",
   },
-  savedIcon: {
-    fontSize: 40,
-    color: Colors.sage,
-  },
+  savedIcon: { fontSize: 40, color: Colors.accent },
   savedText: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 22,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
   },
   savedSub: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: Colors.muted,
   },
@@ -389,89 +348,58 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
   },
-  moodDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
+  moodDot: { width: 8, height: 8, borderRadius: 4 },
   moodWord: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
   },
-  intensitySection: {
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
+  intensitySection: { paddingHorizontal: 24, marginBottom: 16 },
   sectionLabel: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 15,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
     textAlign: "right",
     marginBottom: 12,
   },
-  intensityRow: {
-    flexDirection: "row",
-    gap: 12,
-    justifyContent: "flex-end",
-  },
-  intensityDot: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-  },
-  intensityLabels: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
+  intensityRow: { flexDirection: "row", gap: 12, justifyContent: "flex-end" },
+  intensityDot: { width: 32, height: 32, borderRadius: 16 },
+  intensityLabels: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
   intensityLabel: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
     color: Colors.muted,
   },
-  notesSection: {
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
+  notesSection: { paddingHorizontal: 24, marginBottom: 16 },
   notesInput: {
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainerHigh,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
     padding: 16,
-    color: Colors.nearWhite,
-    fontFamily: "Amiri_400Regular",
+    color: Colors.onSurface,
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
     minHeight: 100,
     textAlignVertical: "top",
   },
-  saveSection: {
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
+  saveSection: { paddingHorizontal: 24, marginBottom: 16 },
   saveBtn: {
-    borderRadius: 20,
+    borderRadius: 999,
     paddingVertical: 18,
     alignItems: "center",
+    backgroundColor: Colors.accent,
   },
   saveBtnText: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 17,
-    color: Colors.navy,
+    color: Colors.surface,
   },
-  historySection: {
-    paddingHorizontal: 24,
-    marginTop: 8,
-  },
+  historySection: { paddingHorizontal: 24, marginTop: 8 },
   infoCard: {
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
   },
   infoText: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: Colors.muted,
     lineHeight: 22,
@@ -479,13 +407,13 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(4,23,16,0.85)",
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
   },
   winModal: {
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 28,
     padding: 28,
     alignItems: "center",
@@ -493,73 +421,65 @@ const styles = StyleSheet.create({
     maxWidth: 340,
     gap: 12,
     borderWidth: 1,
-    borderColor: Colors.gold + "30",
+    borderColor: Colors.ghostBorder,
   },
   winEmoji: { fontSize: 52 },
   winTitle: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 26,
-    color: Colors.gold,
-    textAlign: "center",
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 24,
+    color: Colors.onSurface,
   },
   winLevel: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 22,
-    color: "#F2EBD9",
-    textAlign: "center",
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 20,
+    color: Colors.accent,
   },
   streakBadge: {
-    backgroundColor: "rgba(201,168,76,0.15)",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "rgba(201,168,76,0.3)",
+    backgroundColor: Colors.primaryContainer,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
   },
   streakBadgeText: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 15,
-    color: Colors.gold,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 13,
+    color: Colors.accent,
   },
   winRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    backgroundColor: "rgba(255,255,255,0.04)",
-    borderRadius: 12,
-    padding: 12,
+    paddingHorizontal: 4,
   },
   winRowLabel: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 13,
-    color: "rgba(242,235,217,0.8)",
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
+    color: Colors.primary,
     flex: 1,
     textAlign: "right",
   },
   winRowPoints: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 14,
-    color: Colors.gold,
-    marginLeft: 12,
+    color: Colors.accent,
   },
   winEncouragement: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "rgba(242,235,217,0.5)",
+    color: Colors.muted,
     textAlign: "center",
     lineHeight: 22,
   },
   winCloseBtn: {
-    backgroundColor: Colors.gold,
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    backgroundColor: Colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
     marginTop: 4,
   },
   winCloseBtnText: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 16,
-    color: Colors.navy,
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 15,
+    color: Colors.surface,
   },
 });

@@ -45,7 +45,7 @@ const MOOD_LABELS: Record<string, string> = {
 
 const MOOD_COLORS: Record<string, string> = {
   anxiety: "#6B7FD7",
-  gratitude: "#C9A84C",
+  gratitude: "#74C69D",
   reflection: "#10B981",
   support: "#D97757",
 };
@@ -167,7 +167,7 @@ export default function Community() {
             </div>
           ) : (
             sessions.map((session, i) => {
-              const color = MOOD_COLORS[session.moodTheme] ?? "#C9A84C";
+              const color = MOOD_COLORS[session.moodTheme] ?? "#74C69D";
               const fullPercent = Math.round((session.participantCount / session.maxParticipants) * 100);
               return (
                 <motion.div

@@ -23,7 +23,7 @@ export function Hero() {
       {/* Arabesque pattern overlay */}
       <div className="absolute inset-0 z-0 opacity-[0.03]" 
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath fill='%23C9A84C' d='M30 0 L60 30 L30 60 L0 30 Z M30 10 L50 30 L30 50 L10 30 Z'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath fill='%2374C69D' d='M30 0 L60 30 L30 60 L0 30 Z M30 10 L50 30 L30 50 L10 30 Z'/%3E%3C/svg%3E")`,
           backgroundSize: "60px 60px"
         }}
       />
@@ -36,7 +36,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="mb-8"
         >
-          <span className="px-5 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-arabic tracking-wide inline-flex items-center gap-2 shadow-[0_0_20px_rgba(201,168,76,0.15)]">
+          <span className="px-5 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-arabic tracking-wide inline-flex items-center gap-2 shadow-[0_0_20px_rgba(116,198,157,0.15)]">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             النسخة التجريبية الخاصة قادمة قريباً
           </span>
@@ -85,7 +85,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.65 }}
           className="flex flex-col sm:flex-row items-center gap-4 mb-20"
         >
-          <Button size="lg" onClick={scrollToWaitlist} className="w-full sm:w-auto text-lg font-arabic px-8 py-6 h-auto group shadow-[0_0_30px_rgba(201,168,76,0.25)]">
+          <Button size="lg" onClick={scrollToWaitlist} className="w-full sm:w-auto text-lg font-arabic px-8 py-6 h-auto group shadow-[0_0_30px_rgba(116,198,157,0.25)]">
             احجز مكانك الآن
             <span className="mr-2 group-hover:-translate-x-1 transition-transform">←</span>
           </Button>

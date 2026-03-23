@@ -30,9 +30,9 @@ function GamificationSection() {
         totalXpAwarded: 0,
         avgStreak: 0,
         levelDistribution: [
-          { level: "awareness", labelAr: "الوعي", count: 0, color: "#6B7FD7" },
-          { level: "balance", labelAr: "التوازن", count: 0, color: "#C9A84C" },
-          { level: "tranquility", labelAr: "الطمأنينة", count: 0, color: "#10B981" },
+          { level: "awareness", labelAr: "الوعي", count: 0, color: "#6B9FD7" },
+          { level: "balance", labelAr: "التوازن", count: 0, color: "#74C69D" },
+          { level: "tranquility", labelAr: "الطمأنينة", count: 0, color: "#a5d0b9" },
         ],
         topStreaks: [],
       }));
@@ -41,8 +41,8 @@ function GamificationSection() {
   if (!stats) return null;
 
   const gamStats = [
-    { label: "إجمالي XP المُمنوحة", value: stats.totalXpAwarded.toLocaleString("ar-SA"), icon: Zap, color: "text-amber-400", bg: "bg-amber-400/10" },
-    { label: "متوسط السلسلة", value: `${stats.avgStreak} يوم`, icon: Flame, color: "text-orange-400", bg: "bg-orange-400/10" },
+    { label: "إجمالي XP المُمنوحة", value: stats.totalXpAwarded.toLocaleString("ar-SA"), icon: Zap, color: "text-[#74C69D]", bg: "bg-[#74C69D]/10" },
+    { label: "متوسط السلسلة", value: `${stats.avgStreak} يوم`, icon: Flame, color: "text-[#a5d0b9]", bg: "bg-[#a5d0b9]/10" },
   ];
 
   return (
@@ -233,11 +233,11 @@ export default function Dashboard() {
                 <XAxis dataKey="name" stroke="#ffffff40" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#ffffff40" fontSize={12} tickLine={false} axisLine={false} />
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#1a1f2c', borderColor: '#ffffff10', borderRadius: '12px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#10231c', borderColor: '#74C69D22', borderRadius: '12px', color: '#e8f5ee' }}
+                  itemStyle={{ color: '#e8f5ee' }}
                 />
-                <Line type="monotone" dataKey="Users" stroke="#c9a84c" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="Sessions" stroke="#d97757" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} />
+                <Line type="monotone" dataKey="Users" stroke="#74C69D" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="Sessions" stroke="#a5d0b9" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -271,8 +271,8 @@ export default function Dashboard() {
                   ))}
                 </Pie>
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#1a1f2c', borderColor: '#ffffff10', borderRadius: '12px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#10231c', borderColor: '#74C69D22', borderRadius: '12px', color: '#e8f5ee' }}
+                  itemStyle={{ color: '#e8f5ee' }}
                   formatter={(value: number) => [`${value}%`, 'Percentage']}
                 />
               </PieChart>

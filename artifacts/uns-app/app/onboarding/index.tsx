@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  ScrollView,
   Dimensions,
   Platform,
 } from "react-native";
@@ -13,9 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, {
   FadeInDown,
   FadeInUp,
-  FadeOut,
   SlideInRight,
-  SlideOutLeft,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,19 +21,19 @@ import Colors from "@/constants/colors";
 const { width } = Dimensions.get("window");
 
 const DIALECTS = [
-  { key: "gulf", labelAr: "خليجية", emoji: "🌊" },
-  { key: "levant", labelAr: "شامية", emoji: "🌿" },
-  { key: "egyptian", labelAr: "مصرية", emoji: "🌙" },
-  { key: "maghrebi", labelAr: "مغاربية", emoji: "⭐" },
-  { key: "msa", labelAr: "فصحى", emoji: "📖" },
+  { key: "gulf", labelAr: "خليجية", icon: "🌊" },
+  { key: "levant", labelAr: "شامية", icon: "🌿" },
+  { key: "egyptian", labelAr: "مصرية", icon: "🌙" },
+  { key: "maghrebi", labelAr: "مغاربية", icon: "⭐" },
+  { key: "msa", labelAr: "فصحى", icon: "📖" },
 ];
 
 const INTENTIONS = [
-  { key: "cope", labelAr: "للتعامل مع الضغط والقلق", emoji: "🌬️" },
-  { key: "grow", labelAr: "للنمو والوعي الذاتي", emoji: "🌱" },
-  { key: "connect", labelAr: "لأشعر بأنني لست وحدي", emoji: "🤝" },
-  { key: "habits", labelAr: "لبناء عادات صحية للعقل", emoji: "✨" },
-  { key: "explore", labelAr: "فقط أستكشف", emoji: "🔭" },
+  { key: "cope", labelAr: "للتعامل مع الضغط والقلق", icon: "🌬️" },
+  { key: "grow", labelAr: "للنمو والوعي الذاتي", icon: "🌱" },
+  { key: "connect", labelAr: "لأشعر بأنني لست وحدي", icon: "🤝" },
+  { key: "habits", labelAr: "لبناء عادات صحية للعقل", icon: "✨" },
+  { key: "explore", labelAr: "فقط أستكشف", icon: "🔭" },
 ];
 
 export default function OnboardingScreen() {
@@ -58,42 +55,42 @@ export default function OnboardingScreen() {
   };
 
   const canProceed =
-    (step === 0) ||
+    step === 0 ||
     (step === 1 && dialect !== "") ||
     (step === 2 && intention !== "");
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
-      {/* Progress dots */}
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 24 },
+      ]}
+    >
       <View style={styles.progressRow}>
         {[0, 1, 2].map(i => (
           <View
             key={i}
-            style={[styles.dot, i === step && styles.dotActive]}
+            style={[styles.dot, i === step && styles.dotActive, i < step && styles.dotComplete]}
           />
         ))}
       </View>
 
-      {/* Step content */}
       {step === 0 && (
-        <Animated.View entering={FadeInDown.duration(600)} style={styles.stepContent}>
-          <Text style={styles.brandGold}>أُنس</Text>
-          <Text style={styles.bigTitle}>
-            رفيقك العاطفي{"\n"}الأول من نوعه
+        <Animated.View entering={FadeInDown.duration(700)} style={styles.stepContent}>
+          <Text style={styles.brandMark}>أُنْس</Text>
+          <Text style={styles.heroTitle}>رفيقك العاطفي{"\n"}الأول من نوعه</Text>
+          <Text style={styles.heroSub}>
+            لست وحدك. أُنس هنا معك كل يوم —{"\n"}يستمع، يتذكر، ويكون معك.
           </Text>
-          <Text style={styles.subtitle}>
-            لست وحدك. أُنس هنا معك كل يوم — يستمع، يتذكر، ويكون معك.
-          </Text>
-
-          <View style={styles.cardsRow}>
+          <View style={styles.featureRow}>
             {[
-              { icon: "🧠", labelAr: "يتذكر قصتك" },
-              { icon: "💬", labelAr: "يتحدث بلهجتك" },
-              { icon: "🔒", labelAr: "يحمي خصوصيتك" },
-            ].map((c) => (
-              <View key={c.labelAr} style={styles.featureCard}>
-                <Text style={styles.featureIcon}>{c.icon}</Text>
-                <Text style={styles.featureLabel}>{c.labelAr}</Text>
+              { icon: "🧠", text: "يتذكر قصتك" },
+              { icon: "💬", text: "يتحدث بلهجتك" },
+              { icon: "🔒", text: "يحمي خصوصيتك" },
+            ].map(f => (
+              <View key={f.text} style={styles.featureCard}>
+                <Text style={styles.featureIcon}>{f.icon}</Text>
+                <Text style={styles.featureLabel}>{f.text}</Text>
               </View>
             ))}
           </View>
@@ -102,11 +99,9 @@ export default function OnboardingScreen() {
 
       {step === 1 && (
         <Animated.View entering={SlideInRight.duration(400)} style={styles.stepContent}>
-          <Text style={styles.stepNum}>١ / ٢</Text>
-          <Text style={styles.bigTitle}>ما هي لهجتك{"\n"}المفضّلة؟</Text>
-          <Text style={styles.subtitle}>
-            أُنس يتكيّف معك — اختر اللهجة التي تشعر فيها بالراحة
-          </Text>
+          <Text style={styles.stepNumLabel}>١ / ٢</Text>
+          <Text style={styles.heroTitle}>ما هي لهجتك{"\n"}المفضّلة؟</Text>
+          <Text style={styles.heroSub}>أُنس يتكيّف معك — اختر ما تشعر فيه بالراحة</Text>
           <View style={styles.optionsGrid}>
             {DIALECTS.map(d => (
               <Pressable
@@ -117,8 +112,8 @@ export default function OnboardingScreen() {
                   if (Platform.OS !== "web") Haptics.selectionAsync();
                 }}
               >
-                <Text style={styles.optionEmoji}>{d.emoji}</Text>
-                <Text style={[styles.optionLabel, dialect === d.key && styles.optionLabelActive]}>
+                <Text style={styles.optionIcon}>{d.icon}</Text>
+                <Text style={[styles.optionLabel, dialect === d.key && { color: Colors.accent }]}>
                   {d.labelAr}
                 </Text>
               </Pressable>
@@ -129,11 +124,9 @@ export default function OnboardingScreen() {
 
       {step === 2 && (
         <Animated.View entering={SlideInRight.duration(400)} style={styles.stepContent}>
-          <Text style={styles.stepNum}>٢ / ٢</Text>
-          <Text style={styles.bigTitle}>لماذا أنت{"\n"}هنا اليوم؟</Text>
-          <Text style={styles.subtitle}>
-            لا إجابة خاطئة. أريد أن أبدأ معك من حيث أنت
-          </Text>
+          <Text style={styles.stepNumLabel}>٢ / ٢</Text>
+          <Text style={styles.heroTitle}>لماذا أنت{"\n"}هنا اليوم؟</Text>
+          <Text style={styles.heroSub}>لا إجابة خاطئة — أريد أن أبدأ معك من حيث أنت</Text>
           <View style={styles.intentionsList}>
             {INTENTIONS.map(int => (
               <Pressable
@@ -144,8 +137,10 @@ export default function OnboardingScreen() {
                   if (Platform.OS !== "web") Haptics.selectionAsync();
                 }}
               >
-                <Text style={styles.intentionEmoji}>{int.emoji}</Text>
-                <Text style={[styles.intentionLabel, intention === int.key && styles.intentionLabelActive]}>
+                <Text style={styles.intentionIcon}>{int.icon}</Text>
+                <Text
+                  style={[styles.intentionLabel, intention === int.key && { color: Colors.accent }]}
+                >
                   {int.labelAr}
                 </Text>
               </Pressable>
@@ -165,13 +160,13 @@ export default function OnboardingScreen() {
           </Text>
         </Pressable>
         {step > 0 && (
-          <Pressable onPress={() => setStep(step - 1)} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>→ رجوع</Text>
+          <Pressable onPress={() => setStep(step - 1)} style={styles.secondaryBtn}>
+            <Text style={styles.secondaryBtnText}>→ رجوع</Text>
           </Pressable>
         )}
         {step === 0 && (
-          <Pressable onPress={handleNext} style={styles.skipBtn}>
-            <Text style={styles.skipBtnText}>تخطي الآن</Text>
+          <Pressable onPress={handleNext} style={styles.secondaryBtn}>
+            <Text style={styles.secondaryBtnText}>تخطي الآن</Text>
           </Pressable>
         )}
       </Animated.View>
@@ -182,84 +177,90 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.navyDeep,
+    backgroundColor: Colors.surface,
     paddingHorizontal: 24,
   },
   progressRow: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 8,
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 8,
+    marginBottom: 4,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: Colors.surfaceContainerHigh,
   },
   dotActive: {
-    width: 24,
-    backgroundColor: Colors.gold,
+    width: 28,
+    backgroundColor: Colors.accent,
+  },
+  dotComplete: {
+    backgroundColor: Colors.primaryContainer,
+    borderWidth: 1,
+    borderColor: Colors.accent + "60",
   },
   stepContent: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 20,
+    paddingTop: 16,
+    gap: 8,
   },
-  brandGold: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 72,
-    color: Colors.gold,
-    marginBottom: 12,
+  brandMark: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 80,
+    color: Colors.accent,
+    marginBottom: 8,
     textAlign: "center",
+    lineHeight: 100,
   },
-  bigTitle: {
-    fontFamily: "Amiri_700Bold",
+  heroTitle: {
+    fontFamily: "Tajawal_700Bold",
     fontSize: 30,
-    color: "#F2EBD9",
+    color: Colors.onSurface,
     textAlign: "center",
     lineHeight: 44,
-    marginBottom: 16,
+    marginBottom: 8,
   },
-  subtitle: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 16,
-    color: "rgba(242,235,217,0.6)",
+  heroSub: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 15,
+    color: Colors.muted,
     textAlign: "center",
     lineHeight: 26,
-    marginBottom: 32,
-    maxWidth: 300,
+    marginBottom: 24,
+    maxWidth: 310,
   },
-  stepNum: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 13,
-    color: Colors.gold,
-    marginBottom: 16,
+  stepNumLabel: {
+    fontFamily: "BeVietnamPro_400Regular",
+    fontSize: 12,
+    color: Colors.accent,
+    marginBottom: 12,
     letterSpacing: 2,
   },
-  cardsRow: {
+  featureRow: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
     marginTop: 8,
   },
   featureCard: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
-    padding: 16,
+    padding: 14,
     alignItems: "center",
     gap: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
   },
   featureIcon: { fontSize: 24 },
   featureLabel: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "rgba(242,235,217,0.7)",
+    color: Colors.primary,
     textAlign: "center",
+    lineHeight: 18,
   },
   optionsGrid: {
     flexDirection: "row",
@@ -270,76 +271,70 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: (width - 68) / 2,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 16,
+    backgroundColor: Colors.surfaceContainer,
+    borderRadius: 18,
     padding: 20,
     alignItems: "center",
-    gap: 8,
+    gap: 10,
     borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: "transparent",
   },
   optionCardActive: {
-    borderColor: Colors.gold,
-    backgroundColor: "rgba(201,168,76,0.12)",
+    borderColor: Colors.accent + "80",
+    backgroundColor: Colors.primaryContainer,
   },
-  optionEmoji: { fontSize: 28 },
+  optionIcon: { fontSize: 28 },
   optionLabel: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "rgba(242,235,217,0.7)",
+    color: Colors.primary,
     textAlign: "center",
   },
-  optionLabelActive: { color: Colors.gold },
   intentionsList: { width: "100%", gap: 10 },
   intentionCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: "transparent",
   },
   intentionCardActive: {
-    borderColor: Colors.gold,
-    backgroundColor: "rgba(201,168,76,0.10)",
+    borderColor: Colors.accent + "80",
+    backgroundColor: Colors.primaryContainer,
   },
-  intentionEmoji: { fontSize: 22 },
+  intentionIcon: { fontSize: 22 },
   intentionLabel: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: "rgba(242,235,217,0.8)",
+    color: Colors.primary,
     flex: 1,
     textAlign: "right",
+    lineHeight: 22,
   },
-  intentionLabelActive: { color: Colors.gold },
   footer: {
-    gap: 12,
+    gap: 10,
     paddingBottom: 8,
+    paddingTop: 8,
   },
   nextBtn: {
-    backgroundColor: Colors.gold,
-    borderRadius: 20,
+    backgroundColor: Colors.accent,
+    borderRadius: 999,
     paddingVertical: 18,
     alignItems: "center",
   },
-  nextBtnDisabled: { opacity: 0.4 },
+  nextBtnDisabled: { opacity: 0.35 },
   nextBtnText: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 17,
-    color: "#0B0E18",
+    color: Colors.surface,
   },
-  backBtn: { alignItems: "center", paddingVertical: 8 },
-  backBtnText: {
-    fontFamily: "Amiri_400Regular",
+  secondaryBtn: { alignItems: "center", paddingVertical: 10 },
+  secondaryBtnText: {
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "rgba(242,235,217,0.5)",
-  },
-  skipBtn: { alignItems: "center", paddingVertical: 8 },
-  skipBtnText: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 14,
-    color: "rgba(242,235,217,0.4)",
+    color: Colors.muted,
   },
 });

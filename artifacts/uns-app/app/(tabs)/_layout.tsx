@@ -1,153 +1,107 @@
 import { BlurView } from "expo-blur";
-import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
-import { SymbolView } from "expo-symbols";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
 
-function NativeTabLayout() {
+function TabIcon({ name, color, focused }: { name: any; color: string; focused: boolean }) {
   return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: "house.fill", selected: "house.fill" }} />
-        <Label>رفيقي</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="mood">
-        <Icon sf={{ default: "heart", selected: "heart.fill" }} />
-        <Label>مشاعري</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="journey">
-        <Icon sf={{ default: "map", selected: "map.fill" }} />
-        <Label>رحلتي</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="community">
-        <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
-        <Label>مجتمع</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <Icon sf={{ default: "person", selected: "person.fill" }} />
-        <Label>أنا</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <Feather name={name} size={20} color={focused ? Colors.surface : color} />
+    </View>
   );
 }
 
-function ClassicTabLayout() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const isIOS = Platform.OS === "ios";
+export default function TabLayout() {
+  const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.gold,
-        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
+        tabBarActiveTintColor: Colors.accent,
+        tabBarInactiveTintColor: Colors.muted,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: isIOS ? "transparent" : Colors.navyCard,
-          borderTopWidth: isWeb ? 1 : 0,
-          borderTopColor: Colors.dark.border,
+          backgroundColor: isWeb ? Colors.surfaceContainer : "transparent",
+          borderTopWidth: 0,
           elevation: 0,
-          paddingBottom: safeAreaInsets.bottom,
-          ...(isWeb ? { height: 72 } : {}),
+          height: 64 + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: 8,
         },
         tabBarBackground: () =>
-          isIOS ? (
+          Platform.OS !== "web" ? (
             <BlurView
-              intensity={100}
+              intensity={80}
               tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-          ) : isWeb ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: Colors.navyCard, borderTopWidth: 1, borderTopColor: Colors.dark.border },
-              ]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(4,23,16,0.88)" }]}
             />
           ) : null,
         tabBarLabelStyle: {
-          fontFamily: "Amiri_400Regular",
-          fontSize: 11,
+          fontFamily: "BeVietnamPro_500Medium",
+          fontSize: 10,
+          marginTop: 2,
         },
+        tabBarShowLabel: true,
       }}
     >
       <Tabs.Screen
-        name="index"
-        options={{
-          title: "رفيقي",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="house.fill" tintColor={color} size={24} />
-            ) : (
-              <Feather name="home" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="mood"
-        options={{
-          title: "مشاعري",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="heart" tintColor={color} size={24} />
-            ) : (
-              <Feather name="heart" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
         name="journey"
         options={{
-          title: "رحلتي",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="map" tintColor={color} size={24} />
-            ) : (
-              <Feather name="map" size={22} color={color} />
-            ),
+          title: "Journey",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="map" color={color} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="community"
+        name="insights"
         options={{
-          title: "مجتمع",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="person.2" tintColor={color} size={24} />
-            ) : (
-              <Feather name="users" size={22} color={color} />
-            ),
+          title: "Insights",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="trending-up" color={color} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="programs"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="profile"
+        name="chat"
         options={{
-          title: "أنا",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="person" tintColor={color} size={24} />
-            ) : (
-              <Feather name="user" size={22} color={color} />
-            ),
+          title: "Chat",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="message-circle" color={color} focused={focused} />
+          ),
         }}
       />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="feather" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen name="mood" options={{ href: null }} />
+      <Tabs.Screen name="community" options={{ href: null }} />
+      <Tabs.Screen name="programs" options={{ href: null }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }
 
-export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
-  return <ClassicTabLayout />;
-}
+const styles = StyleSheet.create({
+  iconWrap: {
+    width: 40,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconWrapActive: {
+    backgroundColor: Colors.accent,
+  },
+});

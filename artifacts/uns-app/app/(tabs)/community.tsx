@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
@@ -24,8 +24,8 @@ const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
 
 const MOOD_THEME_COLORS: Record<string, string> = {
   anxiety: "#6B7FD7",
-  gratitude: "#C9A84C",
-  reflection: "#10B981",
+  gratitude: Colors.accent,
+  reflection: Colors.secondary,
   support: "#D97757",
 };
 
@@ -56,34 +56,26 @@ interface Post {
 }
 
 function SessionCard({ session, onEnter }: { session: Session; onEnter: () => void }) {
-  const color = MOOD_THEME_COLORS[session.moodTheme] ?? "#C9A84C";
+  const color = MOOD_THEME_COLORS[session.moodTheme] ?? Colors.accent;
   const icon = MOOD_THEME_ICONS[session.moodTheme] ?? "💫";
   const isFull = session.participantCount >= session.maxParticipants;
 
   return (
-    <Pressable style={[styles.sessionCard, { borderColor: color + "30" }]} onPress={onEnter}>
-      <View style={[styles.sessionIconCircle, { backgroundColor: color + "15" }]}>
+    <Pressable style={styles.sessionCard} onPress={onEnter}>
+      <View style={[styles.sessionIconCircle, { backgroundColor: color + "20" }]}>
         <Text style={styles.sessionIcon}>{icon}</Text>
       </View>
       <View style={styles.sessionInfo}>
         <Text style={styles.sessionTitle}>{session.titleAr}</Text>
         <Text style={styles.sessionDesc} numberOfLines={2}>{session.descriptionAr}</Text>
         <View style={styles.sessionMeta}>
-          <View style={styles.sessionMetaItem}>
-            <Feather name="users" size={12} color={color} />
-            <Text style={[styles.sessionMetaText, { color: color }]}>
-              {session.participantCount} مشارك
-            </Text>
-          </View>
-          <View style={styles.sessionMetaItem}>
-            <Feather name="clock" size={12} color="rgba(255,255,255,0.3)" />
-            <Text style={styles.sessionMetaGrey}>
-              {session.durationMinutes} دقيقة
-            </Text>
-          </View>
+          <Feather name="users" size={11} color={color} />
+          <Text style={[styles.sessionMetaText, { color }]}>{session.participantCount} مشارك</Text>
+          <Feather name="clock" size={11} color={Colors.muted} />
+          <Text style={styles.sessionMetaGrey}>{session.durationMinutes} دقيقة</Text>
         </View>
       </View>
-      <View style={[styles.joinBtn, { backgroundColor: color + "20", borderColor: color + "40" }]}>
+      <View style={[styles.joinBtn, { backgroundColor: color + "20" }]}>
         <Text style={[styles.joinBtnText, { color }]}>{isFull ? "ممتلئ" : "ادخل"}</Text>
       </View>
     </Pressable>
@@ -92,7 +84,6 @@ function SessionCard({ session, onEnter }: { session: Session; onEnter: () => vo
 
 function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
   const [hearted, setHearted] = useState(false);
-
   return (
     <Animated.View entering={FadeInDown.duration(400)} style={styles.postCard}>
       <View style={styles.postHeader}>
@@ -112,7 +103,7 @@ function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
           }
         }}
       >
-        <Feather name="heart" size={16} color={hearted ? "#E94D6D" : "rgba(255,255,255,0.3)"} />
+        <Feather name="heart" size={16} color={hearted ? "#E94D6D" : Colors.muted} />
         <Text style={[styles.heartCount, hearted && { color: "#E94D6D" }]}>
           {hearted ? post.hearts + 1 : post.hearts}
         </Text>
@@ -132,6 +123,9 @@ export default function CommunityScreen() {
   const [newPost, setNewPost] = useState("");
   const [posting, setPosting] = useState(false);
 
+  const webTop = Platform.OS === "web" ? 67 : insets.top;
+  const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
+
   useEffect(() => {
     fetch(`${BASE_URL}/community/sessions`)
       .then(r => r.json())
@@ -147,11 +141,8 @@ export default function CommunityScreen() {
       const r = await fetch(`${BASE_URL}/community/sessions/${session.id}/posts`);
       const d = await r.json();
       setPosts(d.posts ?? []);
-    } catch {
-      setPosts([]);
-    } finally {
-      setPostsLoading(false);
-    }
+    } catch { setPosts([]); }
+    finally { setPostsLoading(false); }
   };
 
   const submitPost = async () => {
@@ -171,24 +162,20 @@ export default function CommunityScreen() {
         setPosts(prev => [d, ...prev]);
         setNewPost("");
       }
-    } catch {
-      Alert.alert("خطأ", "تعذّر نشر الرسالة. حاول مرة أخرى.");
-    } finally {
-      setPosting(false);
-    }
+    } catch { Alert.alert("خطأ", "تعذّر نشر الرسالة."); }
+    finally { setPosting(false); }
   };
 
   if (activeSession) {
     return (
       <KeyboardAvoidingView
-        style={[styles.container, { paddingTop: insets.top }]}
+        style={[styles.container, { paddingTop: webTop }]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={insets.bottom + 80}
       >
-        {/* Session Header */}
         <View style={styles.sessionHeader}>
           <Pressable onPress={() => setActiveSession(null)} style={styles.backBtn}>
-            <Feather name="arrow-right" size={20} color="rgba(255,255,255,0.6)" />
+            <Feather name="arrow-right" size={20} color={Colors.muted} />
           </Pressable>
           <View style={{ flex: 1, alignItems: "flex-end" }}>
             <Text style={styles.sessionHeaderTitle}>{activeSession.titleAr}</Text>
@@ -198,47 +185,40 @@ export default function CommunityScreen() {
           </View>
         </View>
 
-        {/* Safety Notice */}
         <View style={styles.safetyBanner}>
-          <Feather name="shield" size={14} color={Colors.gold} />
-          <Text style={styles.safetyText}>
-            مساحة آمنة · بدون هوية حقيقية · جميع المشاركات مراجَعة
-          </Text>
+          <Feather name="shield" size={13} color={Colors.accent} />
+          <Text style={styles.safetyText}>مساحة آمنة · بدون هوية حقيقية · جميع المشاركات مراجَعة</Text>
         </View>
 
-        {/* Posts */}
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 120 }}
           showsVerticalScrollIndicator={false}
         >
           {postsLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
-          ) : (
-            posts.map(p => (
-              <PostCard
-                key={p.id}
-                post={p}
-                onHeart={() => {
-                  fetch(`${BASE_URL}/community/sessions/${activeSession.id}/heart`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ postId: p.id }),
-                  });
-                }}
-              />
-            ))
-          )}
+            <ActivityIndicator color={Colors.accent} style={{ marginTop: 40 }} />
+          ) : posts.map(p => (
+            <PostCard
+              key={p.id}
+              post={p}
+              onHeart={() => {
+                fetch(`${BASE_URL}/community/sessions/${activeSession.id}/heart`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ postId: p.id }),
+                });
+              }}
+            />
+          ))}
         </ScrollView>
 
-        {/* Post Input */}
-        <View style={[styles.postInputContainer, { paddingBottom: insets.bottom + 8 }]}>
+        <View style={[styles.postInputContainer, { paddingBottom: webBottom + 8 }]}>
           <TextInput
             style={styles.postInput}
             value={newPost}
             onChangeText={setNewPost}
             placeholder="شارك ما تشعر به... أنت في أمان هنا"
-            placeholderTextColor="rgba(255,255,255,0.3)"
+            placeholderTextColor={Colors.muted}
             multiline
             maxLength={500}
             textAlign="right"
@@ -249,8 +229,8 @@ export default function CommunityScreen() {
             disabled={!newPost.trim() || posting}
           >
             {posting
-              ? <ActivityIndicator size="small" color="#0B0E18" />
-              : <Feather name="send" size={18} color="#0B0E18" />
+              ? <ActivityIndicator size="small" color={Colors.surface} />
+              : <Feather name="send" size={18} color={Colors.surface} />
             }
           </Pressable>
         </View>
@@ -260,8 +240,8 @@ export default function CommunityScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { paddingTop: insets.top }]}
-      contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+      style={[styles.container, { paddingTop: webTop }]}
+      contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
       <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
@@ -269,13 +249,12 @@ export default function CommunityScreen() {
         <Text style={styles.screenSubtitle}>لست وحدك في هذا</Text>
       </Animated.View>
 
-      {/* Principles */}
       <Animated.View entering={FadeInDown.duration(500).delay(100)} style={styles.principlesCard}>
         {[
           { icon: "👤", text: "هوية مجهولة تماماً" },
           { icon: "🤝", text: "استماع بلا حكم" },
           { icon: "🛡️", text: "مراقبة ذكاء اصطناعي" },
-        ].map((p) => (
+        ].map(p => (
           <View key={p.text} style={styles.principleRow}>
             <Text style={styles.principleIcon}>{p.icon}</Text>
             <Text style={styles.principleText}>{p.text}</Text>
@@ -286,21 +265,15 @@ export default function CommunityScreen() {
       <Text style={styles.listTitle}>الدوائر المفتوحة</Text>
 
       {loading ? (
-        <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
-      ) : (
-        sessions.map((session, i) => (
-          <Animated.View
-            key={session.id}
-            entering={FadeInDown.duration(500).delay(150 + i * 80)}
-          >
-            <SessionCard session={session} onEnter={() => enterSession(session)} />
-          </Animated.View>
-        ))
-      )}
+        <ActivityIndicator color={Colors.accent} style={{ marginTop: 40 }} />
+      ) : sessions.map((session, i) => (
+        <Animated.View key={session.id} entering={FadeInDown.duration(500).delay(150 + i * 80)}>
+          <SessionCard session={session} onEnter={() => enterSession(session)} />
+        </Animated.View>
+      ))}
 
-      {/* Reflection Prompt */}
       <Animated.View entering={FadeInDown.duration(500).delay(500)} style={styles.reflectionCard}>
-        <Text style={styles.reflectionTitle}>تذكّر</Text>
+        <Text style={styles.reflectionTitle}>✦ تذكّر</Text>
         <Text style={styles.reflectionText}>
           ما تشعر به الآن لا يُعرّفك. أنت أكثر مما تمر به في هذه اللحظة.
         </Text>
@@ -310,39 +283,42 @@ export default function CommunityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.navyDeep },
+  container: { flex: 1, backgroundColor: Colors.surface },
   header: { padding: 24, paddingBottom: 8, alignItems: "flex-end" },
-  screenTitle: { fontFamily: "Amiri_700Bold", fontSize: 32, color: "#F2EBD9" },
+  screenTitle: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 32,
+    color: Colors.onSurface,
+    letterSpacing: -0.5,
+  },
   screenSubtitle: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 15,
-    color: "rgba(242,235,217,0.5)",
-    marginTop: 2,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
+    color: Colors.muted,
+    marginTop: 4,
   },
   principlesCard: {
     margin: 16,
     marginTop: 8,
-    backgroundColor: "rgba(255,255,255,0.03)",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 20,
     padding: 16,
     gap: 12,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
     flexDirection: "row",
     justifyContent: "space-around",
   },
   principleRow: { alignItems: "center", gap: 6, flex: 1 },
   principleIcon: { fontSize: 20 },
   principleText: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: "rgba(242,235,217,0.6)",
+    color: Colors.primary,
     textAlign: "center",
   },
   listTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: "#F2EBD9",
+    color: Colors.onSurface,
     textAlign: "right",
     marginHorizontal: 16,
     marginBottom: 8,
@@ -353,10 +329,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginHorizontal: 16,
     marginBottom: 10,
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 20,
     padding: 16,
-    borderWidth: 1.5,
   },
   sessionIconCircle: {
     width: 52,
@@ -364,121 +339,124 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
-    shrink: 0,
-  } as any,
+    flexShrink: 0,
+  },
   sessionIcon: { fontSize: 24 },
   sessionInfo: { flex: 1 },
   sessionTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 16,
-    color: "#F2EBD9",
+    color: Colors.onSurface,
     textAlign: "right",
   },
   sessionDesc: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "rgba(242,235,217,0.5)",
+    color: Colors.muted,
     textAlign: "right",
     marginTop: 4,
     lineHeight: 18,
   },
-  sessionMeta: { flexDirection: "row", justifyContent: "flex-end", gap: 12, marginTop: 8 },
-  sessionMetaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
-  sessionMetaText: { fontFamily: "Amiri_400Regular", fontSize: 12 },
-  sessionMetaGrey: {
-    fontFamily: "Amiri_400Regular",
+  sessionMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 6,
+    marginTop: 8,
+  },
+  sessionMetaText: {
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "rgba(255,255,255,0.3)",
+  },
+  sessionMetaGrey: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 12,
+    color: Colors.muted,
   },
   joinBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
-    borderWidth: 1,
   },
-  joinBtnText: { fontFamily: "Amiri_700Bold", fontSize: 13 },
+  joinBtnText: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+  },
   reflectionCard: {
     margin: 16,
     marginTop: 8,
-    backgroundColor: "rgba(201,168,76,0.06)",
+    backgroundColor: Colors.primaryContainer,
     borderRadius: 20,
     padding: 20,
-    borderWidth: 1,
-    borderColor: "rgba(201,168,76,0.15)",
+    alignItems: "flex-end",
+    gap: 8,
   },
   reflectionTitle: {
-    fontFamily: "Amiri_700Bold",
-    fontSize: 14,
-    color: Colors.gold,
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+    color: Colors.accent,
     textAlign: "right",
-    marginBottom: 8,
   },
   reflectionText: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: "rgba(242,235,217,0.7)",
+    color: Colors.primary,
     textAlign: "right",
-    lineHeight: 24,
+    lineHeight: 26,
   },
   sessionHeader: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.06)",
     gap: 12,
   },
   backBtn: { padding: 8 },
   sessionHeaderTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: "#F2EBD9",
+    color: Colors.onSurface,
   },
   sessionHeaderSub: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "rgba(255,255,255,0.4)",
+    color: Colors.muted,
     marginTop: 2,
   },
   safetyBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "rgba(201,168,76,0.08)",
+    backgroundColor: Colors.primaryContainer,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(201,168,76,0.1)",
     justifyContent: "flex-end",
   },
   safetyText: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "rgba(201,168,76,0.8)",
+    color: Colors.accent,
   },
   postCard: {
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
     padding: 14,
     gap: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
   },
   postHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   postName: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.gold,
+    color: Colors.accent,
   },
   postTime: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: "rgba(255,255,255,0.3)",
+    color: Colors.muted,
   },
   postContent: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "rgba(242,235,217,0.85)",
+    color: Colors.onSurface,
     lineHeight: 22,
     textAlign: "right",
   },
@@ -489,39 +467,35 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   heartCount: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: "rgba(255,255,255,0.3)",
+    color: Colors.muted,
   },
   postInputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 10,
     padding: 12,
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.06)",
-    backgroundColor: Colors.navyDeep,
+    backgroundColor: Colors.surfaceContainer,
   },
   postInput: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: Colors.surfaceContainerHigh,
     borderRadius: 16,
     padding: 12,
-    paddingTop: 12,
-    color: "#F2EBD9",
-    fontFamily: "Amiri_400Regular",
+    color: Colors.onSurface,
+    fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    minHeight: 48,
+    minHeight: 44,
     maxHeight: 100,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    textAlignVertical: "top",
+    textAlign: "right",
   },
   sendBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: Colors.gold,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.accent,
     alignItems: "center",
     justifyContent: "center",
   },

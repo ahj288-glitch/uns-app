@@ -47,16 +47,12 @@ function SettingRow({
   danger?: boolean;
 }) {
   return (
-    <Pressable
-      style={styles.settingRow}
-      onPress={onPress}
-      disabled={!onPress}
-    >
-      <View style={[styles.settingIcon, { backgroundColor: danger ? Colors.terracotta + "20" : Colors.navySurface }]}>
-        <Feather name={icon as any} size={16} color={danger ? Colors.terracotta : Colors.gold} />
+    <Pressable style={styles.settingRow} onPress={onPress} disabled={!onPress}>
+      <View style={[styles.settingIcon, { backgroundColor: danger ? Colors.error + "20" : Colors.surfaceContainerHigh }]}>
+        <Feather name={icon as any} size={16} color={danger ? Colors.error : Colors.accent} />
       </View>
       <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, danger && { color: Colors.terracotta }]}>{title}</Text>
+        <Text style={[styles.settingTitle, danger && { color: Colors.error }]}>{title}</Text>
         {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
       {rightElement ?? (onPress ? <Feather name="chevron-right" size={16} color={Colors.muted} /> : null)}
@@ -76,7 +72,7 @@ export default function ProfileScreen() {
   async function clearSession() {
     Alert.alert(
       "إعادة البدء",
-      "هل تريد إنشاء جلسة جديدة؟ ستفقد تاريخ محادثتك.",
+      "هل تريد إنشاء جلسة جديدة؟",
       [
         { text: "إلغاء", style: "cancel" },
         {
@@ -94,7 +90,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.navy }]}
+      style={[styles.container, { backgroundColor: Colors.surface }]}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
@@ -103,7 +99,7 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>أ</Text>
           </View>
-          <View style={styles.goldRing} />
+          <View style={styles.mintRing} />
         </View>
         <Text style={styles.userName}>مرحباً بك</Text>
         <Text style={styles.userSub}>رفيقك الخاص</Text>
@@ -112,14 +108,15 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>اللهجة المفضلة</Text>
         <View style={styles.dialectGrid}>
-          {DIALECTS.map((d) => (
+          {DIALECTS.map(d => (
             <Pressable
               key={d.id}
               style={[
                 styles.dialectChip,
                 dialect === d.id && {
-                  borderColor: Colors.gold,
-                  backgroundColor: Colors.gold + "15",
+                  borderColor: Colors.accent + "80",
+                  backgroundColor: Colors.primaryContainer,
+                  borderWidth: 1.5,
                 },
               ]}
               onPress={() => {
@@ -128,12 +125,7 @@ export default function ProfileScreen() {
               }}
             >
               <Text style={styles.dialectFlag}>{d.flag}</Text>
-              <Text
-                style={[
-                  styles.dialectLabel,
-                  { color: dialect === d.id ? Colors.gold : Colors.nearWhite },
-                ]}
-              >
+              <Text style={[styles.dialectLabel, { color: dialect === d.id ? Colors.accent : Colors.primary }]}>
                 {d.ar}
               </Text>
             </Pressable>
@@ -151,12 +143,9 @@ export default function ProfileScreen() {
             rightElement={
               <Switch
                 value={notifications}
-                onValueChange={(v) => {
-                  setNotifications(v);
-                  Haptics.selectionAsync();
-                }}
-                trackColor={{ false: Colors.dark.border, true: Colors.gold }}
-                thumbColor={Colors.nearWhite}
+                onValueChange={v => { setNotifications(v); Haptics.selectionAsync(); }}
+                trackColor={{ false: Colors.surfaceContainerHigh, true: Colors.accent }}
+                thumbColor={Colors.onSurface}
               />
             }
           />
@@ -167,12 +156,9 @@ export default function ProfileScreen() {
             rightElement={
               <Switch
                 value={spiritual}
-                onValueChange={(v) => {
-                  setSpiritual(v);
-                  Haptics.selectionAsync();
-                }}
-                trackColor={{ false: Colors.dark.border, true: Colors.gold }}
-                thumbColor={Colors.nearWhite}
+                onValueChange={v => { setSpiritual(v); Haptics.selectionAsync(); }}
+                trackColor={{ false: Colors.surfaceContainerHigh, true: Colors.accent }}
+                thumbColor={Colors.onSurface}
               />
             }
           />
@@ -190,7 +176,7 @@ export default function ProfileScreen() {
         <View style={styles.privacyCard}>
           {PRIVACY_ITEMS.map((item, i) => (
             <View key={i} style={styles.privacyItem}>
-              <Feather name="shield" size={14} color={Colors.sage} />
+              <Feather name="shield" size={14} color={Colors.accent} />
               <Text style={styles.privacyText}>{item}</Text>
             </View>
           ))}
@@ -200,13 +186,13 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>أزمات نفسية؟</Text>
         <View style={styles.crisisCard}>
-          <Feather name="phone" size={20} color={Colors.terracotta} />
+          <Feather name="phone" size={20} color={Colors.error} />
           <Text style={styles.crisisTitle}>خطوط الدعم النفسي</Text>
           {[
             { country: "السعودية", num: "920033360" },
             { country: "الإمارات", num: "800-4673" },
             { country: "مصر", num: "08008880700" },
-          ].map((r) => (
+          ].map(r => (
             <View key={r.country} style={styles.crisisLine}>
               <Text style={styles.crisisCountry}>{r.country}</Text>
               <Text style={styles.crisisNum}>{r.num}</Text>
@@ -225,7 +211,7 @@ export default function ProfileScreen() {
         />
       </View>
 
-      <Text style={styles.footer}>UNS | أُنس  •  v1.0.0{"\n"}نحن لا نبيع مشاعرك.</Text>
+      <Text style={styles.footer}>أُنْس  •  v1.0.0{"\n"}نحن لا نبيع مشاعرك.</Text>
     </ScrollView>
   );
 }
@@ -234,59 +220,51 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
     alignItems: "center",
-    paddingBottom: 32,
+    paddingBottom: 28,
     paddingHorizontal: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
     gap: 8,
   },
-  avatarContainer: {
-    position: "relative",
-    marginBottom: 8,
-  },
+  avatarContainer: { position: "relative", marginBottom: 8 },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: Colors.navySurface,
+    backgroundColor: Colors.primaryContainer,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: Colors.gold,
+    borderWidth: 1.5,
+    borderColor: Colors.ghostBorder,
   },
-  goldRing: {
+  mintRing: {
     position: "absolute",
     inset: -4,
     borderRadius: 48,
     borderWidth: 1,
-    borderColor: Colors.gold + "30",
-  },
+    borderColor: Colors.accent + "40",
+  } as any,
   avatarText: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 36,
-    color: Colors.gold,
+    color: Colors.accent,
   },
   userName: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 24,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
   },
   userSub: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 13,
     color: Colors.muted,
   },
-  section: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    gap: 12,
-  },
+  section: { paddingHorizontal: 20, paddingTop: 20, gap: 12 },
   sectionTitle: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Tajawal_500Medium",
     fontSize: 12,
     color: Colors.muted,
     textAlign: "right",
     letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   dialectGrid: {
     flexDirection: "row",
@@ -298,25 +276,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: Colors.dark.border,
+    borderColor: "transparent",
   },
-  dialectFlag: {
-    fontSize: 16,
-  },
+  dialectFlag: { fontSize: 16 },
   dialectLabel: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
   },
   settingsList: {
-    backgroundColor: Colors.navyCard,
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
     overflow: "hidden",
   },
   settingRow: {
@@ -325,7 +299,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 14,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
+    borderBottomColor: Colors.ghostBorder,
   },
   settingIcon: {
     width: 36,
@@ -334,28 +308,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  settingContent: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
+  settingContent: { flex: 1, alignItems: "flex-end" },
   settingTitle: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 16,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
     textAlign: "right",
   },
   settingSubtitle: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 12,
     color: Colors.muted,
   },
   privacyCard: {
-    backgroundColor: Colors.sage + "10",
+    backgroundColor: Colors.primaryContainer,
     borderRadius: 16,
     padding: 16,
     gap: 10,
-    borderWidth: 1,
-    borderColor: Colors.sage + "30",
   },
   privacyItem: {
     flexDirection: "row",
@@ -364,44 +333,38 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   privacyText: {
-    fontFamily: "Amiri_400Regular",
-    fontSize: 15,
-    color: Colors.nearWhite,
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
+    color: Colors.primary,
     flex: 1,
     textAlign: "right",
   },
   crisisCard: {
-    backgroundColor: Colors.terracotta + "10",
+    backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
     padding: 16,
     gap: 10,
-    borderWidth: 1,
-    borderColor: Colors.terracotta + "30",
     alignItems: "flex-end",
   },
   crisisTitle: {
-    fontFamily: "Amiri_700Bold",
+    fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: Colors.nearWhite,
+    color: Colors.onSurface,
     textAlign: "right",
   },
-  crisisLine: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
+  crisisLine: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
   crisisCountry: {
-    fontFamily: "Amiri_400Regular",
+    fontFamily: "Tajawal_400Regular",
     fontSize: 15,
     color: Colors.muted,
   },
   crisisNum: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: "BeVietnamPro_500Medium",
     fontSize: 14,
-    color: Colors.terracotta,
+    color: Colors.error,
   },
   footer: {
-    fontFamily: "Inter_400Regular",
+    fontFamily: "BeVietnamPro_400Regular",
     fontSize: 12,
     color: Colors.muted,
     textAlign: "center",

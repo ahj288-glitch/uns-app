@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: 'Outfit', sans-serif;
+  --font-sans: 'Be Vietnam Pro', sans-serif;
   --font-arabic: 'Tajawal', sans-serif;
 
   --color-background: hsl(var(--background));
@@ -44,38 +44,41 @@
 }
 
 :root {
-  /* Enforcing Dark Premium Theme */
-  --background: 225 20% 8%;
-  --foreground: 40 20% 92%;
+  /* Midnight Garden — Forest Green Admin */
+  --background: 158 70% 5%;
+  --foreground: 147 40% 93%;
   
-  --card: 228 22% 12%;
-  --card-foreground: 40 20% 92%;
-  --card-border: 225 15% 18%;
+  --card: 158 37% 10%;
+  --card-foreground: 147 40% 93%;
+  --card-border: 156 28% 14%;
 
-  --primary: 43 60% 55%;
-  --primary-foreground: 225 20% 8%;
+  /* Mint Primary */
+  --primary: 150 42% 62%;
+  --primary-foreground: 158 70% 5%;
   
-  --secondary: 225 15% 18%;
-  --secondary-foreground: 40 20% 92%;
+  --secondary: 156 28% 14%;
+  --secondary-foreground: 147 40% 93%;
 
-  --muted: 225 15% 14%;
-  --muted-foreground: 225 10% 65%;
+  --muted: 156 28% 14%;
+  --muted-foreground: 145 24% 38%;
 
-  --accent: 25 65% 55%;
-  --accent-foreground: 40 20% 92%;
+  /* Secondary mint accent */
+  --accent: 149 51% 68%;
+  --accent-foreground: 158 70% 5%;
 
-  --destructive: 0 65% 55%;
-  --destructive-foreground: 40 20% 92%;
+  --destructive: 4 74% 85%;
+  --destructive-foreground: 158 70% 5%;
 
-  --border: 225 15% 18%;
-  --input: 225 15% 18%;
-  --ring: 43 60% 55%;
+  --border: 156 28% 14%;
+  --input: 156 28% 14%;
+  --ring: 150 42% 62%;
 
-  --sidebar: 225 20% 6%;
-  --sidebar-foreground: 40 20% 92%;
-  --sidebar-border: 225 15% 12%;
-  --sidebar-primary: 43 60% 55%;
-  --sidebar-accent: 25 65% 55%;
+  /* Darker sidebar */
+  --sidebar: 158 60% 4%;
+  --sidebar-foreground: 147 40% 93%;
+  --sidebar-border: 156 28% 10%;
+  --sidebar-primary: 150 42% 62%;
+  --sidebar-accent: 149 51% 68%;
 
   color-scheme: dark;
 }
@@ -89,33 +92,26 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
-  /* Custom Scrollbar for dark theme */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1B4332; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #74C69D; }
 }
 
-/* Utilities for visual depth */
 @layer utilities {
   .glass-panel {
-    @apply bg-card/80 backdrop-blur-xl border border-white/5 shadow-2xl;
+    @apply bg-card/80 backdrop-blur-xl border border-[#74C69D]/10 shadow-2xl;
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] to-[#a5d0b9];
   }
 
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30;
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30;
+  }
+
+  .mint-glow {
+    box-shadow: 0 0 24px rgba(116, 198, 157, 0.15);
   }
 }
