@@ -1,0 +1,590 @@
+Act as an elite cross-functional team including:
+- Product Design Director
+- Senior UX/UI Designer
+- Design Systems Expert
+- Motion Designer
+- Behavioral Psychologist
+- Emotional UX Strategist
+- AI Personalization Engineer
+- Data Scientist
+- Mobile Product Designer
+- Growth & Viral Product Strategist
+- Social Sharing Experience Designer
+- Arabic Copywriting Specialist
+- Privacy & Trust Expert
+- Mobile Engineer
+- Frontend Architect
+- Backend Architect
+
+I will share with you a set of redesigned screens that represent the NEW approved identity and experience direction of the app “أُنْس”.
+
+These screens are NOT inspiration.
+They are the OFFICIAL benchmark and must be treated as the governing design authority, visual system, emotional language, and product DNA for the entire app.
+
+Your mission is to deeply analyze these approved screens and build a complete, production-ready system that translates this identity into:
+1) a full design system
+2) an adaptive emotional interaction system
+3) a personalization engine
+4) a premium “Share your state” feature
+5) a complete emotional fingerprint system
+6) social-share card designs
+7) AI prompts for generating shareable Arabic lines
+8) JSON schemas ready for implementation
+9) a viral growth loop from share → curiosity → install
+10) privacy-safe and trust-centered behavior
+
+The final output should feel like a world-class premium Arabic-first app that is emotionally intelligent, visually distinctive, highly shareable, and capable of spreading organically because users genuinely want to share their experience.
+
+==================================================
+1. DESIGN DNA EXTRACTION
+==================================================
+
+Deeply analyze the provided approved screens and extract the full Design DNA, including but not limited to:
+- visual identity
+- emotional tone
+- color system
+- gradient behavior
+- spacing rhythm
+- typography hierarchy
+- Arabic-first layout rules
+- component styling
+- card styles
+- buttons
+- input fields
+- data visualization language
+- trust-building cues
+- calming patterns
+- premium simplicity principles
+- modernity and warmth balance
+- motion language
+- microcopy style
+- reassurance patterns
+- confirmation logic
+- emotional safety patterns
+
+Then define:
+- core design principles
+- visual rules
+- interaction rules
+- do’s and don’ts
+- consistency rules
+- accessibility standards
+- emotional UX standards
+- premium brand rules
+
+The result must be reusable across all current and future screens so the product feels like one unified, intentional system.
+
+==================================================
+2. LIVING UI & ADAPTIVE EMOTIONAL INTERACTION
+==================================================
+
+Design a next-generation Living UI system that feels:
+- alive
+- calm
+- adaptive
+- emotionally aware
+- different per user
+- modern and premium
+
+The interface must not feel static.
+
+Define how the UI adapts based on:
+- current mood
+- emotional state trends
+- behavior patterns
+- time of day
+- engagement intensity
+- progress level
+- reflection history
+
+Examples:
+- if user is overwhelmed, the UI becomes calmer, lighter in interaction density, more reassuring
+- if user is stable, the UI becomes more reflective and insight-oriented
+- if user is active and motivated, the UI may feel slightly more energetic and progressive
+
+Include:
+- breathing-inspired animations
+- expanding/contracting orb behavior
+- soft pulse states
+- adaptive gradients
+- gentle transitions between emotional modes
+- haptic feedback ideas
+- calm confirmation patterns
+- low-friction user interactions
+- elegant loading and empty states
+
+==================================================
+3. DEEP PERSONALIZATION ENGINE
+==================================================
+
+Design a system where each user gets a truly personalized experience.
+
+Define:
+- how emotional profiles are built
+- what data is used
+- how the system evolves over time
+- which parts of the UI are personalized
+- which parts of the content are personalized
+- which parts of the tone are personalized
+- how privacy is preserved while still delivering deep personalization
+
+Possible inputs:
+- mood selection
+- breathing sessions completed
+- reflections written
+- journaling patterns
+- time of engagement
+- session duration
+- streaks
+- engagement depth
+- trend over recent days
+- content preferences
+- tone preference
+
+Define how the app changes per user in:
+- tone
+- interaction intensity
+- recommendation style
+- shareable content style
+- card defaults
+- emotional language
+- default layout mood
+- animation speed and softness
+
+==================================================
+4. SHARE YOUR STATE FEATURE
+==================================================
+
+Design a complete premium mobile feature called:
+
+“Share your state”
+
+The goal is to allow the user to transform a current emotional moment into a beautiful, shareable card that:
+- represents them
+- feels emotionally intelligent
+- is safe to share
+- is visually desirable
+- reflects the identity of أُنْس clearly
+- makes the viewer curious
+- increases the likelihood of app download
+
+This feature must not feel like generic social sharing.
+It must feel like identity expression through أُنْس.
+
+Define:
+- feature purpose
+- user value
+- business/growth value
+- UI structure
+- screen layout
+- primary components
+- user flow
+- entry points
+- customization options
+- privacy controls
+- export/share options
+- post-share experience
+
+==================================================
+5. EMOTIONAL FINGERPRINT SYSTEM
+==================================================
+
+Design a shareable “emotional fingerprint” system for each user.
+
+This system should generate a compact representation of the user’s emotional moment in a way that is:
+- beautiful
+- minimal
+- meaningful
+- premium
+- not overly revealing
+- brand-consistent
+- naturally shareable
+
+Examples of fingerprint elements:
+- state label
+- aura color
+- emotional insight
+- mood energy
+- personal progress identity
+- reflection style
+- daily essence
+- calmness marker
+- streak identity
+
+The emotional fingerprint must feel like a signature expression powered by أُنْس.
+
+==================================================
+6. SHARE CARD DESIGN SYSTEM
+==================================================
+
+Create a full system of shareable cards for social media.
+
+Card types should include:
+1. Aura Card
+2. Insight Card
+3. Daily Summary Card
+4. Streak / Progress Card
+5. Reflection Snapshot Card
+6. Night Calm Card
+7. Morning Reset Card
+
+For each card type, define:
+- purpose
+- emotional use case
+- layout structure
+- content priority
+- typography rules
+- color usage
+- gradient behavior
+- motion behavior if animated
+- branding placement
+- safe area rules
+- share aspect ratios
+
+Supported share contexts:
+- Instagram Story
+- Snapchat
+- WhatsApp
+- X / social post
+- image save
+- text copy
+
+The cards must feel premium, contemporary, emotionally resonant, and instantly recognizable as belonging to أُنْس.
+
+==================================================
+7. BRAND VISIBILITY OF أُنْس INSIDE SHARE CARDS
+==================================================
+
+This is critical.
+
+The share cards must clearly carry the identity of “أُنْس” so that the receiver of the card becomes curious and wants to know more and download the app.
+
+Design the brand visibility strategy so that:
+- the identity of أُنْس is visible and elegant
+- it does not feel intrusive or cheap
+- it is integrated naturally into the card
+- it creates curiosity and memorability
+- the viewer can easily connect the emotional beauty of the card to the app brand
+
+Define:
+- where the wordmark/logo of أُنْس appears
+- how often it appears
+- whether it appears as watermark, signature, footer, or subtle badge
+- how the branding behaves across card types
+- what supporting line can appear under the brand
+- how to make the brand feel premium and desirable
+
+Important:
+I do NOT want the brand hidden.
+I want the brand to be clearly present in a tasteful, premium way that increases curiosity and supports organic installs.
+
+The card should make the viewer feel:
+“What is أُنْس? I want this.”
+
+Also define:
+- subtle CTA options that are elegant, not spammy
+- examples like:
+  - via أُنْس
+  - from أُنْس
+  - اكتشف بصمتك مع أُنْس
+  - لحظة من أُنْس
+- but improve them to feel more premium, smarter, and more brand-defining
+
+==================================================
+8. SCREEN UI FOR SHARE YOUR STATE
+==================================================
+
+Design the actual screen UI inside the app.
+
+The screen should include:
+- Header
+- Preview card area
+- Card type selector
+- Tone selector
+- Privacy level selector
+- Regenerate line button
+- Visual customization options
+- Brand visibility controls if needed
+- Main CTA for share
+- Secondary CTA for save image
+- Copy text option
+
+Define:
+- exact information architecture
+- hierarchy
+- states
+- interaction logic
+- transitions
+- empty/loading/generation states
+- micro-interactions
+- sticky actions
+- Arabic-first usability considerations
+
+The screen should feel world-class and premium.
+
+==================================================
+9. AI COPY GENERATION SYSTEM
+==================================================
+
+Design a full AI-powered Arabic copy generation system for share cards.
+
+The system should generate short shareable Arabic lines that are:
+- elegant
+- emotionally intelligent
+- modern
+- warm
+- reflective
+- positive without sounding fake
+- sometimes slightly mysterious
+- socially shareable
+- safe
+- non-clinical
+- concise
+- brand-appropriate for أُنْس
+
+Tone modes should include:
+- calm
+- deep
+- reflective
+- warm
+- motivating
+- mysterious
+- restorative
+- quietly powerful
+
+Define:
+- prompt structure
+- tone mapping logic
+- output rules
+- privacy-safe writing rules
+- prohibited language
+- regeneration behavior
+- how line generation changes depending on card type and privacy level
+
+Also create:
+- one single-output prompt
+- one multi-option prompt
+- rules for filtering weak outputs
+- rules for keeping the tone premium and consistent with the brand
+
+==================================================
+10. JSON SCHEMA READY FOR IMPLEMENTATION
+==================================================
+
+Provide production-friendly JSON schemas and object structures for:
+- user share state input
+- emotional fingerprint output
+- share card output
+- card template configuration
+- branding visibility configuration
+- privacy settings
+- card generation logic
+- analytics events
+- share target configuration
+- deep link structure
+- viral attribution metadata
+
+The JSON must be implementation-ready, organized, extensible, and practical for mobile and backend teams.
+
+==================================================
+11. SHARE LOGIC ENGINE
+==================================================
+
+Design the full logic engine that automatically selects:
+- card type
+- tone
+- color palette
+- branding treatment
+- quote style
+- privacy level default
+- animation type
+- suggested share target
+
+Possible inputs:
+- mood state
+- emotional label
+- energy level
+- recent trend
+- time of day
+- session type
+- completed activity
+- share history
+- user preference
+- privacy behavior
+
+Create:
+- logic rules
+- examples
+- mapping strategy
+- fallback behavior
+- regeneration behavior
+- safe sharing conditions
+
+Use both:
+- rule-based logic
+- AI-assisted selection where relevant
+
+==================================================
+12. PRIVACY, TRUST & SAFE SHARING
+==================================================
+
+Define a strict privacy-safe sharing framework.
+
+Clarify:
+- what is safe to show
+- what must never be shown
+- how sensitive data is abstracted
+- how journaling/private reflections are protected
+- how emotional content becomes shareable without becoming risky
+- how users control visibility
+- how privacy levels affect wording and design
+
+Privacy levels should include examples such as:
+- public
+- semi-private
+- highly private
+
+The system should protect the user while still enabling beautiful, viral, curiosity-driven sharing.
+
+==================================================
+13. VIRAL LOOP & GROWTH SYSTEM
+==================================================
+
+Design a complete organic viral loop for this feature.
+
+Flow:
+1. user experiences something meaningful
+2. app suggests turning it into a shareable card
+3. user previews and customizes it
+4. user shares it externally
+5. viewer sees premium emotional card with visible أُنْس branding
+6. viewer becomes curious
+7. viewer clicks link or searches for أُنْس
+8. landing page/app store listing reflects same identity
+9. viewer installs
+10. new user creates their own fingerprint
+11. loop repeats
+
+Define:
+- trigger moments
+- psychological drivers
+- curiosity mechanics
+- emotional relatability
+- aesthetic pull
+- identity expression
+- non-spammy referral mechanics
+- elegant brand-led growth tactics
+
+The growth strategy must feel natural, emotionally intelligent, and premium.
+
+==================================================
+14. LANDING EXPERIENCE AFTER SHARING
+==================================================
+
+Design the experience of the recipient after they click the shared card link.
+
+The landing experience must:
+- match the visual tone of the card
+- preserve emotional continuity
+- reinforce the identity of أُنْس
+- translate curiosity into install intent
+- feel immediate and elegant
+
+Define:
+- landing page structure
+- headline
+- subheadline
+- CTA strategy
+- app store routing
+- visual matching rules
+- first impression goals
+
+==================================================
+15. ANALYTICS & OPTIMIZATION
+==================================================
+
+Define a full analytics system for this feature.
+
+Track:
+- feature entry rate
+- card generation rate
+- regeneration rate
+- save rate
+- share rate
+- share target distribution
+- click-through rate
+- install rate from shared cards
+- retention of invited users
+- card type performance
+- tone performance
+- branding visibility impact
+- privacy level selection
+- viral coefficient indicators
+
+Define:
+- key KPIs
+- events
+- dimensions
+- experiment ideas
+- A/B tests
+- success metrics for Week 1 launch
+
+==================================================
+16. EXECUTION PRIORITIES
+==================================================
+
+Prioritize the work into:
+- MVP for one-week launch
+- phase 2 enhancements
+- phase 3 optimization
+
+MVP should include only the most critical elements needed to launch a premium, differentiated, shareable, brand-visible feature quickly and effectively.
+
+Clearly distinguish:
+- must-have
+- should-have
+- nice-to-have
+
+==================================================
+17. OUTPUT FORMAT REQUIRED
+==================================================
+
+Return the output in this exact structure:
+
+A. Design DNA Summary  
+B. Design System Rules  
+C. Living UI & Emotional Interaction Model  
+D. Personalization Engine  
+E. Share Your State Feature Definition  
+F. Emotional Fingerprint System  
+G. Share Card Design System  
+H. Brand Visibility Strategy for أُنْس  
+I. Share Screen UI Specification  
+J. AI Arabic Copy Generation System  
+K. JSON Schemas  
+L. Share Logic Engine  
+M. Privacy & Trust Model  
+N. Viral Loop & Growth Strategy  
+O. Landing Experience  
+P. Analytics & KPIs  
+Q. MVP / Phase Plan  
+R. Final Recommendations
+
+==================================================
+18. IMPORTANT CONSTRAINTS
+==================================================
+
+- Do NOT produce generic wellness app output
+- Do NOT hide the brand identity of أُنْس
+- Do NOT make the share cards look like random quote cards
+- Do NOT overcomplicate the UI
+- Do NOT use spammy growth tactics
+- Do NOT use cheap referral mechanics
+- Do NOT expose sensitive emotional details
+- Do NOT weaken the emotional elegance of the product
+- Keep everything Arabic-first and premium
+- Make the brand visible enough to drive curiosity and installs
+- Ensure the viewer of the shared card can clearly notice أُنْس and associate the beauty of the card with the app
+
+The final result must feel like:
+a premium, emotionally intelligent, visually distinctive, Arabic-first app with a world-class sharing feature that spreads organically because users want to express themselves through it, and because the visible identity of أُنْس creates curiosity and desire to download the app.

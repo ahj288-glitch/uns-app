@@ -35,7 +35,7 @@ export function Navbar() {
             <span className="font-arabic font-bold text-background text-lg leading-none">أ</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl arabic-calligraphy text-gradient-gold pb-1">أُنس</span>
+            <span className="text-2xl arabic-calligraphy text-gradient-gold pb-1">أُنْس</span>
             <span className="w-px h-4 bg-white/20"></span>
             <span className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground">UNS</span>
           </div>

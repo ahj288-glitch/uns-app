@@ -51,7 +51,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <span className="font-arabic font-bold text-background text-2xl leading-none">أ</span>
             </div>
             <div>
-              <h1 className="font-arabic font-bold text-xl leading-tight text-foreground">أُنس</h1>
+              <h1 className="font-arabic font-bold text-xl leading-tight text-foreground">أُنْس</h1>
               <p className="text-[10px] text-primary font-medium tracking-widest uppercase">UNS Admin Panel</p>
             </div>
           </div>

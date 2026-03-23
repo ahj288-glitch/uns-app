@@ -10,7 +10,7 @@ export function Footer() {
             <span className="font-arabic font-bold text-background text-xl leading-none">أ</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-4xl arabic-calligraphy text-primary">أُنس</span>
+            <span className="text-4xl arabic-calligraphy text-primary">أُنْس</span>
             <span className="w-px h-6 bg-white/20"></span>
             <span className="text-lg font-bold tracking-widest uppercase text-muted-foreground">UNS</span>
           </div>
@@ -38,7 +38,7 @@ export function Footer() {
         </div>
 
         <div className="text-sm text-muted-foreground/60 flex flex-col md:flex-row items-center justify-center gap-4">
-          <span>© ٢٠٢٦ أُنس. جميع الحقوق محفوظة.</span>
+          <span>© ٢٠٢٦ أُنْس. جميع الحقوق محفوظة.</span>
           <span className="hidden md:block w-1 h-1 rounded-full bg-white/20"></span>
           <a href="#" className="hover:text-primary transition-colors font-arabic">سياسة الخصوصية</a>
           <span className="hidden md:block w-1 h-1 rounded-full bg-white/20"></span>

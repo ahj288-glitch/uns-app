@@ -49,7 +49,7 @@ export function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="text-8xl md:text-[10rem] lg:text-[13rem] arabic-calligraphy text-gradient-gold mb-2 leading-none drop-shadow-2xl select-none"
         >
-          أُنس
+          أُنْس
         </motion.h1>
 
         <motion.p 
@@ -90,7 +90,7 @@ export function Hero() {
             <span className="mr-2 group-hover:-translate-x-1 transition-transform">←</span>
           </Button>
           <Button size="lg" variant="glass" onClick={scrollToWaitlist} className="w-full sm:w-auto text-lg font-arabic gap-2 px-8 py-6 h-auto">
-            كيف يعمل أُنس؟
+            كيف يعمل أُنْس؟
           </Button>
         </motion.div>
 

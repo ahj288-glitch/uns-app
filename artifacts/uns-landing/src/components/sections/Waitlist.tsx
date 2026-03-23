@@ -112,7 +112,7 @@ export function Waitlist() {
               <Button 
                 type="submit" 
                 size="lg" 
-                className="w-full mt-4 font-arabic text-base py-6 h-auto shadow-[0_0_25px_rgba(201,168,76,0.2)]" 
+                className="w-full mt-4 font-arabic text-base py-6 h-auto shadow-[0_0_25px_rgba(116,198,157,0.2)]" 
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "جارٍ التسجيل..." : "احجز مكانك في قائمة الانتظار ←"}
@@ -128,12 +128,12 @@ export function Waitlist() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-8"
             >
-              <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/40 shadow-[0_0_40px_rgba(201,168,76,0.2)]">
+              <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/40 shadow-[0_0_40px_rgba(116,198,157,0.25)]">
                 <svg className="w-10 h-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="arabic-text text-3xl font-bold text-foreground mb-3">أهلاً بك في أُنس</h3>
+              <h3 className="arabic-text text-3xl font-bold text-foreground mb-3">أهلاً بك في أُنْس</h3>
               <p className="text-lg text-muted-foreground mb-8 arabic-text">شكراً لانضمامك — رفيقك في الطريق!</p>
               
               <div className="bg-background rounded-2xl p-6 border border-white/5 inline-block min-w-[250px]">

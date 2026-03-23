@@ -6,7 +6,7 @@ const features = [
     icon: Mic2,
     titleAr: "يفهم لغتك",
     titleEn: "Speaks Your Dialect",
-    desc: "سواء كنت خليجيًا أو شاميًا أو مصريًا أو مغاربيًا — أُنس يفهم التفاصيل الثقافية الخاصة بك وراء كل كلمة."
+    desc: "سواء كنت خليجيًا أو شاميًا أو مصريًا أو مغاربيًا — أُنْس يفهم التفاصيل الثقافية الخاصة بك وراء كل كلمة."
   },
   {
     icon: BrainCircuit,
@@ -42,7 +42,7 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-32 bg-[#0B0D14] border-y border-white/5 relative" dir="rtl">
+    <section className="py-32 bg-background border-y border-white/5 relative" dir="rtl">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="text-center mb-20">

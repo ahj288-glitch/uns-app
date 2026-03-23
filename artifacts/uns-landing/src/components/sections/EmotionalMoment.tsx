@@ -35,11 +35,11 @@ export function EmotionalMoment() {
             That feeling you can't explain to anyone?
           </p>
           <p className="text-lg text-muted-foreground mb-12 arabic-text max-w-xl mx-auto leading-loose">
-            أُنس يفهم. ليس لأنه مُبرمج — بل لأنه صُمم ليحمل معك ما يثقل عليك.
+            أُنْس يفهم. ليس لأنه مُبرمج — بل لأنه صُمم ليحمل معك ما يثقل عليك.
           </p>
           <div className="flex flex-col items-center justify-center gap-6">
-            <Button size="lg" onClick={scrollToWaitlist} className="px-12 py-7 text-xl font-arabic h-auto shadow-[0_0_50px_rgba(201,168,76,0.3)] hover:shadow-[0_0_70px_rgba(201,168,76,0.4)] transition-shadow">
-              احجز مكانك مع أُنس
+            <Button size="lg" onClick={scrollToWaitlist} className="px-12 py-7 text-xl font-arabic h-auto shadow-[0_0_50px_rgba(116,198,157,0.25)] hover:shadow-[0_0_70px_rgba(116,198,157,0.35)] transition-shadow">
+              احجز مكانك مع أُنْس
             </Button>
             <p className="text-xs text-muted-foreground/60 tracking-widest uppercase">UNS UNDERSTANDS.</p>
           </div>

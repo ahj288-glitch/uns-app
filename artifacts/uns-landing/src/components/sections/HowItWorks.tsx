@@ -48,7 +48,7 @@ export function HowItWorks() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold arabic-text text-foreground"
           >
-            كيف يعمل أُنس؟
+            كيف يعمل أُنْس؟
           </motion.h2>
         </div>
 
@@ -64,7 +64,7 @@ export function HowItWorks() {
             >
               <div className="mb-6 relative">
                 <span className="text-8xl font-black text-white/[0.03] absolute -top-8 -right-4 select-none pointer-events-none arabic-text">{step.num}</span>
-                <div className="w-16 h-16 rounded-2xl glass-panel flex items-center justify-center text-2xl relative z-10 border-primary/20 shadow-[0_0_30px_rgba(201,168,76,0.1)]">
+                <div className="w-16 h-16 rounded-2xl glass-panel flex items-center justify-center text-2xl relative z-10 border-primary/20 shadow-[0_0_30px_rgba(116,198,157,0.15)]">
                   {step.icon}
                 </div>
               </div>

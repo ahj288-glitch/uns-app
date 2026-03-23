@@ -1,0 +1,77 @@
+==================================================
+LONG-FORM TEXT HANDLING, SECURITY & PERFORMANCE
+==================================================
+
+Design for scenarios where the user may write long-form input such as 500–2000+ words in journaling, reflection, or emotional expression.
+
+You must define a complete strategy for handling long text safely, efficiently, and intelligently.
+
+Cover all of the following:
+
+1. INPUT HANDLING
+- soft limit and hard limit for characters/words
+- autosave behavior
+- draft recovery
+- client-side validation
+- text area performance requirements
+- handling paste events for very long text
+
+2. PROCESSING PIPELINE
+- chunking strategy
+- summarization strategy
+- emotional signal extraction
+- theme extraction
+- safe generation pipeline
+- when to process synchronously vs asynchronously
+- fallback behavior if the text is too long or processing is delayed
+
+3. SECURITY & PRIVACY
+- input sanitization
+- prompt injection defense
+- abuse prevention
+- rate limiting
+- detection of PII such as names, emails, phone numbers, IDs, addresses
+- redaction/masking before downstream processing
+- encryption in transit and at rest
+- secure logging rules
+- retention policy for long-form emotional text
+- permanent deletion capability
+- access control rules
+- privacy-by-default for sensitive entries
+
+4. CONTENT SAFETY
+- detection of highly sensitive content
+- crisis / self-harm / abuse indicators
+- escalation rules
+- safe response rules
+- prevention of unsafe or overly revealing share outputs
+
+5. PERFORMANCE REQUIREMENTS
+- latency targets for different text lengths
+- max supported text size
+- chunk processing thresholds
+- caching strategy
+- cost-aware AI orchestration
+- graceful degradation
+- timeout handling
+- retry logic
+
+6. USER EXPERIENCE
+- progress indicators during analysis
+- clear user messaging during processing
+- no freezing or blocking UI
+- reassurance when long text is being analyzed
+- preserving user trust and emotional safety
+
+7. SHARE SAFETY
+- never expose raw long-form text directly in share cards
+- generate only abstracted, safe, elegant outputs
+- ensure shared content cannot reveal sensitive personal details from the original text
+
+Provide:
+A) architecture for long-text handling
+B) security controls
+C) privacy model
+D) performance targets
+E) UX behaviors
+F) implementation recommendations
