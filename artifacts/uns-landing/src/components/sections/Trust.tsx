@@ -62,7 +62,7 @@ export function Trust() {
               <div className="absolute top-6 right-6 text-6xl font-serif text-primary/20 leading-none">"</div>
               <div>
                 <p className="arabic-text text-xl md:text-2xl text-foreground mb-6 relative z-10">{q.quote}</p>
-                <p className="text-sm text-muted-foreground italic mb-8 border-l-2 border-primary/30 pl-4">{q.en}</p>
+                <p className="text-sm text-muted-foreground italic mb-8 bg-primary/5 rounded-xl px-4 py-3">{q.en}</p>
               </div>
               <div className="flex items-center gap-4 mt-auto">
                 <div className="w-10 h-10 rounded-full bg-gradient-mint flex items-center justify-center text-primary-foreground font-bold arabic-text text-lg">

@@ -30,7 +30,7 @@ function GamificationSection() {
         totalXpAwarded: 0,
         avgStreak: 0,
         levelDistribution: [
-          { level: "awareness", labelAr: "الوعي", count: 0, color: "#6B9FD7" },
+          { level: "awareness", labelAr: "الوعي", count: 0, color: "#4a7a5e" },
           { level: "balance", labelAr: "التوازن", count: 0, color: "#74C69D" },
           { level: "tranquility", labelAr: "الطمأنينة", count: 0, color: "#a5d0b9" },
         ],

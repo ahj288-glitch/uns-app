@@ -99,7 +99,7 @@
   }
   
   .bg-gradient-mint {
-    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332];
+    background: linear-gradient(135deg, #74C69D, #1B4332);
   }
 
   .glass-panel {

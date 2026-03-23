@@ -132,7 +132,7 @@
   }
 
   .btn-gradient {
-    background: linear-gradient(to right, #74C69D, #1B4332);
+    background: linear-gradient(135deg, #74C69D, #1B4332);
     color: #041710;
     font-weight: 700;
     border-radius: 9999px;
