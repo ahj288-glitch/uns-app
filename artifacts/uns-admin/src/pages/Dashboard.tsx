@@ -1,13 +1,106 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Users, Activity, Clock, Award, AlertTriangle, TrendingUp, Heart
+  Users, Activity, Clock, Award, AlertTriangle, TrendingUp, Heart,
+  Zap, Flame, Star, Trophy
 } from "lucide-react";
 import { useGetAdminOverview } from "@workspace/api-client-react";
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, BarChart, Bar
 } from "recharts";
+
+const BASE = "/api";
+
+interface GamificationStats {
+  totalXpAwarded: number;
+  avgStreak: number;
+  levelDistribution: { level: string; labelAr: string; count: number; color: string }[];
+  topStreaks: { streak: number; count: number }[];
+}
+
+function GamificationSection() {
+  const [stats, setStats] = useState<GamificationStats | null>(null);
+
+  useEffect(() => {
+    fetch(`${BASE}/gamification/stats`)
+      .then(r => r.json())
+      .then(d => setStats(d))
+      .catch(() => setStats({
+        totalXpAwarded: 0,
+        avgStreak: 0,
+        levelDistribution: [
+          { level: "awareness", labelAr: "الوعي", count: 0, color: "#6B7FD7" },
+          { level: "balance", labelAr: "التوازن", count: 0, color: "#C9A84C" },
+          { level: "tranquility", labelAr: "الطمأنينة", count: 0, color: "#10B981" },
+        ],
+        topStreaks: [],
+      }));
+  }, []);
+
+  if (!stats) return null;
+
+  const gamStats = [
+    { label: "إجمالي XP المُمنوحة", value: stats.totalXpAwarded.toLocaleString("ar-SA"), icon: Zap, color: "text-amber-400", bg: "bg-amber-400/10" },
+    { label: "متوسط السلسلة", value: `${stats.avgStreak} يوم`, icon: Flame, color: "text-orange-400", bg: "bg-orange-400/10" },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className="bg-card border border-border rounded-2xl p-6"
+    >
+      <div className="mb-6">
+        <h3 className="text-xl font-bold font-arabic">نظام التطور العاطفي</h3>
+        <p className="text-muted-foreground text-sm mt-1 font-arabic">توزيع مستويات المستخدمين والنقاط</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {gamStats.map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className={`${stat.bg} rounded-xl p-4`}>
+              <div className={`${stat.color} mb-2`}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <p className="text-muted-foreground text-xs font-arabic">{stat.label}</p>
+              <p className={`text-xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div>
+        <p className="text-sm text-muted-foreground font-arabic mb-4">توزيع المستويات</p>
+        <div className="space-y-3">
+          {stats.levelDistribution.map(level => {
+            const total = stats.levelDistribution.reduce((s, l) => s + l.count, 0) || 1;
+            const pct = Math.round((level.count / total) * 100);
+            return (
+              <div key={level.level}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-muted-foreground">{pct}%</span>
+                  <span className="font-arabic font-medium" style={{ color: level.color }}>{level.labelAr}</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: level.color }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 const MOOD_COLORS: Record<string, string> = {
   "calm": "#10b981",    // Emerald
@@ -91,6 +184,30 @@ export default function Dashboard() {
             </motion.div>
           );
         })}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2">
+          <GamificationSection />
+        </div>
+        <div>
+          {/* Community quick stats placeholder */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            className="bg-card border border-border rounded-2xl p-6"
+          >
+            <h3 className="text-xl font-bold font-arabic mb-4">المساحة الآمنة</h3>
+            <div className="text-center py-8 text-muted-foreground">
+              <div className="text-4xl mb-3">🤝</div>
+              <p className="font-arabic text-sm">الدوائر المجتمعية ستظهر هنا</p>
+              <a href="/uns-admin/community" className="text-primary text-sm font-arabic mt-3 inline-block hover:underline">
+                إدارة المجتمع ←
+              </a>
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -94,3 +94,75 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+---
+
+## UNS | أُنس — Product Architecture
+
+**Brand**: UNS | أُنس — "warmth of companionship." Navy bg (#0B0E18), Gold primary (#C9A84C), Terracotta accent (#D97757). All interfaces are Arabic-first, RTL.
+
+### Artifacts
+
+| Artifact | Path | Purpose |
+|---|---|---|
+| `artifacts/api-server` | API at `/api` | Express backend — all routes |
+| `artifacts/uns-app` | `/uns-app/` (Expo) | Mobile app (Arabic-first) |
+| `artifacts/uns-admin` | `/uns-admin/` | Admin panel (Arabic RTL) |
+| `artifacts/uns-landing` | `/uns-landing/` | Marketing landing page |
+| `artifacts/uns-strategy` | `/` | Investor strategy deck |
+
+### API Routes (`artifacts/api-server/src/routes/`)
+
+- `health.ts` — `GET /api/health`
+- `waitlist.ts` — Waitlist management
+- `companion.ts` — AI companion sessions (OpenAI)
+- `moods.ts` — Mood check-ins
+- `insights.ts` — Emotional trend analytics
+- `admin.ts` — Admin overview & safety monitor (mounted at `/api/admin`)
+- `gamification.ts` — XP / streaks / levels / daily loops (mounted at `/api/gamification`)
+  - `GET /progress?sessionId` — User XP, streak, level, milestones
+  - `POST /checkin-complete` — Awards XP after mood check-in, tracks streak
+  - `GET /loop/today?sessionId` — Get/create today's daily loop
+  - `POST /loop/complete` — Complete daily loop (+30 XP)
+  - `POST /progress/win` — Award a specific win type
+  - `GET /stats` — Admin-level aggregated gamification stats
+- `community.ts` — Safe space community sessions (mounted flat at `/api`)
+  - `GET /community/sessions` — List active sessions (falls back to seed data)
+  - `GET /community/sessions/:id/posts` — Posts within a session
+  - `POST /community/sessions/:id/posts` — Submit anonymous post (crisis detection)
+  - `POST /community/sessions/:id/heart` — Heart a post
+
+### Database Tables (`lib/db/src/schema/`)
+
+- `companionSessions`, `moodCheckins`, `waitlistEntries`, `programs`, `userSessions`
+- `userProgress` — XP, streak, level, totalCheckins, totalLoopsCompleted
+- `microWins` — Individual win events (checkin, streak_3, streak_7, loop_complete etc.)
+- `dailyLoops` — Daily micro-experience state (pending/completed)
+- `communitySessions` — Safe community circles
+- `communityPosts` — Anonymous posts within sessions
+
+### Mobile App (`artifacts/uns-app/`)
+
+5-tab layout: **رفيقي** (companion) | **مشاعري** (mood) | **رحلتي** (journey/evolution) | **مجتمع** (community) | **أنا** (profile)
+
+Key screens:
+- `app/onboarding/index.tsx` — 3-step: welcome, dialect selection, intention
+- `app/(tabs)/index.tsx` — AI companion chat
+- `app/(tabs)/mood.tsx` — Mood check-in (8 moods, intensity) + MicroWin modal after save
+- `app/(tabs)/journey.tsx` — Evolution Map: level card (XP bar), streak stats, milestones
+- `app/(tabs)/community.tsx` — Safe community circles + in-session anonymous post feed
+- `app/(tabs)/profile.tsx` — User profile
+- `constants/colors.ts` — Includes `navyDeep` (#08090F), `navy`, `gold`, `terracotta`, `sage`
+- Fonts: `Amiri_400Regular`, `Amiri_700Bold`, `Inter_*`
+
+### Gamification System
+
+Levels: **الوعي** (0–300 XP) → **التوازن** (300–700 XP) → **الطمأنينة** (700–1200 XP)
+Streak system: consecutive daily check-ins build the chain. Milestones at 3, 7, 14, 30 days.
+Daily loop: one micro-experience per day (breathing, gratitude, reflection, body scan, affirmation).
+
+### Admin Panel (`artifacts/uns-admin/`)
+
+RTL sidebar: لوحة التحكم | المستخدمون وقائمة الانتظار | المساحة الآمنة | مراقبة السلامة | إعدادات الذكاء الاصطناعي
+Dashboard includes: 6 KPI cards, "نظام التطور العاطفي" (gamification stats + level distribution), community quick panel, user growth chart, mood distribution pie chart.
+Community page (`/community`): Session management, moderation queue, safety banner with crisis hotlines.

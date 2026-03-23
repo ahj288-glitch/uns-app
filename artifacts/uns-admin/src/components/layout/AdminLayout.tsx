@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 const NAV_ITEMS = [
   { path: "/", label: "لوحة التحكم", labelEn: "Dashboard", icon: Home },
   { path: "/users", label: "المستخدمون وقائمة الانتظار", labelEn: "Users & Waitlist", icon: Users },
-  { path: "/programs", label: "برامج الرفاه", labelEn: "Wellness Programs", icon: BookOpen },
+  { path: "/community", label: "المساحة الآمنة", labelEn: "Community", icon: BookOpen },
   { path: "/safety", label: "مراقبة السلامة", labelEn: "Safety Monitor", icon: ShieldAlert },
   { path: "/ai-config", label: "إعدادات الذكاء الاصطناعي", labelEn: "AI Config", icon: Settings },
 ];

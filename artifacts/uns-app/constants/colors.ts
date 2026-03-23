@@ -1,5 +1,6 @@
 const GOLD = "#C9A84C";
 const GOLD_LIGHT = "#E8C96A";
+const NAVY_DEEP = "#08090F";
 const NAVY = "#0B0E18";
 const NAVY_CARD = "#131727";
 const NAVY_SURFACE = "#1A2038";
@@ -11,6 +12,7 @@ const MUTED = "#8090B0";
 export default {
   gold: GOLD,
   goldLight: GOLD_LIGHT,
+  navyDeep: NAVY_DEEP,
   navy: NAVY,
   navyCard: NAVY_CARD,
   navySurface: NAVY_SURFACE,

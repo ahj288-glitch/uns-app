@@ -5,6 +5,8 @@ import companionRouter from "./companion";
 import moodsRouter from "./moods";
 import insightsRouter from "./insights";
 import adminRouter from "./admin";
+import gamificationRouter from "./gamification";
+import communityRouter from "./community";
 
 const router: IRouter = Router();
 
@@ -14,5 +16,7 @@ router.use(companionRouter);
 router.use(moodsRouter);
 router.use(insightsRouter);
 router.use(adminRouter);
+router.use("/gamification", gamificationRouter);
+router.use(communityRouter);
 
 export default router;

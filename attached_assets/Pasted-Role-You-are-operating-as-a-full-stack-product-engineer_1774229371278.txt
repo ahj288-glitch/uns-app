@@ -1,0 +1,165 @@
+Role:
+You are operating as a full-stack product engineering team (AI/ML, Backend, Mobile, DevOps, Security, and Product). Your responsibility is to audit, validate, enhance, and implement the “Unns – Emotional Operating System” product.
+
+1. Mandatory First Step: Audit & Validation
+
+Before writing or modifying any code, you must:
+
+Carefully review the entire product concept, including:
+AI Companion (Al-Rafeeq)
+Emotional Insights Engine
+Daily Loop System
+Emotional Gamification (Gentle Streak, Micro Wins, Emotional Levels)
+Smart Nudging Engine
+Evolution Map (Journey System)
+Safe Community System
+Your responsibilities:
+Identify:
+Missing components
+Weak logic or gaps
+Opportunities for improvement
+Propose enhancements where needed
+Ensure the system is cohesive, scalable, and production-ready
+2. Execution Condition
+
+After completing the review:
+
+If the system (or any part of it) is NOT implemented:
+
+→ You MUST begin building it immediately.
+
+If partially implemented:
+
+→ Refactor, improve, and complete it to production-grade quality.
+
+If already implemented:
+
+→ Optimize, validate performance, and ensure alignment with the product vision.
+
+3. Core Systems to Implement (Non-Negotiable)
+
+You must ensure the following systems are fully designed and implemented:
+
+A. AI Companion Engine (Core Brain)
+Context-aware conversational system (text + voice-ready)
+Memory engine (user mood history, patterns, behaviors)
+Decision engine (when to intervene, what to suggest)
+Humanized responses (empathetic, non-clinical tone)
+Safety constraints (no diagnosis, escalation rules)
+B. Daily Loop System (Habit Engine)
+
+Implement a full daily behavioral loop:
+
+Trigger (AI or notification)
+Emotional Check-in (mood input)
+AI-driven recommendation
+Micro experience (2–5 minutes)
+Micro reward
+Insight generation
+Reinforcement for next-day return
+
+This loop must be seamless, fast, and frictionless.
+
+C. Emotional Gamification System (Non-Traditional)
+Gentle Streak (self-care days, no punishment reset)
+Micro Wins tracking (breathing, journaling, participation)
+Emotional Levels (Awareness → Balance → Tranquility)
+Positive reinforcement messaging (no pressure, no guilt)
+D. Smart Nudging Engine
+Context-aware triggers based on:
+inactivity
+mood changes
+behavioral patterns
+Personalized timing per user
+Soft, human-centered messaging (non-intrusive)
+E. Emotional Insights Engine
+Mood tracking & aggregation
+Trend analysis (daily, weekly)
+Insight generation:
+“Your stress decreased by X%”
+“This activity improved your mood”
+Explainable logic (transparent to user)
+F. Evolution Map (Journey System)
+Visual progress across emotional stages:
+Awareness → Balance → Tranquility
+Dynamic progression based on real behavior
+Milestones & emotional achievements
+G. Safe Community System
+Anonymous mode (no real identity required)
+Structured sessions (not chaotic chat)
+AI moderation (toxicity, abuse detection)
+No direct messaging initially
+Safe environment enforcement
+H. Personalization Engine
+Each user must have:
+Unique nudges
+Tailored recommendations
+Personalized journey progression
+4. Technical Requirements
+Clean architecture (modular, scalable)
+API-first backend
+Real-time capability where needed
+Secure data handling (encryption, anonymization)
+High performance:
+AI response < 1.5s
+App load < 2s
+5. Behavioral Design Constraints (Critical)
+
+You MUST ensure:
+
+Do NOT implement:
+Competitive gamification (leaderboards, points, pressure)
+Addictive dark patterns
+MUST implement:
+Gentle motivation
+Emotional safety
+Human-like interaction
+Positive reinforcement
+6. System Integrity Requirement
+
+All systems must be interconnected:
+
+AI → drives nudges
+Nudges → trigger daily loop
+Daily loop → feeds insights
+Insights → reinforce retention
+Retention → strengthens habit
+
+No isolated features are allowed.
+
+7. Final Deliverable (Critical)
+
+After completing the review and/or implementation:
+
+You MUST provide a complete list of:
+👉 All application screens/pages
+
+Including (but not limited to):
+
+Home / Sanctuary
+AI Companion (Al-Rafeeq)
+Emotional Check-in
+Daily Experience
+Insights Dashboard
+Evolution Map (Journey)
+Community (Safe Space)
+Session Entry (Listen/Share)
+Profile
+Settings
+Notifications
+Onboarding
+Any additional system pages
+8. Final Purpose
+
+This list will be shared with a UI/UX Design Expert to:
+
+Refine user experience
+Improve interface design
+Ensure emotional consistency and usability
+9. Execution Mindset
+
+Do NOT build features.
+
+Build:
+
+A living, adaptive emotional system that learns, evolves, and supports the user daily.
