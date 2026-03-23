@@ -97,7 +97,8 @@ export function Waitlist() {
                 <label className="text-sm font-arabic font-medium text-foreground">اللهجة العربية المفضّلة *</label>
                 <select 
                   {...register("dialect")}
-                  className="flex h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-foreground font-arabic focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary focus-visible:bg-white/10 transition-all appearance-none"
+                  className="flex h-12 w-full rounded-xl bg-card/50 px-4 py-2 text-sm text-foreground font-arabic focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-all appearance-none"
+                  style={{ border: '1px solid rgba(116,198,157,0.15)' }}
                 >
                   <option value="" disabled>اختر لهجتك...</option>
                   <option value="gulf" className="bg-background text-foreground">خليجية</option>

@@ -33,7 +33,7 @@ export function Privacy() {
               desc: "إقامة البيانات في منطقة الشرق الأوسط وشمال أفريقيا تضمن الامتثال لأنظمة حماية البيانات في الإمارات والسعودية." 
             },
           ].map((item, i) => (
-            <div key={i} className="border-r-2 border-primary/30 pr-4 py-1">
+            <div key={i} className="bg-primary/5 rounded-xl px-4 py-3">
               <h4 className="text-base font-bold text-foreground mb-1 font-arabic">{item.titleAr}</h4>
               <p className="text-xs text-primary/60 uppercase tracking-widest mb-3">{item.titleEn}</p>
               <p className="text-sm text-muted-foreground leading-loose arabic-text">{item.desc}</p>

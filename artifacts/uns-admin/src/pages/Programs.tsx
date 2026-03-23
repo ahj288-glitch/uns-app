@@ -273,7 +273,7 @@ export default function Programs() {
             <button 
               type="submit" 
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none"
+              className="px-5 py-2.5 btn-gradient disabled:opacity-50 disabled:transform-none"
             >
               {editingId ? "Save Changes" : "Create Program"}
             </button>

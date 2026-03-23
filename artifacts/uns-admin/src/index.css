@@ -7,7 +7,7 @@
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --color-border: rgba(116, 198, 157, var(--border-opacity, 0.08));
+  --color-border: rgba(116, 198, 157, 0.15);
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
@@ -18,7 +18,8 @@
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-primary-container: hsl(var(--primary-container));
-  
+  --color-primary-strong: hsl(var(--primary-strong));
+
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
 
@@ -33,7 +34,7 @@
 
   --color-sidebar: hsl(var(--sidebar));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: rgba(116, 198, 157, 0.06);
+  --color-sidebar-border: rgba(116, 198, 157, 0.08);
   --color-sidebar-primary: hsl(var(--sidebar-primary));
   --color-sidebar-accent: hsl(var(--sidebar-accent));
 
@@ -46,10 +47,10 @@
 
 :root {
   /* Midnight Garden — Forest Green Admin */
-  /* bg: #041710 = hsl(158 70% 5%) */
-  --background: 158 70% 5%;
+  /* bg: #041710 → hsl(155 82% 6%) */
+  --background: 155 82% 6%;
   --foreground: 147 40% 93%;
-  
+
   /* Surface layers */
   /* card: #10231c = surfaceContainer */
   --card: 158 37% 10%;
@@ -57,9 +58,11 @@
   /* card-high: #1a2e26 = surfaceContainerHigh */
   --card-high: 157 28% 14%;
 
-  /* Mint Primary: #a5d0b9 */
-  --primary: 150 42% 62%;
-  --primary-foreground: 158 70% 5%;
+  /* Primary: #74C69D = hsl(149 51% 62%) */
+  --primary: 149 51% 62%;
+  --primary-foreground: 155 82% 6%;
+  /* Primary strong: deeper mint */
+  --primary-strong: 149 44% 52%;
   /* Primary container: #1B4332 */
   --primary-container: 158 38% 17%;
 
@@ -69,24 +72,21 @@
   --muted: 156 28% 14%;
   --muted-foreground: 145 24% 38%;
 
-  /* Secondary Mint Accent: #74C69D */
-  --accent: 149 51% 62%;
-  --accent-foreground: 158 70% 5%;
+  /* Accent: #85d7ad = hsl(150 53% 68%) */
+  --accent: 150 53% 68%;
+  --accent-foreground: 155 82% 6%;
 
-  /* Error */
   --destructive: 4 74% 85%;
-  --destructive-foreground: 158 70% 5%;
+  --destructive-foreground: 155 82% 6%;
 
-  /* Ghost mint border */
-  --border-opacity: 0.08;
   --input: 156 28% 14%;
-  --ring: 150 42% 62%;
+  --ring: 149 51% 62%;
 
   /* Sidebar — slightly deeper than bg */
-  --sidebar: 158 60% 4%;
+  --sidebar: 155 70% 4%;
   --sidebar-foreground: 147 40% 93%;
-  --sidebar-primary: 150 42% 62%;
-  --sidebar-accent: 149 51% 62%;
+  --sidebar-primary: 149 51% 62%;
+  --sidebar-accent: 150 53% 68%;
 
   color-scheme: dark;
 }
@@ -94,6 +94,11 @@
 @layer base {
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  ::selection {
+    background: rgba(116, 198, 157, 0.3);
+    color: inherit;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -106,12 +111,12 @@
   .glass-panel {
     background: rgba(16, 35, 28, 0.8);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(116, 198, 157, 0.1);
+    border: 1px solid rgba(116, 198, 157, 0.15);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
-  
+
   .ghost-border {
-    border: 1px solid rgba(116, 198, 157, 0.08);
+    border: 1px solid rgba(116, 198, 157, 0.15);
   }
 
   .text-gradient {
@@ -127,6 +132,16 @@
   }
 
   .btn-gradient {
-    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332] text-[#041710] font-bold shadow-lg shadow-black/20 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all rounded-full;
+    background: linear-gradient(to right, #74C69D, #1B4332);
+    color: #041710;
+    font-weight: 700;
+    border-radius: 9999px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .btn-gradient:hover {
+    box-shadow: 0 6px 20px rgba(116, 198, 157, 0.3);
+    transform: translateY(-2px);
   }
 }
