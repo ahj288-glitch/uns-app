@@ -6,7 +6,9 @@ import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
 
-function TabIcon({ name, color, focused }: { name: any; color: string; focused: boolean }) {
+type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
+
+function TabIcon({ name, color, focused }: { name: FeatherIconName; color: string; focused: boolean }) {
   return (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
       <Feather name={name} size={20} color={focused ? Colors.surface : color} />

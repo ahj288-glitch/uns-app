@@ -68,10 +68,24 @@ function XPBar({ current, max }: { current: number; max: number }) {
   );
 }
 
+interface GamificationProgress {
+  xp: number;
+  streakDays: number;
+  longestStreak: number;
+  totalCheckins: number;
+  totalLoopsCompleted: number;
+  currentLevel: {
+    key: string;
+    labelAr: string;
+    progressPercent: number;
+  };
+  recentWins: unknown[];
+}
+
 export default function JourneyScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId } = useSession();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<GamificationProgress | null>(null);
   const [loading, setLoading] = useState(true);
 
   const webTop = Platform.OS === "web" ? 67 : insets.top;
