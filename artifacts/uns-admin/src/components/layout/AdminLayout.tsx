@@ -16,6 +16,7 @@ import {
   Megaphone,
   UserCog,
   ScrollText,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -63,6 +64,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { path: "/team", label: "الفريق والصلاحيات", labelEn: "Team & RBAC", icon: UserCog },
       { path: "/audit-logs", label: "سجل المراجعة", labelEn: "Audit Logs", icon: ScrollText },
+      { path: "/errors-config", label: "الأخطاء والحدود", labelEn: "Errors & Limits", icon: AlertTriangle },
     ],
   },
 ];

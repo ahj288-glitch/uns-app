@@ -21,7 +21,10 @@ import Animated, {
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/colors";
+import { ERRORS, LIMITS } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
+import ErrorToast from "@/components/ui/ErrorToast";
+import CharCounter from "@/components/ui/CharCounter";
 
 const MOODS = [
   { word: "سعيد", en: "happy", color: Colors.accent, intensity: 4 },
@@ -141,16 +144,40 @@ export default function MoodScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [winResult, setWinResult] = useState<WinResult | null>(null);
+  const [toast, setToast] = useState<{ visible: boolean; message: string; severity: "info" | "warning" | "error" | "limit" | "critical" | "safety" }>({
+    visible: false,
+    message: "",
+    severity: "error",
+  });
+
+  const NOTES_MAX = LIMITS.MOOD_NOTES_MAX_CHARS;
+  const NOTES_WARN = LIMITS.MOOD_NOTES_WARN_AT_CHARS;
+
+  function showToast(message: string, severity: typeof toast.severity = "error") {
+    setToast({ visible: true, message, severity });
+  }
 
   const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
   async function saveCheckin() {
-    if (!selectedMood || !sessionId) return;
+    if (!selectedMood) {
+      showToast(ERRORS.MOOD_NOT_SELECTED.ar, "info");
+      return;
+    }
+    if (!sessionId) {
+      showToast(ERRORS.SESSION_INVALID.ar, "error");
+      return;
+    }
+    if (notes.length > NOTES_MAX) {
+      showToast(ERRORS.NOTES_TOO_LONG.ar, "warning");
+      return;
+    }
+
     setIsSaving(true);
     try {
-      await fetch(`${BASE}/api/moods/checkin`, {
+      const res = await fetch(`${BASE}/api/moods/checkin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,6 +188,8 @@ export default function MoodScreen() {
           notes: notes.trim() || undefined,
         }),
       });
+      if (!res.ok && res.status !== 201) throw new Error("checkin_failed");
+
       const progressRes = await fetch(`${BASE}/api/gamification/checkin-complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -178,8 +207,14 @@ export default function MoodScreen() {
         setNotes("");
         setIntensity(3);
       }, 2000);
-    } catch (e) {
-      console.error(e);
+    } catch (err: unknown) {
+      const isNetwork = err instanceof TypeError;
+      if (isNetwork) {
+        showToast(ERRORS.NETWORK_FAILED_RETRY.ar, "error");
+      } else {
+        showToast(ERRORS.UNKNOWN_ERROR.ar, "error");
+      }
+      if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsSaving(false);
     }
@@ -249,15 +284,21 @@ export default function MoodScreen() {
               <Animated.View entering={FadeInDown.duration(500)} style={styles.notesSection}>
                 <Text style={styles.sectionLabel}>ملاحظات (اختياري)</Text>
                 <TextInput
-                  style={styles.notesInput}
+                  style={[styles.notesInput, notes.length > NOTES_MAX && styles.notesInputError]}
                   value={notes}
-                  onChangeText={setNotes}
+                  onChangeText={text => {
+                    if (text.length > NOTES_MAX + 20) return;
+                    setNotes(text);
+                  }}
                   placeholder="أخبرني أكثر عن شعورك..."
                   placeholderTextColor={Colors.muted}
                   multiline
                   numberOfLines={3}
                   textAlign="right"
+                  accessibilityLabel="ملاحظات المزاج"
+                  accessibilityHint={`الحد الأقصى ${NOTES_MAX} حرف`}
                 />
+                <CharCounter current={notes.length} max={NOTES_MAX} warnAt={NOTES_WARN} />
               </Animated.View>
             )}
 
@@ -295,6 +336,12 @@ export default function MoodScreen() {
         </View>
       </ScrollView>
       {winResult && <MicroWinModal result={winResult} onClose={() => setWinResult(null)} />}
+      <ErrorToast
+        visible={toast.visible}
+        message={toast.message}
+        severity={toast.severity}
+        onDismiss={() => setToast(t => ({ ...t, visible: false }))}
+      />
     </>
   );
 }
@@ -385,6 +432,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     minHeight: 100,
     textAlignVertical: "top",
+  },
+  notesInputError: {
+    borderWidth: 1,
+    borderColor: Colors.error + "66",
   },
   saveSection: { paddingHorizontal: 24, marginBottom: 16 },
   saveBtn: {

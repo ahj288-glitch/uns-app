@@ -1,0 +1,505 @@
+Error Handling, Limits Messaging, and User-Safe Feedback System for Unns
+
+You are operating as a senior cross-functional team including Product, UX Writing, Backend Engineering, Frontend Engineering, AI Systems, Security, and Behavioral Design.
+
+Your task is to design and implement a comprehensive Error Handling, Limits Management, and User Feedback System for Unns.
+
+This system must ensure that every possible limit, restriction, validation issue, system failure, AI interruption, permission problem, or business rule violation is handled gracefully, clearly, safely, and consistently across the app.
+
+The goal is not only to show errors.
+The goal is to build a human-centered communication layer that:
+	•	protects user trust
+	•	reduces frustration
+	•	guides the user toward the next best action
+	•	avoids technical confusion
+	•	reflects the emotional and supportive identity of Unns
+	•	remains fully aligned with product rules, configurable limits, and security constraints
+
+⸻
+
+1) Mandatory First Step: Audit All Possible Error Scenarios
+
+Before implementation, you must first review and map all possible error and limit scenarios across the product, including but not limited to:
+	•	exceeding maximum daily messages
+	•	exceeding maximum characters per message
+	•	exceeding session time
+	•	sending empty messages
+	•	unsupported characters or unsafe input
+	•	blocked actions due to permissions
+	•	provider failure
+	•	AI timeout
+	•	failed message delivery
+	•	failed check-in submission
+	•	unavailable feature
+	•	internet connectivity issues
+	•	outdated app version
+	•	unauthorized access
+	•	expired session
+	•	moderation or safety intervention
+	•	duplicate submissions
+	•	rate limit exceeded
+	•	cooldown periods
+	•	missing required fields
+	•	invalid file or media input if applicable
+	•	restricted feature by plan or role
+	•	service temporarily unavailable
+	•	maintenance mode
+	•	fallback provider activated
+	•	dashboard config conflicts
+	•	invalid configurable values entered by admin
+
+Do not restrict yourself to obvious errors only.
+Think systematically across frontend, backend, API, AI, security, moderation, analytics, permissions, and operations.
+
+⸻
+
+2) Core Principle
+
+Do not implement a random collection of messages.
+
+Build a Unified Error Communication System with the following principles:
+
+A. Human-Centered
+
+Messages must sound clear, calm, respectful, and supportive.
+
+B. Actionable
+
+Every message should tell the user what happened and what they can do next.
+
+C. Non-Technical by Default
+
+Do not expose raw system errors to end users unless necessary and properly sanitized.
+
+D. Emotionally Safe
+
+Because Unns is an emotional wellness product, messages must never sound harsh, blaming, cold, robotic, or punitive.
+
+E. Configurable
+
+Error copy, limits, thresholds, and escalation behavior must be manageable through the Admin Dashboard whenever appropriate.
+
+F. Consistent
+
+The same rule should not produce inconsistent wording in different parts of the app.
+
+⸻
+
+3) Build a Structured Error Taxonomy
+
+Design a formal error taxonomy and classification model.
+
+At minimum, categorize errors into domains such as:
+	•	Validation Errors
+	•	Usage Limit Errors
+	•	Permission Errors
+	•	Authentication Errors
+	•	Network Errors
+	•	AI Provider Errors
+	•	System Errors
+	•	Feature Availability Errors
+	•	Safety & Moderation Errors
+	•	Config/Rule Conflict Errors
+	•	Admin Dashboard Errors
+	•	Subscription/Plan Restriction Errors
+	•	Rate Limiting Errors
+	•	Retryable vs Non-Retryable Errors
+
+Each error must have:
+	•	unique error code
+	•	domain/category
+	•	user-facing message
+	•	internal technical message
+	•	severity level
+	•	retry behavior
+	•	UI treatment type
+	•	logging behavior
+	•	analytics event mapping
+
+⸻
+
+4) Limits Management Messaging (Critical)
+
+The system must properly handle all product and business limits.
+
+Examples include:
+
+A. Daily Message Limit Exceeded
+
+If a user sends more than the allowed number of daily messages, the system must:
+	•	stop the action safely
+	•	show a clear and supportive message
+	•	explain that the daily limit has been reached
+	•	optionally show when access will reset
+	•	optionally suggest an alternative action such as breathing, journaling, or returning later
+
+Example intent:
+	•	calm
+	•	respectful
+	•	informative
+	•	non-punitive
+
+B. Character Limit Exceeded
+
+If a user enters more characters than allowed:
+	•	prevent submission
+	•	show live character feedback before submit
+	•	explain the limit clearly
+	•	guide the user to shorten the message
+
+C. Session Limit Reached
+
+If a user reaches the maximum allowed session duration:
+	•	close or pause gracefully
+	•	explain why
+	•	suggest the next step
+	•	preserve trust and continuity
+
+D. Rate Limit / Cooldown
+
+If a user is sending too many requests too quickly:
+	•	communicate clearly
+	•	tell them to wait
+	•	show remaining wait time when possible
+
+⸻
+
+5) UX Requirements for Error Display
+
+Design the system so that error communication depends on context and severity.
+
+Support appropriate presentation types such as:
+	•	inline validation messages
+	•	helper text
+	•	toasts/snackbars
+	•	modal dialogs
+	•	banners
+	•	full-screen states
+	•	empty/error states
+	•	retry prompts
+	•	fallback messages
+	•	admin warnings
+	•	silent logging only for certain background issues
+
+You must decide the correct UI pattern for each error category.
+
+Examples:
+	•	character limit: inline
+	•	network failure: banner or retry state
+	•	expired session: blocking modal or redirect
+	•	AI timeout: soft retry prompt
+	•	hard safety restriction: strong modal with explanation
+
+⸻
+
+6) Live Validation and Preventive Feedback
+
+Do not wait until submission for all errors.
+
+Where applicable, implement real-time preventive UX such as:
+	•	live character counters
+	•	message count indicators
+	•	warnings as users approach a limit
+	•	disabled CTA with explanation
+	•	format validation before submit
+	•	proactive guidance when input is likely to fail
+
+The product should reduce avoidable errors before they happen.
+
+⸻
+
+7) Friendly Message Writing Standards
+
+All end-user error copy must follow these rules:
+	•	concise
+	•	calm
+	•	respectful
+	•	supportive
+	•	specific
+	•	action-oriented
+	•	never blaming
+	•	never shaming
+	•	never vague
+
+Avoid wording like:
+	•	“Invalid request”
+	•	“Operation failed”
+	•	“Unexpected error”
+	•	“Bad input”
+	•	“Access denied”
+	•	“You are not allowed”
+
+Prefer wording like:
+	•	“You’ve reached today’s message limit. You can continue tomorrow, or try a quick calming exercise now.”
+	•	“Your message is a little too long. Please shorten it to continue.”
+	•	“We couldn’t complete that right now. Please try again in a moment.”
+	•	“This section isn’t available for your current access level.”
+
+The tone must match Unns: warm, intelligent, and grounded.
+
+⸻
+
+8) System for Dynamic and Configurable Error Messages
+
+Whenever appropriate, error messages must not be hardcoded.
+
+Build support for configurable message templates that can use dynamic values such as:
+	•	current limit
+	•	remaining count
+	•	reset time
+	•	required length
+	•	retry time
+	•	active provider status
+	•	role name
+	•	feature name
+
+Example template behavior:
+	•	“You’ve used {used_messages} of {max_daily_messages} messages today.”
+	•	“Please wait {retry_after_seconds} seconds before sending another message.”
+
+These templates should be manageable from the Admin Dashboard where appropriate.
+
+⸻
+
+9) AI and Provider Failure Handling
+
+Because Unns depends on AI providers, implement graceful error and failover communication.
+
+Scenarios include:
+	•	provider timeout
+	•	provider unavailable
+	•	provider returned invalid response
+	•	provider switched automatically to fallback
+	•	all providers unavailable
+
+Requirements:
+
+For users:
+
+Do not expose internal provider names unless intentionally designed.
+Show calm fallback messages such as:
+	•	“We’re having a brief issue completing this response right now. Please try again in a moment.”
+
+For operations/admin:
+
+Show full detail:
+	•	failed provider
+	•	error reason
+	•	time
+	•	fallback provider selected
+	•	whether auto-failover succeeded
+
+For system behavior:
+	•	log event
+	•	trigger alert if configured
+	•	retry when appropriate
+	•	fall back safely
+	•	avoid duplicate user submissions
+
+⸻
+
+10) Safety and Moderation Error Handling
+
+When actions are blocked or interrupted for safety reasons, the system must communicate carefully.
+
+Scenarios:
+	•	abusive or harmful language detected
+	•	moderation block
+	•	restricted content
+	•	unsafe community action
+	•	temporary communication suspension
+
+Requirements:
+	•	do not shame the user
+	•	do not reveal harmful moderation internals
+	•	explain the restriction calmly
+	•	provide next steps if appropriate
+	•	escalate internally where needed
+
+⸻
+
+11) Offline, Connectivity, and Recovery States
+
+Handle all network-related states gracefully.
+
+Scenarios:
+	•	no internet
+	•	unstable connection
+	•	failed retry
+	•	submission delayed
+	•	reconnect state
+
+Support:
+	•	retry actions
+	•	save draft where applicable
+	•	preserve input where possible
+	•	reconnect messaging
+	•	background resubmission logic where safe
+
+The user should never lose work unnecessarily.
+
+⸻
+
+12) Authentication, Session, and Access Errors
+
+Handle:
+	•	expired session
+	•	invalid token
+	•	unauthorized access
+	•	forbidden action
+	•	logged out state
+	•	role-restricted access
+
+Requirements:
+	•	secure handling
+	•	clean redirect flows
+	•	clear explanation
+	•	preserve context where possible
+	•	no leaked sensitive system detail
+
+⸻
+
+13) Admin Dashboard Error Handling
+
+This system must also support professional error handling in the Admin Dashboard itself.
+
+Include scenarios such as:
+	•	invalid config value
+	•	dependency conflict
+	•	missing required config
+	•	unsafe publish attempt
+	•	provider key test failure
+	•	failed rollback
+	•	permission-restricted admin action
+	•	stale config version conflict
+	•	draft/publish mismatch
+
+Admin messages may be more detailed than end-user messages, but must still be clear and structured.
+
+⸻
+
+14) Logging, Monitoring, and Analytics
+
+Every meaningful error must be traceable.
+
+Build logging rules for:
+	•	user-facing errors
+	•	silent backend failures
+	•	provider issues
+	•	rate limit triggers
+	•	moderation blocks
+	•	invalid admin changes
+	•	config validation failures
+
+For each error, determine:
+	•	whether to log
+	•	severity
+	•	whether to alert
+	•	whether to count in analytics
+	•	whether it should trigger support investigation
+
+Support operational visibility into:
+	•	top recurring errors
+	•	failed flows
+	•	limit-related friction
+	•	provider-related failures
+	•	conversion drop caused by error states
+
+⸻
+
+15) Retry, Recovery, and Fallback Logic
+
+For each error type, define recovery behavior.
+
+Examples:
+	•	retry automatically
+	•	retry manually
+	•	switch provider
+	•	save and retry later
+	•	redirect
+	•	disable action
+	•	show alternative path
+	•	escalate to support
+
+Do not treat all failures equally.
+
+The system must distinguish between:
+	•	temporary failure
+	•	user input problem
+	•	business rule restriction
+	•	permission issue
+	•	fatal system issue
+
+⸻
+
+16) Localization and Copy Governance
+
+If the app supports Arabic and English, error messaging must support multilingual delivery with consistent meaning and tone.
+
+Build:
+	•	centralized copy management
+	•	translation-safe templates
+	•	consistent terminology
+	•	support for RTL/LTR rendering
+
+Do not allow inconsistent or machine-like translations across the product.
+
+⸻
+
+17) Accessibility and Inclusivity
+
+Error messages must also be accessible.
+
+Ensure:
+	•	screen reader compatibility
+	•	color is not the only signal
+	•	clear focus behavior
+	•	readable contrast
+	•	mobile-friendly visibility
+	•	understandable wording
+
+⸻
+
+18) Required Deliverables
+
+After implementation planning, provide:
+
+A. Complete error matrix
+
+A full list of all identified errors, grouped by category
+
+B. For each error:
+	•	error code
+	•	trigger condition
+	•	user message
+	•	internal/admin message
+	•	severity
+	•	UI display type
+	•	retry/recovery rule
+	•	logging/alerting rule
+
+C. Copy standards guide
+
+The tone and writing rules for all future error messages
+
+D. Configurable error message list
+
+Which messages and limits should be editable through the Admin Dashboard
+
+E. Preventive UX recommendations
+
+Where live validation, counters, or warnings should exist to reduce frustration
+
+⸻
+
+19) Final Mindset
+
+Do not build “error messages.”
+
+Build a trust-preserving, emotionally intelligent failure-handling system.
+
+In Unns, every failure state is part of the user experience.
+Every limit is part of the product design.
+Every message must protect clarity, trust, safety, and emotional comfort.
+
+The final result must ensure that when something goes wrong, the user still feels guided, respected, and supported.

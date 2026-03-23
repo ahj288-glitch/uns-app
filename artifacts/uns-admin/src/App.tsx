@@ -17,6 +17,7 @@ import FeatureFlags from "./pages/FeatureFlags";
 import Nudges from "./pages/Nudges";
 import TeamRBAC from "./pages/TeamRBAC";
 import AuditLogs from "./pages/AuditLogs";
+import ErrorsConfig from "./pages/ErrorsConfig";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ function Router() {
         <Route path="/nudges" component={Nudges} />
         <Route path="/team" component={TeamRBAC} />
         <Route path="/audit-logs" component={AuditLogs} />
+        <Route path="/errors-config" component={ErrorsConfig} />
         <Route component={NotFound} />
       </Switch>
     </AdminLayout>
