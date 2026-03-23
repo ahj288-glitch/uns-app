@@ -1,26 +1,73 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { 
-  Home, 
-  Users, 
-  BookOpen, 
-  ShieldAlert, 
-  Settings, 
+import {
+  Home,
+  Users,
+  BookOpen,
+  ShieldAlert,
+  Settings,
   Menu,
   X,
   LogOut,
-  Bell
+  Bell,
+  Cpu,
+  Sliders,
+  Flag,
+  Megaphone,
+  UserCog,
+  ScrollText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const NAV_ITEMS = [
-  { path: "/", label: "لوحة التحكم", labelEn: "Dashboard", icon: Home },
-  { path: "/users", label: "المستخدمون وقائمة الانتظار", labelEn: "Users & Waitlist", icon: Users },
-  { path: "/community", label: "المساحة الآمنة", labelEn: "Community", icon: BookOpen },
-  { path: "/safety", label: "مراقبة السلامة", labelEn: "Safety Monitor", icon: ShieldAlert },
-  { path: "/ai-config", label: "إعدادات الذكاء الاصطناعي", labelEn: "AI Config", icon: Settings },
+type NavItem = {
+  path: string;
+  label: string;
+  labelEn: string;
+  icon: React.ElementType;
+};
+
+type NavSection = {
+  title: string;
+  items: NavItem[];
+};
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    title: "الرئيسية",
+    items: [
+      { path: "/", label: "لوحة التحكم", labelEn: "Dashboard", icon: Home },
+      { path: "/users", label: "المستخدمون", labelEn: "Users & Waitlist", icon: Users },
+    ],
+  },
+  {
+    title: "المحتوى والمجتمع",
+    items: [
+      { path: "/programs", label: "البرامج", labelEn: "Programs", icon: BookOpen },
+      { path: "/community", label: "المساحة الآمنة", labelEn: "Community", icon: BookOpen },
+      { path: "/safety", label: "مراقبة السلامة", labelEn: "Safety Monitor", icon: ShieldAlert },
+      { path: "/nudges", label: "التدخلات السلوكية", labelEn: "Nudges", icon: Megaphone },
+    ],
+  },
+  {
+    title: "النظام والذكاء الاصطناعي",
+    items: [
+      { path: "/ai-config", label: "إعدادات AI", labelEn: "AI Config", icon: Settings },
+      { path: "/ai-providers", label: "مزودو AI", labelEn: "AI Providers", icon: Cpu },
+      { path: "/config-engine", label: "محرك الإعدادات", labelEn: "Config Engine", icon: Sliders },
+      { path: "/feature-flags", label: "رايات الميزات", labelEn: "Feature Flags", icon: Flag },
+    ],
+  },
+  {
+    title: "الفريق والمراجعة",
+    items: [
+      { path: "/team", label: "الفريق والصلاحيات", labelEn: "Team & RBAC", icon: UserCog },
+      { path: "/audit-logs", label: "سجل المراجعة", labelEn: "Audit Logs", icon: ScrollText },
+    ],
+  },
 ];
+
+const ALL_NAV_ITEMS = NAV_SECTIONS.flatMap(s => s.items);
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -28,13 +75,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const closeMobile = () => setIsMobileOpen(false);
 
-  const currentPage = NAV_ITEMS.find(i => i.path === location);
+  const currentPage = ALL_NAV_ITEMS.find(i => i.path === location);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex overflow-hidden selection:bg-primary/30 selection:text-primary" dir="rtl">
-      {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
           onClick={closeMobile}
         />
@@ -45,7 +91,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         "fixed inset-y-0 right-0 z-50 w-72 bg-sidebar border-l border-sidebar-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:flex lg:flex-col",
         isMobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
       )}>
-        <div className="p-6 flex items-center justify-between border-b border-sidebar-border">
+        {/* Logo */}
+        <div className="p-6 flex items-center justify-between border-b border-sidebar-border shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
               <span className="font-arabic font-bold text-background text-2xl leading-none">أ</span>
@@ -60,76 +107,92 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.path;
-            
-            return (
-              <Link key={item.path} href={item.path} onClick={closeMobile} className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
-                isActive 
-                  ? "text-primary bg-primary/10 font-medium" 
-                  : "text-sidebar-foreground/70 hover:bg-white/5 hover:text-sidebar-foreground"
-              )}>
-                {isActive && (
-                  <motion.div 
-                    layoutId="activeTab"
-                    className="absolute right-0 top-0 bottom-0 w-1 bg-primary rounded-l-full"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground")} />
-                <span className="font-arabic text-sm">{item.label}</span>
-              </Link>
-            );
-          })}
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-5">
+          {NAV_SECTIONS.map(section => (
+            <div key={section.title}>
+              <p className="text-[10px] text-muted-foreground/50 font-arabic tracking-widest uppercase px-3 mb-1.5">
+                {section.title}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map(item => {
+                  const Icon = item.icon;
+                  const isActive = location === item.path;
+
+                  return (
+                    <Link
+                      key={item.path}
+                      href={item.path}
+                      onClick={closeMobile}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                        isActive
+                          ? "text-primary bg-primary/10 font-medium"
+                          : "text-sidebar-foreground/60 hover:bg-white/5 hover:text-sidebar-foreground"
+                      )}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute right-0 top-0 bottom-0 w-0.5 bg-primary rounded-l-full"
+                          initial={false}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                      <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground")} />
+                      <span className="font-arabic text-sm">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        <div className="p-6 border-t border-sidebar-border mt-auto">
-          <button className="flex items-center gap-3 text-sidebar-foreground/70 hover:text-destructive transition-colors w-full px-4 py-2 font-arabic">
-            <LogOut className="w-5 h-5 shrink-0" />
-            <span>تسجيل الخروج</span>
+        {/* Footer */}
+        <div className="p-4 border-t border-sidebar-border shrink-0">
+          <button className="flex items-center gap-3 text-sidebar-foreground/60 hover:text-destructive transition-colors w-full px-3 py-2.5 rounded-xl hover:bg-destructive/8 font-arabic">
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span className="text-sm">تسجيل الخروج</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        <header className="h-20 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-6 lg:px-10">
-          <div className="flex items-center gap-4">
-            <button 
+        <header className="h-16 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-5 lg:px-8">
+          <div className="flex items-center gap-3">
+            <button
               onClick={() => setIsMobileOpen(true)}
               className="p-2 rounded-lg text-muted-foreground hover:bg-white/5 lg:hidden"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h2 className="text-xl font-bold font-arabic">
+              <h2 className="text-base font-bold font-arabic leading-tight">
                 {currentPage?.label || "لوحة التحكم"}
               </h2>
-              <p className="text-xs text-muted-foreground">{currentPage?.labelEn || "Dashboard"}</p>
+              <p className="text-[11px] text-muted-foreground leading-tight">{currentPage?.labelEn || "Dashboard"}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button className="p-2 rounded-full hover:bg-white/5 text-muted-foreground transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 left-1 w-2.5 h-2.5 bg-destructive rounded-full border-2 border-background"></span>
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-1.5 left-1.5 w-2 h-2 bg-destructive rounded-full border border-background"></span>
             </button>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-medium font-arabic">مدير النظام</p>
-                <p className="text-xs text-muted-foreground">admin@uns.ai</p>
+                <p className="text-xs font-medium font-arabic leading-tight">مدير النظام</p>
+                <p className="text-[11px] text-muted-foreground leading-tight">admin@uns.ai</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 border border-primary/30 flex items-center justify-center shrink-0">
-                <span className="font-arabic font-bold text-primary text-sm">م</span>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 border border-primary/30 flex items-center justify-center shrink-0">
+                <span className="font-arabic font-bold text-primary text-xs">م</span>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-6 lg:p-10 pb-24">
+        <div className="flex-1 overflow-y-auto p-5 lg:p-8 pb-16">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

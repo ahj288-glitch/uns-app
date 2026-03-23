@@ -15,6 +15,9 @@ export const NAV_SECTIONS = [
   { id: "roadmap", num: "14", title: "Phased Roadmap", arabic: "خارطة الطريق" },
   { id: "risks", num: "15", title: "Risk Analysis", arabic: "تحليل المخاطر" },
   { id: "recommendation", num: "16", title: "Final Recommendation", arabic: "التوصية الختامية" },
+  { id: "design-system", num: "17", title: "Design DNA & Midnight Garden System", arabic: "الهوية التصميمية" },
+  { id: "personalization", num: "18", title: "Personalization Engine", arabic: "محرك التخصيص" },
+  { id: "viral-loop", num: "19", title: "Viral Loop — Share Your State", arabic: "الحلقة الفيروسية" },
 ];
 
 export const COMPETITORS = [

@@ -153,12 +153,13 @@ Utility scripts package. Each script is a `.ts` file in `src/` with a correspond
 
 ### Mobile App (`artifacts/uns-app/`)
 
-4-tab layout: **Journey** (رحلة) | **Insights** (رؤى) | **Chat** (أُنس) | **Home** (الرئيسية)
+5-tab layout: **Journey** (رحلة) | **Insights** (رؤى) | **Chat** (أُنس) | **Home** (الرئيسية) | **Share** (مشاركة)
 Hidden tabs (href: null): mood, community, programs, profile (accessible via navigation)
 
 Key screens:
 - `app/onboarding/index.tsx` — 3-step: welcome, dialect selection, intention (Midnight Garden)
-- `app/(tabs)/index.tsx` — Home dashboard: breathing orb, greeting, mood chips, featured card, metrics
+- `app/(tabs)/index.tsx` — Adaptive Home: time-of-day greeting/orb colors, breathing orb (sin easing + slow rotate ring), mood chips with state feedback, quick action cards, Share CTA, 3-metric row
+- `app/(tabs)/share.tsx` — **Share Your State**: 5 card types (Aura, Insight, Streak, Summary, Night Calm), 5 tone library (40+ Arabic quotes), 5 aura states, privacy controls (public/semi/private), regenerate + share/save CTAs
 - `app/(tabs)/chat.tsx` — AI companion chat (redesigned Midnight Garden)
 - `app/(tabs)/insights.tsx` — Insights: mood bar chart, key insights, emotion pattern
 - `app/(tabs)/journey.tsx` — Journey: 3 stages (إدراك/توازن/طمأنينة), XP bar, quote
@@ -167,7 +168,7 @@ Key screens:
 - `app/(tabs)/profile.tsx` — Profile: dialect selector, settings, privacy, crisis hotlines
 - `app/(tabs)/programs.tsx` — Welfare programs catalogue
 - `constants/colors.ts` — Midnight Garden palette (see Brand section above)
-- Fonts: `Tajawal_400Regular`, `Tajawal_700Bold`, `BeVietnamPro_400Regular`, `BeVietnamPro_500Medium`
+- Fonts: `Tajawal_400Regular`, `Tajawal_700Bold`, `BeVietnamPro_500Medium` (mobile only uses 500 Medium, not 400 Regular for Latin)
 
 ### Gamification System
 
@@ -177,6 +178,22 @@ Daily loop: one micro-experience per day (breathing, gratitude, reflection, body
 
 ### Admin Panel (`artifacts/uns-admin/`)
 
-RTL sidebar: لوحة التحكم | المستخدمون وقائمة الانتظار | المساحة الآمنة | مراقبة السلامة | إعدادات الذكاء الاصطناعي
-Dashboard includes: 6 KPI cards, "نظام التطور العاطفي" (gamification stats + level distribution), community quick panel, user growth chart, mood distribution pie chart.
-Community page (`/community`): Session management, moderation queue, safety banner with crisis hotlines.
+RTL sidebar with 4 grouped sections:
+- **الرئيسية**: لوحة التحكم (`/`), المستخدمون (`/users`)
+- **المحتوى والمجتمع**: البرامج (`/programs`), المساحة الآمنة (`/community`), مراقبة السلامة (`/safety`), التدخلات السلوكية (`/nudges`)
+- **النظام والذكاء الاصطناعي**: إعدادات AI (`/ai-config`), مزودو AI (`/ai-providers`), محرك الإعدادات (`/config-engine`), رايات الميزات (`/feature-flags`)
+- **الفريق والمراجعة**: الفريق والصلاحيات (`/team`), سجل المراجعة (`/audit-logs`)
+
+Admin modules:
+- `Dashboard` — 6 KPI cards, gamification stats, user growth chart, mood distribution
+- `Users` — Waitlist management, dialect breakdown, invite tools
+- `Programs` — CRUD programs with enrollment & completion metrics
+- `Community` — Circle management, moderation queue, crisis hotlines
+- `Safety` — Crisis detection, regional routing, event acknowledgement
+- `AiConfig` — Personality, dialect, tone, spiritual layer, model selector
+- `AiProviders` — Add/edit/disable LLM providers, failover rules, latency & error metrics
+- `ConfigEngine` — Typed config (string/number/boolean/json), draft/publish, env filters, audit trail
+- `FeatureFlags` — Release/experiment/ops flags, % rollout, segment targeting, A/B variants
+- `Nudges` — Behavioral interventions with trigger types, delivery stats, open rates, Arabic copy
+- `TeamRBAC` — 6 roles (super_admin/admin/moderator/safety_officer/content_editor/analyst), member list, permission matrix
+- `AuditLogs` — Full activity log with severity filtering, actor tracking, searchable, CSV export

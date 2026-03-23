@@ -16,6 +16,9 @@ import { MVP } from "@/components/sections/MVP";
 import { Roadmap } from "@/components/sections/Roadmap";
 import { Risks } from "@/components/sections/Risks";
 import { FinalRecommendation } from "@/components/sections/FinalRecommendation";
+import { DesignSystem } from "@/components/sections/DesignSystem";
+import { PersonalizationEngine } from "@/components/sections/PersonalizationEngine";
+import { ViralLoop } from "@/components/sections/ViralLoop";
 import { useState } from "react";
 import { NAV_SECTIONS } from "@/data/strategy";
 
@@ -82,6 +85,9 @@ function App() {
             <Roadmap />
             <Risks />
             <FinalRecommendation />
+            <DesignSystem />
+            <PersonalizationEngine />
+            <ViralLoop />
           </div>
           <footer className="py-12 px-8 lg:px-16 border-t border-border/30 text-center">
             <div className="text-2xl gold-gradient font-bold mb-2">أُنس | UNS</div>
