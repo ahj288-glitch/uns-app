@@ -1,0 +1,603 @@
+Professional Prompt — Intelligent, Fully Configurable Admin Dashboard for Unns
+
+You are not simply building an admin panel.
+
+You are designing and implementing the central command system for Unns, an advanced emotional operating system.
+This dashboard must function as a live operational brain, allowing the business, product, operations, AI, marketing, support, and technology teams to control, tune, monitor, and evolve the product without requiring code changes, redeployment, or direct developer intervention whenever the change is business-configurable.
+
+Your responsibility is to architect this system as a configuration-driven, permission-aware, highly secure, scalable, and operationally intelligent platform that can support a complex AI-powered emotional wellness product at scale.
+
+1) Mandatory First Step: Review, Audit, and Improve the Concept
+
+Before implementation, you must first:
+
+Review the full concept of this dashboard
+Identify missing modules, weak assumptions, security gaps, scalability limitations, and operational blind spots
+Improve the concept where necessary
+Expand it beyond the explicitly listed requirements whenever doing so improves:
+control
+safety
+scalability
+maintainability
+business agility
+AI reliability
+governance
+observability
+growth enablement
+
+Do not implement narrowly.
+Do not limit yourself to the examples only.
+Treat the requirements below as the minimum baseline, not the ceiling.
+
+If any part of this system has already been implemented, you must audit it, refactor it, and upgrade it to fully align with this vision.
+If any part is missing, you must design and implement it properly.
+
+2) Core Product Philosophy
+
+The Admin Dashboard must follow these principles:
+
+A. Configuration over Code
+
+Any function, threshold, rule, parameter, workflow, or experience that can reasonably be configurable must not be hardcoded.
+
+B. Business Agility
+
+Product and operations teams must be able to adjust system behavior immediately without waiting for engineering whenever code changes are not technically required.
+
+C. Safety by Design
+
+Every configuration capability must be protected by permissions, logs, validation rules, and rollback mechanisms.
+
+D. Observability by Default
+
+The dashboard must not only control the system, but also explain what is happening, what changed, why it changed, and what the operational impact is.
+
+E. Scalable Governance
+
+As the product grows, the dashboard must be able to support multiple roles, workflows, teams, environments, AI providers, user segments, and regional rules.
+
+3) Central Configuration Management System (Foundational Requirement)
+
+Build a centralized configuration engine as the backbone of the entire platform.
+
+This engine must:
+
+Store product and operational settings in the database, not in code
+Support typed configuration values:
+string
+number
+boolean
+enum
+array
+JSON object
+rich text where applicable
+Support:
+versioning
+history tracking
+rollback
+draft mode
+publish/activate workflow
+environment scoping (development, staging, production)
+optional region or segment scoping
+Support validation rules for each config item
+Support dependency logic between settings
+Support immediate or scheduled activation
+Clearly identify:
+who changed it
+when
+what the old value was
+what the new value is
+why the change was made
+Prevent unsafe changes from being published without warning
+Allow change previews when applicable
+
+Anything configurable must be manageable from this system.
+
+4) AI Providers Management Module
+
+Build a dedicated module for managing all AI providers and model routing logic.
+
+This module must allow administrators to:
+
+Add, edit, enable, disable, archive, and prioritize AI providers
+Store and manage:
+provider name
+API keys
+endpoints
+model names
+rate limits
+timeout settings
+region
+cost metadata
+fallback eligibility
+Securely encrypt all secrets
+Mask secrets in the UI
+Rotate keys safely
+Test provider connectivity from the dashboard
+View provider health in real time
+Mandatory Failover Logic
+
+The system must support primary, secondary, tertiary, and ordered fallback providers.
+
+If one provider fails, degrades, times out, exceeds threshold limits, or becomes unavailable, the system must automatically:
+
+Detect the issue
+Fail over to the next configured provider in priority order
+Log the event
+Notify the operations team
+Continue serving the application without manual intervention if possible
+Alerting
+
+When a failover event or provider issue occurs, the system must be able to:
+
+Send email alerts to operations
+Optionally send Slack / Teams / webhook alerts if supported later
+Include:
+provider affected
+type of failure
+timestamp
+fallback action taken
+current active provider
+recommended next action
+Advanced Controls
+
+Also support:
+
+traffic split across providers
+provider-level feature toggles
+cost-aware routing
+latency-aware routing
+reliability-aware routing
+manual override of active provider
+maintenance mode for a provider
+sandbox/testing provider assignment
+5) AI Model Behavior & Orchestration Module
+
+Create a module where authorized teams can control how the AI behaves without changing code.
+
+This must include controls for:
+
+tone of voice
+response length
+empathy level
+proactiveness
+intervention frequency
+conversation safety strictness
+memory usage level
+model temperature or equivalent creativity setting
+escalation behavior
+prompt template selection
+fallback behavior when confidence is low
+regional/language variants
+AI feature enablement by user segment
+
+Support:
+
+prompt versioning
+safe editing workflows
+rollback of prompt and behavior settings
+A/B testing of different prompt behaviors
+staging before production publish
+guardrails for unsafe edits
+
+This module must make the AI system manageable like a product, not a black box.
+
+6) Conversation Controls Module
+
+Build a dedicated section to control user conversation rules and usage limits in real time.
+
+This must allow control of:
+
+max messages per day
+max messages per session
+max characters per user message
+max response length
+max session duration
+cooldown periods
+rate limiting rules
+feature access by subscription tier or user type
+conversation timeout behavior
+attachment permissions if applicable later
+voice conversation enablement
+journaling/chat distinction if needed
+daily reset timing
+silent soft-limits vs hard limits
+
+These rules must apply instantly or near real time and must be configurable by role.
+
+7) Retention, Gamification, and Habit Formation Controls
+
+The dashboard must include a Retention Engine Control Center.
+
+This is critical.
+
+Build configurable controls for:
+
+daily loop logic
+check-in triggers
+streak logic
+grace periods
+recovery day rules
+emotional progress stage thresholds
+micro win triggers
+reward copy and reinforcement messaging
+insight generation thresholds
+nudge frequency and timing
+inactivity logic
+re-engagement campaigns
+habit milestones
+user return strategies by segment
+burnout prevention rules
+notification suppression limits
+weekend/holiday logic if applicable
+
+This system must support the emotional design philosophy of Unns:
+
+no manipulative dark patterns
+no stressful gamification
+no guilt-based behavior loops
+no childish reward mechanics
+
+Instead, it must enable:
+
+supportive progression
+gentle accountability
+human-centered reinforcement
+non-harmful retention design
+
+The dashboard must also allow product teams to test and tune retention logic safely.
+
+8) Nudges, Notifications, and Behavioral Interventions Module
+
+Build a smart module to manage all nudges and behavioral interventions.
+
+This module must support:
+
+push notifications
+in-app nudges
+contextual prompts
+recovery nudges
+inactivity nudges
+milestone nudges
+bedtime or morning prompts
+emotional support prompts
+AI-triggered interventions
+
+Allow configuration of:
+
+message content
+tone
+timing
+trigger conditions
+user segment targeting
+delivery channel
+suppression rules
+fatigue prevention rules
+quiet hours
+resend behavior
+localization
+priority level
+
+Include scheduling tools and preview/testing capabilities.
+
+9) User Segmentation and Targeting Module
+
+Build the ability to segment users dynamically so that configurations, nudges, AI behavior, and feature access can differ by segment.
+
+Examples of segmentation dimensions:
+
+activity level
+emotional progress stage
+subscription tier
+language
+country/region
+risk level
+churn risk
+engagement pattern
+onboarding status
+feature adoption status
+
+The dashboard must allow teams to apply rules and experiences by segment without code changes.
+
+10) Team Management and Role-Based Access Control (RBAC)
+
+Build a robust team and permissions system.
+
+The system must support:
+
+inviting team members
+assigning job titles
+assigning roles
+custom roles
+permission groups
+module-level access
+action-level access (view, create, edit, delete, publish, rollback, export)
+temporary elevated access if needed
+deactivation and suspension
+activity visibility by role
+
+Example roles may include:
+
+Super Admin
+Admin
+Technical Operations
+Product Manager
+AI Operations
+Marketing
+Customer Support
+Clinical/Safety Reviewer
+Data Analyst
+Finance/Commercial Reviewer
+
+Each role must see only what is relevant to their responsibility.
+
+For example:
+
+Admin sees everything
+Technical Operations sees AI providers, technical configs, logs, system health, APIs
+Marketing sees campaigns, nudges, funnels, engagement analytics, waitlist and growth modules
+Product sees feature flags, behavior settings, retention controls, experiments
+Support sees user issues, escalations, conversation summaries where authorized
+Safety or moderation roles see moderation and incident tools only
+
+Do not implement simplistic permissions.
+Build a flexible, enterprise-grade RBAC model.
+
+11) Feature Flags and Experimentation Module
+
+Build a full feature flag system.
+
+It must support:
+
+enable/disable features instantly
+user-segment-based release
+percentage rollout
+internal-only testing
+beta release groups
+A/B testing
+rollback
+scheduled release windows
+environment-based flags
+
+This module is essential for safely evolving the product.
+
+12) Community and Safety Operations Module
+
+Because Unns includes emotionally sensitive interactions, build an operational control center for safety.
+
+This must include:
+
+moderation queue
+flagged conversations
+toxicity and abuse signals
+suspicious behavior review
+escalation workflows
+incident tagging
+policy enforcement tools
+visibility into room/session safety
+content or session suspension tools
+reporting analytics
+AI moderation status
+manual override actions for moderators
+rule tuning if the moderation engine supports it
+
+The system must help maintain a safe environment at all times.
+
+13) Analytics, Intelligence, and Operational Insights Module
+
+The dashboard must provide decision-grade visibility, not vanity metrics only.
+
+Include reporting and dashboards for:
+
+DAU / WAU / MAU
+retention (D1, D7, D30)
+churn indicators
+activation rate
+onboarding completion
+session frequency
+average session duration
+average emotional check-ins
+insight usage
+nudge performance
+AI provider reliability
+failover events
+cost by provider
+feature adoption
+funnel conversion
+waitlist conversion
+community participation
+moderation incidents
+user segment behavior
+cohort analysis where possible
+
+Support filtering by:
+
+date range
+role
+plan
+segment
+geography
+feature
+provider
+
+Also support export where authorized.
+
+14) Audit Logs, Compliance, and Change Governance
+
+Every sensitive action must be traceable.
+
+Build complete audit logging for:
+
+configuration changes
+permission changes
+provider edits
+role changes
+feature flag changes
+safety actions
+publish/rollback actions
+access to sensitive areas
+failed access attempts
+
+Audit logs must show:
+
+actor
+action
+timestamp
+affected entity
+old value
+new value
+optional note/reason
+
+Support immutable logging for critical actions where feasible.
+
+15) Security, Secrets, and Environment Safety
+
+Treat this dashboard as mission-critical infrastructure.
+
+Implement:
+
+encrypted secret storage
+masked display of sensitive values
+secure key rotation workflows
+MFA-ready authentication architecture if not immediate
+session security
+permission checks on every sensitive endpoint
+environment separation
+IP restrictions or additional controls for highly privileged areas if appropriate
+CSRF, XSS, SSRF, and injection protection
+validation and sanitization
+safe file handling if uploads exist
+principle of least privilege everywhere
+
+No sensitive control must be exposed casually.
+
+16) Workflow Design and Quality of Operations
+
+The dashboard must support operational maturity.
+
+This means adding workflows such as:
+
+draft → review → approve → publish
+emergency override
+rollback
+change note requirement for critical settings
+staging/testing before production
+config dependency warnings
+impact preview when possible
+approval rules for high-risk changes
+operational status banners
+maintenance mode controls
+
+This should feel like a professional control plane, not a basic admin CRUD interface.
+
+17) UX Expectations for the Dashboard Itself
+
+The Admin Dashboard must be:
+
+elegant
+fast
+highly usable
+logically grouped
+searchable
+permission-aware
+easy to navigate
+built for real operational use under pressure
+
+It should include:
+
+powerful search
+filters
+clear module grouping
+change status indicators
+configuration health indicators
+warnings and validation cues
+human-readable descriptions for each config item
+inline help or documentation where useful
+safe confirmation for destructive actions
+
+This dashboard should reduce operational dependency on developers, not create more confusion.
+
+18) Performance and Reliability Requirements
+
+The dashboard must be production-grade.
+
+Requirements include:
+
+fast load times
+responsive UI
+safe handling of large config sets
+support for real-time or near-real-time updates where relevant
+resilient backend architecture
+graceful handling of partial failures
+scalable design for future modules and teams
+19) Extensibility Requirements
+
+Design the system so future modules can be added without reworking the foundation.
+
+Potential future modules may include:
+
+billing and plan controls
+content library management
+therapist/expert operations
+campaign automation
+CRM integrations
+localization controls
+experimentation lab
+external partner controls
+regional compliance rules
+voice model routing
+data retention policy controls
+
+Build the architecture with extensibility in mind from day one.
+
+20) What Must Not Happen
+
+Do not build a hardcoded admin panel.
+Do not build a developer-only tool disguised as admin.
+Do not make product or business teams depend on engineering for every adjustable rule.
+Do not leave critical operations unmanaged.
+Do not expose dangerous controls without governance.
+Do not simplify permissions too much.
+Do not treat AI provider management as a static settings page.
+Do not treat retention, nudges, and AI behavior as code-only concerns.
+
+21) Final Deliverables Required from You
+
+After completing the review, design, and implementation planning, you must provide:
+
+A. Full list of dashboard modules
+B. Full list of configurable parameters grouped by domain
+
+For example:
+
+AI providers
+AI behavior
+conversations
+retention
+nudges
+feature flags
+security
+moderation
+analytics
+team permissions
+environment settings
+growth settings
+onboarding settings
+C. Role matrix
+
+Who can see what, do what, edit what, approve what
+
+D. Recommended architecture
+
+Backend, config model, secret storage, permissions, audit logging, publish workflow
+
+E. Any missing modules or controls you believe should be added to make the system truly world-class
+22) Final Mindset
+
+You are building the operating control center of Unns.
+
+This dashboard must make it possible for the organization to control a sophisticated emotional AI product in real time, with confidence, speed, safety, and precision.
+
+The end result should be a system where most product behavior, AI routing, operational logic, retention rules, safety controls, and team permissions can be adjusted directly from the dashboard whenever the function is business-configurable—without returning to the developer to modify code.
+
+Build it as if this product is expected to dominate the market, scale across teams, operate reliably under
