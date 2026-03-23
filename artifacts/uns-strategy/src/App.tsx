@@ -19,6 +19,15 @@ import { FinalRecommendation } from "@/components/sections/FinalRecommendation";
 import { DesignSystem } from "@/components/sections/DesignSystem";
 import { PersonalizationEngine } from "@/components/sections/PersonalizationEngine";
 import { ViralLoop } from "@/components/sections/ViralLoop";
+import { TrustFramework } from "@/components/sections/TrustFramework";
+import { ContentSystem } from "@/components/sections/ContentSystem";
+import { JournalSystem } from "@/components/sections/JournalSystem";
+import { GrowthMechanics } from "@/components/sections/GrowthMechanics";
+import { ObservabilityAndQA } from "@/components/sections/ObservabilityAndQA";
+import { MonetizationArchitecture } from "@/components/sections/MonetizationArchitecture";
+import { DataGovernance } from "@/components/sections/DataGovernance";
+import { LocalizationEnterprise } from "@/components/sections/LocalizationEnterprise";
+import { BrandAndSupport } from "@/components/sections/BrandAndSupport";
 import { useState } from "react";
 import { NAV_SECTIONS } from "@/data/strategy";
 
@@ -88,6 +97,15 @@ function App() {
             <DesignSystem />
             <PersonalizationEngine />
             <ViralLoop />
+            <TrustFramework />
+            <ContentSystem />
+            <JournalSystem />
+            <GrowthMechanics />
+            <ObservabilityAndQA />
+            <MonetizationArchitecture />
+            <DataGovernance />
+            <LocalizationEnterprise />
+            <BrandAndSupport />
           </div>
           <footer className="py-12 px-8 lg:px-16 border-t border-border/30 text-center">
             <div className="text-2xl gold-gradient font-bold mb-2">أُنس | UNS</div>

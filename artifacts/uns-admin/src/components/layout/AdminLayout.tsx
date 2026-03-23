@@ -17,6 +17,7 @@ import {
   UserCog,
   ScrollText,
   AlertTriangle,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -44,6 +45,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: "المحتوى والمجتمع",
     items: [
+      { path: "/content-cms", label: "إدارة المحتوى", labelEn: "Content CMS", icon: Layers },
       { path: "/programs", label: "البرامج", labelEn: "Programs", icon: BookOpen },
       { path: "/community", label: "المساحة الآمنة", labelEn: "Community", icon: BookOpen },
       { path: "/safety", label: "مراقبة السلامة", labelEn: "Safety Monitor", icon: ShieldAlert },

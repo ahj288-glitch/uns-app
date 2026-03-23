@@ -18,6 +18,15 @@ export const NAV_SECTIONS = [
   { id: "design-system", num: "17", title: "Design DNA & Midnight Garden System", arabic: "الهوية التصميمية" },
   { id: "personalization", num: "18", title: "Personalization Engine", arabic: "محرك التخصيص" },
   { id: "viral-loop", num: "19", title: "Viral Loop — Share Your State", arabic: "الحلقة الفيروسية" },
+  { id: "trust-framework", num: "20", title: "Trust, Consent & Privacy Framework", arabic: "إطار الثقة والخصوصية" },
+  { id: "content-system", num: "21", title: "Content System & Guided Experiences", arabic: "منظومة المحتوى" },
+  { id: "journal-system", num: "22", title: "Journal, Reflection & Personal Archive", arabic: "المفكرة والأرشيف الشخصي" },
+  { id: "growth-mechanics", num: "23", title: "Growth Mechanics & Referral Architecture", arabic: "ميكانيكيات النمو والإحالة" },
+  { id: "observability-qa", num: "24", title: "QA, Observability & Operational Reliability", arabic: "الجودة والموثوقية التشغيلية" },
+  { id: "monetization-architecture", num: "25", title: "Monetization Architecture", arabic: "هندسة الإيرادات" },
+  { id: "data-governance", num: "26", title: "Data Governance, Experimentation & Analytics", arabic: "حوكمة البيانات والتجريب" },
+  { id: "localization-enterprise", num: "27", title: "Localization, Enterprise & Platform Compliance", arabic: "التوطين والمؤسسات والامتثال" },
+  { id: "brand-and-support", num: "28", title: "Brand Voice, Design System & Support Ops", arabic: "هوية العلامة ودعم العملاء" },
 ];
 
 export const COMPETITORS = [

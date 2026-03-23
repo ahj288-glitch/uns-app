@@ -1,0 +1,624 @@
+Additional Strategic, Product, Operational, Trust, and Scale Requirements for Unns
+
+You are operating as an elite cross-functional venture studio composed of senior experts in product strategy, behavioral psychology, AI systems, platform architecture, security, privacy, DevOps, analytics, growth, support operations, and digital trust.
+
+Your responsibility is to perform a full secondary review of the Unns product vision and execution scope in order to identify all major requirements, systems, workflows, controls, and capabilities that may still be missing, underdeveloped, or insufficiently specified.
+
+You must not repeat previously covered items unless necessary for integration and completeness.
+Instead, your role is to identify and define the additional critical requirements that must exist in order for Unns to become a truly world-class, scalable, trustworthy, and category-leading emotional operating system.
+
+If any of the following areas have not already been implemented or specified properly, they must now be added, designed, and structured as part of the product blueprint.
+
+Do not think narrowly.
+Think as if Unns is expected to become the market leader in the Arab world, expand regionally, serve both consumers and institutions, and operate under high expectations of trust, performance, privacy, safety, and emotional quality.
+
+⸻
+
+1) First Mandatory Step: Conduct a Gap Review Before Adding Anything
+
+Before proposing or building anything, first audit the current product scope and determine:
+	•	what has already been covered sufficiently
+	•	what is only partially defined
+	•	what is missing completely
+	•	what needs strengthening for scale, trust, or monetization
+	•	what may become a bottleneck later if ignored now
+
+Then expand the product requirements accordingly.
+
+Do not assume completeness.
+Do not assume that core product screens alone are enough.
+Do not assume that a strong AI companion by itself guarantees long-term success.
+
+⸻
+
+2) Onboarding, User Intake, and Personal Baseline System
+
+Design a complete onboarding and baseline understanding system.
+
+This must include:
+	•	account creation flow
+	•	anonymous or lightweight entry options if appropriate
+	•	emotional baseline questions
+	•	user goals selection
+	•	preferred support style
+	•	preferred interaction format:
+	•	text
+	•	voice
+	•	guided activities
+	•	silent reflection
+	•	language preference
+	•	notification preference setup
+	•	privacy and consent acceptance
+	•	expectation setting for what Unns is and is not
+	•	safe disclosure and trust-building copy during onboarding
+
+The onboarding must not feel long, clinical, or heavy.
+It must feel emotionally intelligent, elegant, and low-friction.
+
+It should also create the initial personalization foundation for the AI companion, nudges, daily loop, and progress engine.
+
+⸻
+
+3) Consent, Privacy Transparency, and Trust Center
+
+Because Unns deals with emotionally sensitive interactions, build an explicit trust framework.
+
+This must include:
+	•	consent flows for data use
+	•	consent for AI interaction where applicable
+	•	clear explanation of what data is collected
+	•	clear explanation of how data is used
+	•	explanation of what is stored and what is not
+	•	user control over data retention
+	•	data export request flow
+	•	account deletion flow
+	•	conversation deletion options where appropriate
+	•	privacy center inside the app
+	•	trust center on the landing page and inside product settings
+	•	clear boundaries between wellness support and medical care
+	•	transparent explanation of AI limitations
+	•	user-facing explanation of moderation and safety safeguards
+
+Trust must be designed as a product feature, not hidden inside legal pages only.
+
+⸻
+
+4) Crisis, Safety Escalation, and Sensitive-State Handling
+
+Unns must have a carefully designed response framework for users in distress.
+
+You must define and structure:
+	•	crisis phrase detection
+	•	self-harm or high-risk language detection logic
+	•	escalation rules
+	•	region-appropriate emergency guidance
+	•	safe fallback responses
+	•	de-escalation response templates
+	•	“seek professional help” flows
+	•	local resource presentation where possible
+	•	safety banners or prompts
+	•	internal logging and review procedures
+	•	differentiation between:
+	•	mild distress
+	•	urgent distress
+	•	crisis-risk content
+
+The system must never behave recklessly, passively, or ambiguously in high-risk moments.
+
+It must also avoid pretending to be a clinical authority when it is not.
+
+⸻
+
+5) Content System and Guided Experiences Library
+
+Unns should not rely only on AI chat.
+
+Define a structured content architecture for:
+	•	breathing exercises
+	•	guided reflections
+	•	emotional regulation activities
+	•	short audio sessions
+	•	sleep wind-down sessions
+	•	grounding exercises
+	•	micro-journaling prompts
+	•	mood-specific interventions
+	•	thematic journeys
+	•	culturally relevant healing content
+	•	short-form “moment rescue” experiences
+
+This must include a content model, categorization logic, tagging, personalization rules, and content lifecycle management.
+
+The system should support future expansion into a proper content management capability, whether internally managed or expert-reviewed.
+
+⸻
+
+6) CMS and Non-Technical Content Operations
+
+Define a proper content operations system that allows authorized teams to manage:
+	•	text content
+	•	audio content
+	•	onboarding copy
+	•	educational sections
+	•	prompts
+	•	FAQ entries
+	•	trust center content
+	•	help content
+	•	in-app banners
+	•	motivational copy
+	•	notifications content
+	•	seasonal campaigns
+	•	landing page sections if desired later
+
+This content should be editable without developer dependency whenever feasible.
+
+Include versioning, draft mode, approval workflow, localization readiness, and scheduled publishing support.
+
+⸻
+
+7) Subscription, Monetization, and Offer Design
+
+Even if monetization is not launched immediately, the product should be future-ready.
+
+Define the monetization architecture for:
+	•	free tier
+	•	premium tier
+	•	family or couple plans if relevant
+	•	institutional or corporate packages
+	•	expert-led sessions or premium experiences
+	•	limited vs unlimited usage rules
+	•	AI access tiers
+	•	exclusive guided journeys
+	•	enterprise emotional wellbeing programs
+	•	premium analytics or progress features
+	•	gift access or referral unlocks
+
+Also define:
+	•	entitlement logic
+	•	billing readiness
+	•	upgrade prompts
+	•	downgrade impact rules
+	•	grace periods
+	•	trial experience design
+	•	paywall philosophy aligned with emotional sensitivity
+
+Monetization must not feel predatory, especially in a wellness product.
+
+⸻
+
+8) Growth Loops, Referral Mechanics, and Organic Distribution
+
+Beyond retention, define all growth-enabling product mechanics that may have been underexplored.
+
+This includes:
+	•	referral flows
+	•	invite systems
+	•	friend or family invitation logic if safe and appropriate
+	•	waitlist growth loops
+	•	shareable progress moments that preserve privacy
+	•	campaign landing page variants
+	•	ambassador model
+	•	community-led growth experiments
+	•	reactivation loops
+	•	email capture strategy
+	•	lead nurturing
+	•	referral incentives that do not cheapen the brand
+	•	culturally appropriate virality mechanics
+
+Growth must be designed carefully to avoid turning the product into noisy social media behavior.
+
+⸻
+
+9) Notifications Preferences and Communication Control Center for the User
+
+Beyond system-level nudges, users should have control.
+
+Define a user-facing preferences system for:
+	•	push notifications
+	•	daily reminders
+	•	morning check-ins
+	•	bedtime prompts
+	•	weekly summaries
+	•	emotional support nudges
+	•	community-related notifications
+	•	email communication
+	•	marketing communication
+	•	quiet hours
+	•	notification intensity
+
+Users must be able to shape how Unns communicates with them.
+
+This increases trust, reduces fatigue, and improves long-term retention quality.
+
+⸻
+
+10) Search, Discoverability, and Retrieval Layer
+
+As the product grows, users will need to find what they need quickly.
+
+Define discoverability systems for:
+	•	searching guided sessions
+	•	searching journeys
+	•	searching community topics if relevant
+	•	retrieving past insights
+	•	finding saved reflections or journal entries
+	•	surfacing recommended content
+	•	semantic retrieval where useful
+	•	AI-assisted recommendation search
+	•	trending but safe content discovery
+
+Do not allow the product to become deep but hard to navigate.
+
+⸻
+
+11) Journal, Reflection, and Personal Archive System
+
+This may become a powerful pillar of the product and should be properly designed.
+
+Define the architecture for:
+	•	private journaling
+	•	mood-linked journal entries
+	•	voice notes if relevant later
+	•	saved insights
+	•	personal reflections history
+	•	emotional timeline
+	•	export functionality
+	•	AI summaries over time
+	•	privacy controls per entry type
+	•	optional AI reflection on user notes
+
+This can become one of the strongest long-term retention and value-creation systems in Unns.
+
+⸻
+
+12) Settings, Preferences, and Personal Control Layer
+
+Ensure the product includes a full personal settings architecture, not just basic preferences.
+
+This should include:
+	•	account settings
+	•	language settings
+	•	accessibility settings
+	•	AI interaction settings
+	•	voice settings if applicable
+	•	content preference settings
+	•	data/privacy settings
+	•	notification settings
+	•	emotional support preferences
+	•	theme preferences if relevant
+	•	safety controls
+	•	content sensitivity controls if needed
+
+Users should feel that Unns adapts to them, not the other way around.
+
+⸻
+
+13) Accessibility, Inclusivity, and Emotional Usability
+
+Define comprehensive accessibility and inclusive design requirements.
+
+This must include:
+	•	screen reader support
+	•	sufficient contrast
+	•	RTL support
+	•	Arabic-first elegance where needed
+	•	readable typography
+	•	non-overwhelming motion
+	•	optional reduced motion
+	•	support for users in fragile emotional states
+	•	low-cognitive-load interaction design
+	•	emotionally safe color usage
+	•	accessible error states
+	•	accessible onboarding and check-in experiences
+
+This is not optional.
+A product like Unns must be emotionally and physically usable.
+
+⸻
+
+14) Offline Behavior, Resilience, and Low-Connectivity Support
+
+Define what should happen when connectivity is poor or unavailable.
+
+This includes:
+	•	offline-safe screens
+	•	cached content availability
+	•	saved drafts
+	•	graceful sync recovery
+	•	local queueing where safe
+	•	offline breathing or guided exercises
+	•	failure-resilient journaling
+	•	reconnection handling
+	•	preservation of user input
+
+The user must not feel abandoned because the network is unstable.
+
+⸻
+
+15) QA, Test Strategy, and Product Reliability Framework
+
+Define a complete quality system.
+
+This must include:
+	•	unit testing expectations
+	•	integration testing
+	•	end-to-end testing
+	•	AI response testing strategy
+	•	prompt regression testing
+	•	config-related testing
+	•	feature flag testing
+	•	localization testing
+	•	accessibility testing
+	•	moderation testing
+	•	stress/load testing
+	•	incident simulation
+	•	recovery testing
+	•	failover testing
+	•	user journey testing
+	•	pre-release quality gates
+
+Do not allow this product to become unstable because of hidden complexity.
+
+⸻
+
+16) Release Management, Environments, and Operational Safety
+
+Define how the product should be safely evolved over time.
+
+Include:
+	•	development/staging/production separation
+	•	release approval process
+	•	beta channel strategy
+	•	internal testing flows
+	•	controlled rollout
+	•	emergency rollback mechanisms
+	•	migration safety
+	•	environment-specific secrets
+	•	release notes discipline
+	•	change approval for high-risk product behavior
+
+A sensitive AI-driven product must not ship recklessly.
+
+⸻
+
+17) Observability, Incident Management, and SRE Readiness
+
+Define how the team will know when something is wrong.
+
+This includes:
+	•	system monitoring
+	•	AI response monitoring
+	•	conversation failure monitoring
+	•	provider outage visibility
+	•	moderation anomaly visibility
+	•	user journey failure points
+	•	error concentration analysis
+	•	alerting thresholds
+	•	incident severity classification
+	•	on-call readiness
+	•	status communication patterns
+	•	recovery playbooks
+
+Unns should not operate blindly.
+
+⸻
+
+18) Backup, Disaster Recovery, and Business Continuity
+
+Define resilience requirements for catastrophic scenarios.
+
+This includes:
+	•	database backups
+	•	encrypted backups
+	•	restore testing
+	•	provider outage continuity
+	•	failover architecture
+	•	recovery time objectives
+	•	recovery point objectives
+	•	secrets recovery procedures
+	•	disaster recovery documentation
+	•	continuity of essential emotional support functions where possible
+
+For a product dealing with personal and emotional continuity, resilience matters deeply.
+
+⸻
+
+19) Data Model, Data Governance, and Analytics Integrity
+
+Define the data architecture more deeply than simple event capture.
+
+This includes:
+	•	mood event model
+	•	session model
+	•	insight model
+	•	streak model
+	•	progression model
+	•	journal model
+	•	intervention model
+	•	nudge model
+	•	provider event model
+	•	moderation event model
+	•	user preference model
+	•	segmentation model
+	•	anonymization strategy
+	•	retention policy by data type
+	•	analytics governance
+	•	source-of-truth clarity
+	•	metric definitions consistency
+
+Do not allow reporting, personalization, and insights to drift into inconsistency.
+
+⸻
+
+20) Experimentation Framework and Learning System
+
+Design the product so it can learn and improve scientifically.
+
+This includes:
+	•	A/B testing framework
+	•	prompt experiments
+	•	nudge experiments
+	•	onboarding experiments
+	•	paywall tests
+	•	landing page experiments
+	•	retention strategy tests
+	•	segment-based experiments
+	•	experiment guardrails
+	•	experiment readouts
+	•	success criteria per test
+	•	rollback of harmful experiments
+
+Growth and product evolution should be evidence-based.
+
+⸻
+
+21) Support, Help Center, and User Care Operations
+
+Define the support system properly.
+
+This includes:
+	•	help center structure
+	•	in-app support entry points
+	•	contact us flow
+	•	issue reporting flow
+	•	support categorization
+	•	escalation routing
+	•	user complaint handling
+	•	moderation appeals if applicable
+	•	trust issue support
+	•	payment issue support in future
+	•	support analytics
+	•	response tone guidelines
+
+Support in Unns must feel calm, human, and trustworthy.
+
+⸻
+
+22) Brand System, Theming, and Emotional Consistency Rules
+
+Define a product-wide emotional design system.
+
+This should include:
+	•	tone of voice rules
+	•	messaging principles
+	•	motion principles
+	•	visual calmness rules
+	•	button/copy tone consistency
+	•	cultural sensitivity rules
+	•	trust language standards
+	•	microcopy standards
+	•	emotional design guardrails
+	•	brand consistency across app, landing page, notifications, help center, and dashboard
+
+Unns should feel like one coherent emotional environment.
+
+⸻
+
+23) Localization, Regionalization, and Cultural Readiness
+
+Define support for multilingual and culturally adapted experiences.
+
+This includes:
+	•	Arabic and English support
+	•	region-aware copy
+	•	localized mental wellness language
+	•	culturally appropriate emotional terminology
+	•	RTL/LTR parity
+	•	localized safety resources
+	•	holiday or seasonal adaptation if relevant
+	•	region-specific legal/compliance readiness
+
+The Arabic market should not feel like a translated afterthought.
+
+⸻
+
+24) Institutional / Enterprise Readiness (Future-Proofing)
+
+If Unns may later serve companies, universities, or institutions, define future-ready architecture for:
+	•	admin-controlled organizational spaces
+	•	employee wellbeing programs
+	•	institution-specific dashboards
+	•	user segmentation by organization
+	•	privacy separation between user and organization
+	•	aggregate analytics only where appropriate
+	•	consent-sensitive reporting
+	•	enterprise onboarding
+	•	bulk invite systems
+	•	SSO readiness if relevant later
+
+Do not build this now unless needed, but ensure the architecture does not block it.
+
+⸻
+
+25) App Store, Platform Compliance, and Policy Readiness
+
+Define product behavior in a way that is compatible with platform expectations.
+
+This includes:
+	•	App Store review readiness
+	•	Play Store compliance
+	•	subscription compliance
+	•	privacy nutrition readiness
+	•	AI disclosure readiness
+	•	moderation policy readiness
+	•	user reporting compliance
+	•	age appropriateness consideration
+	•	prohibited-content handling
+	•	wellness vs medical positioning clarity
+
+This reduces launch and scaling friction significantly.
+
+⸻
+
+26) Anti-Abuse, Fraud, and Misuse Prevention Beyond Community Moderation
+
+Define non-obvious abuse controls such as:
+	•	fake account creation
+	•	automated abuse
+	•	prompt abuse
+	•	token/resource abuse
+	•	referral abuse
+	•	waitlist spam
+	•	suspicious signup patterns
+	•	session abuse
+	•	operational dashboard misuse
+	•	role escalation attempts
+	•	content manipulation
+	•	malicious testing of the AI
+
+Unns should be safe not only emotionally, but operationally and commercially.
+
+⸻
+
+27) Human Expert Layer and Future Expert Operations
+
+If the product may later include psychologists, coaches, or guided experts, make it future-ready.
+
+Define possible future systems for:
+	•	expert profiles
+	•	availability
+	•	session moderation
+	•	booking logic
+	•	session boundaries
+	•	role separation between AI and expert
+	•	compliance boundaries
+	•	content approval by experts
+	•	expert contribution workflows
+
+Even if not in phase one, the architecture should not block this layer.
+
+⸻
+
+28) Product Education and Emotional Literacy Layer
+
+Unns can become stronger if it does not only respond, but also teaches.
+
+Define a product education layer for:
+	•	emotional literacy content
+	•	understanding stress, mood, and calm
+	•	learning patterns
+	•	short educational moments
+	•	“why this helps” explanations
+	•	evidence-informed micro-learning
+	•	practical emotional skills
+
+This increases trust, retention, and perceived value.

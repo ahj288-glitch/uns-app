@@ -18,6 +18,7 @@ import Nudges from "./pages/Nudges";
 import TeamRBAC from "./pages/TeamRBAC";
 import AuditLogs from "./pages/AuditLogs";
 import ErrorsConfig from "./pages/ErrorsConfig";
+import ContentCMS from "./pages/ContentCMS";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ function Router() {
         <Route path="/team" component={TeamRBAC} />
         <Route path="/audit-logs" component={AuditLogs} />
         <Route path="/errors-config" component={ErrorsConfig} />
+        <Route path="/content-cms" component={ContentCMS} />
         <Route component={NotFound} />
       </Switch>
     </AdminLayout>
