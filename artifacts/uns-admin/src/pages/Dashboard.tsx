@@ -103,12 +103,12 @@ function GamificationSection() {
 }
 
 const MOOD_COLORS: Record<string, string> = {
-  "calm": "#10b981",    // Emerald
-  "happy": "#f59e0b",   // Amber
-  "sad": "#6366f1",     // Indigo
-  "anxious": "#ef4444", // Red
-  "grateful": "#8b5cf6",// Violet
-  "other": "#64748b"    // Slate
+  "calm": "#74C69D",    // Mint primary
+  "happy": "#a5d0b9",   // Mint light
+  "sad": "#4a7a5e",     // Muted green
+  "anxious": "#ffb4ab", // Error/destructive (from design system)
+  "grateful": "#85d7ad",// Secondary mint
+  "other": "#1a2e26"    // Surface container high
 };
 
 export default function Dashboard() {
@@ -125,12 +125,12 @@ export default function Dashboard() {
   if (!overview) return null;
 
   const stats = [
-    { label: "إجمالي المستخدمين", value: overview.totalUsers.toLocaleString("ar-SA"), icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "نشطون اليوم", value: overview.activeToday.toLocaleString("ar-SA"), icon: Activity, color: "text-green-500", bg: "bg-green-500/10" },
-    { label: "قائمة الانتظار", value: overview.waitlistCount.toLocaleString("ar-SA"), icon: Clock, color: "text-primary", bg: "bg-primary/10" },
-    { label: "المستخدمون المدفوعون", value: overview.premiumUsers.toLocaleString("ar-SA"), icon: Award, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "متوسط الجلسة", value: `${overview.avgSessionLength}د`, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
-    { label: "الاحتفاظ ٧ أيام", value: `${(overview.d7Retention * 100).toFixed(1)}%`, icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
+    { label: "إجمالي المستخدمين", value: overview.totalUsers.toLocaleString("ar-SA"), icon: Users, color: "text-primary", bg: "bg-primary/10" },
+    { label: "نشطون اليوم", value: overview.activeToday.toLocaleString("ar-SA"), icon: Activity, color: "text-accent", bg: "bg-accent/10" },
+    { label: "قائمة الانتظار", value: overview.waitlistCount.toLocaleString("ar-SA"), icon: Clock, color: "text-[#a5d0b9]", bg: "bg-[#a5d0b9]/10" },
+    { label: "المستخدمون المدفوعون", value: overview.premiumUsers.toLocaleString("ar-SA"), icon: Award, color: "text-[#85d7ad]", bg: "bg-[#85d7ad]/10" },
+    { label: "متوسط الجلسة", value: `${overview.avgSessionLength}د`, icon: TrendingUp, color: "text-primary", bg: "bg-primary/10" },
+    { label: "الاحتفاظ ٧ أيام", value: `${(overview.d7Retention * 100).toFixed(1)}%`, icon: Heart, color: "text-destructive", bg: "bg-destructive/10" },
   ];
 
   const chartData = overview.recentGrowth.map(d => ({

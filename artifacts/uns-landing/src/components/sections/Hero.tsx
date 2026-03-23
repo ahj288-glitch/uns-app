@@ -47,7 +47,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="text-8xl md:text-[10rem] lg:text-[13rem] arabic-calligraphy text-gradient-gold mb-2 leading-none drop-shadow-2xl select-none"
+          className="text-8xl md:text-[10rem] lg:text-[13rem] arabic-calligraphy text-gradient-mint mb-2 leading-none drop-shadow-2xl select-none"
         >
           أُنْس
         </motion.h1>

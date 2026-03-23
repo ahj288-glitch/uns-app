@@ -29,12 +29,12 @@ const programSchema = z.object({
 type ProgramForm = z.infer<typeof programSchema>;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  anxiety: "bg-red-500/10 text-red-500 border-red-500/20",
-  grief: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-  sleep: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-  ramadan: "bg-primary/10 text-primary border-primary/20",
-  general: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  spiritual: "bg-teal-500/10 text-teal-500 border-teal-500/20",
+  anxiety: "bg-destructive/10 text-destructive border-destructive/20",
+  grief: "bg-[#a5d0b9]/10 text-[#a5d0b9] border-[#a5d0b9]/20",
+  sleep: "bg-primary/10 text-primary border-primary/20",
+  ramadan: "bg-accent/10 text-accent border-accent/20",
+  general: "bg-[#85d7ad]/10 text-[#85d7ad] border-[#85d7ad]/20",
+  spiritual: "bg-[#74C69D]/10 text-[#74C69D] border-[#74C69D]/20",
 };
 
 export default function Programs() {
@@ -166,7 +166,7 @@ export default function Programs() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium">{prog.durationDays} Days</div>
-                    <div className={cn("text-xs font-bold mt-1 uppercase tracking-wider", prog.tier === 'premium' ? 'text-purple-400' : 'text-emerald-400')}>
+                    <div className={cn("text-xs font-bold mt-1 uppercase tracking-wider", prog.tier === 'premium' ? 'text-accent' : 'text-primary')}>
                       {prog.tier}
                     </div>
                   </td>
@@ -181,7 +181,7 @@ export default function Programs() {
                   </td>
                   <td className="px-6 py-4">
                     {prog.active ? (
-                      <span className="flex items-center gap-1.5 text-emerald-500 text-sm font-medium"><CheckCircle2 className="w-4 h-4"/> Active</span>
+                      <span className="flex items-center gap-1.5 text-primary text-sm font-medium"><CheckCircle2 className="w-4 h-4"/> Active</span>
                     ) : (
                       <span className="flex items-center gap-1.5 text-muted-foreground text-sm font-medium"><XCircle className="w-4 h-4"/> Draft</span>
                     )}

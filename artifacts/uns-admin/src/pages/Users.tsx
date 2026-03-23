@@ -70,15 +70,15 @@ export default function Users() {
                 <div className="flex w-full h-4 rounded-full overflow-hidden mb-3">
                   <div className="bg-primary" style={{ width: '40%' }} title="Gulf 40%"></div>
                   <div className="bg-accent" style={{ width: '28%' }} title="Levant 28%"></div>
-                  <div className="bg-blue-500" style={{ width: '18%' }} title="Egyptian 18%"></div>
-                  <div className="bg-purple-500" style={{ width: '10%' }} title="Maghrebi 10%"></div>
-                  <div className="bg-emerald-500" style={{ width: '4%' }} title="MSA 4%"></div>
+                  <div className="bg-[#4a7a5e]" style={{ width: '18%' }} title="Egyptian 18%"></div>
+                  <div className="bg-[#1B4332]" style={{ width: '10%' }} title="Maghrebi 10%"></div>
+                  <div className="bg-[#85d7ad]" style={{ width: '4%' }} title="MSA 4%"></div>
                 </div>
                 <div className="flex gap-4 text-xs font-medium text-muted-foreground overflow-x-auto pb-2">
                   <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-primary"></div> Gulf (40%)</div>
                   <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-accent"></div> Levant (28%)</div>
-                  <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Egyptian (18%)</div>
-                  <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-purple-500"></div> Maghrebi (10%)</div>
+                  <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-[#4a7a5e]"></div> Egyptian (18%)</div>
+                  <div className="flex items-center gap-1.5 whitespace-nowrap"><div className="w-2 h-2 rounded-full bg-[#1B4332]"></div> Maghrebi (10%)</div>
                 </div>
               </div>
             </div>

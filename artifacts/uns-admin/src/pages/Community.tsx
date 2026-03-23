@@ -71,10 +71,10 @@ export default function Community() {
   const flaggedCount = flaggedPosts.length;
 
   const stats = [
-    { label: "الدوائر النشطة", value: sessions.length, icon: Users, color: "text-blue-400", bg: "bg-blue-400/10" },
-    { label: "إجمالي المشاركين", value: totalParticipants, icon: Heart, color: "text-rose-400", bg: "bg-rose-400/10" },
-    { label: "مشاركات اليوم", value: totalPosts, icon: MessageSquare, color: "text-green-400", bg: "bg-green-400/10" },
-    { label: "تحتاج مراجعة", value: flaggedCount, icon: Flag, color: "text-amber-400", bg: "bg-amber-400/10" },
+    { label: "الدوائر النشطة", value: sessions.length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
+    { label: "إجمالي المشاركين", value: totalParticipants, icon: Heart, color: "text-accent", bg: "bg-accent/10" },
+    { label: "مشاركات اليوم", value: totalPosts, icon: MessageSquare, color: "text-[#a5d0b9]", bg: "bg-[#a5d0b9]/10" },
+    { label: "تحتاج مراجعة", value: flaggedCount, icon: Flag, color: "text-destructive", bg: "bg-destructive/10" },
   ];
 
   const tabs = [
@@ -116,13 +116,13 @@ export default function Community() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-start gap-3"
+        className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-start gap-3"
       >
-        <div className="p-2 bg-emerald-500/20 rounded-full text-emerald-400 shrink-0">
+        <div className="p-2 bg-primary/20 rounded-full text-primary shrink-0">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-bold font-arabic text-emerald-400">الحماية التلقائية نشطة</h3>
+          <h3 className="font-bold font-arabic text-primary">الحماية التلقائية نشطة</h3>
           <p className="text-muted-foreground text-sm mt-1 font-arabic">
             نظام الذكاء الاصطناعي يكتشف تلقائياً المشاركات ذات الضائقة الشديدة ويحيل صاحبها لخطوط الدعم.
             خط الدعم السعودي: <span className="text-foreground font-mono">920033360</span>
@@ -222,8 +222,8 @@ export default function Community() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {flaggedPosts.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="w-8 h-8 text-emerald-400" />
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShieldCheck className="w-8 h-8 text-primary" />
               </div>
               <p className="font-arabic text-muted-foreground text-lg">لا توجد مشاركات تحتاج مراجعة 🎉</p>
               <p className="font-arabic text-muted-foreground text-sm mt-2">المجتمع في حالة سلامة جيدة</p>
@@ -231,20 +231,20 @@ export default function Community() {
           ) : (
             <div className="space-y-3">
               {flaggedPosts.map((post) => (
-                <div key={post.id} className="bg-card border border-amber-500/30 rounded-2xl p-5">
+                <div key={post.id} className="bg-card border border-destructive/30 rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex gap-2">
-                      <button className="flex items-center gap-1 text-green-400 hover:bg-green-400/10 px-3 py-1.5 rounded-lg transition-colors text-sm">
+                      <button className="flex items-center gap-1 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors text-sm">
                         <CheckCircle className="w-4 h-4" />
                         <span className="font-arabic">قبول</span>
                       </button>
-                      <button className="flex items-center gap-1 text-red-400 hover:bg-red-400/10 px-3 py-1.5 rounded-lg transition-colors text-sm">
+                      <button className="flex items-center gap-1 text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-lg transition-colors text-sm">
                         <XCircle className="w-4 h-4" />
                         <span className="font-arabic">حذف</span>
                       </button>
                     </div>
                     <div className="text-right">
-                      <span className="font-arabic text-sm font-medium text-amber-400">{post.anonymousName}</span>
+                      <span className="font-arabic text-sm font-medium text-accent">{post.anonymousName}</span>
                       <span className="text-xs text-muted-foreground mr-2">
                         {new Date(post.createdAt).toLocaleString("ar-SA")}
                       </span>
@@ -252,11 +252,11 @@ export default function Community() {
                   </div>
                   <p className="font-arabic text-foreground text-right leading-relaxed">{post.contentAr}</p>
                   <div className="flex items-center justify-end gap-3 mt-3">
-                    <div className="flex items-center gap-1 text-rose-400 text-sm">
+                    <div className="flex items-center gap-1 text-accent text-sm">
                       <Heart className="w-3.5 h-3.5" />
                       <span>{post.hearts}</span>
                     </div>
-                    <span className="text-xs px-2 py-0.5 bg-amber-400/15 text-amber-400 rounded-full font-arabic">
+                    <span className="text-xs px-2 py-0.5 bg-destructive/15 text-destructive rounded-full font-arabic">
                       مُبلَّغ عنه
                     </span>
                   </div>

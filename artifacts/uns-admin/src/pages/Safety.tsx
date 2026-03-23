@@ -37,7 +37,7 @@ export default function Safety() {
         </div>
         <div className="bg-card rounded-2xl p-6 border border-border shadow-lg">
           <div className="text-muted-foreground font-medium mb-1">Crisis Response Rate</div>
-          <div className="text-4xl font-bold text-emerald-500">{(safety.crisisResponseRate * 100).toFixed(1)}%</div>
+          <div className="text-4xl font-bold text-primary">{(safety.crisisResponseRate * 100).toFixed(1)}%</div>
           <div className="text-sm mt-2 text-muted-foreground">Automated routing success</div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function Safety() {
                     <td className="px-6 py-4">
                       {event.severity === 'high' && <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-destructive/10 text-destructive border border-destructive/20">HIGH</span>}
                       {event.severity === 'medium' && <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-accent/10 text-accent border border-accent/20">MEDIUM</span>}
-                      {event.severity === 'low' && <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">LOW</span>}
+                      {event.severity === 'low' && <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">LOW</span>}
                     </td>
                     <td className="px-6 py-4 font-medium capitalize">{event.type.replace(/_/g, ' ')}</td>
                     <td className="px-6 py-4">
@@ -78,7 +78,7 @@ export default function Safety() {
                     </td>
                     <td className="px-6 py-4">
                       {event.resolvedAt ? (
-                        <div className="flex items-center gap-1.5 text-emerald-500 text-sm font-medium"><CheckCircle className="w-4 h-4"/> Resolved</div>
+                        <div className="flex items-center gap-1.5 text-primary text-sm font-medium"><CheckCircle className="w-4 h-4"/> Resolved</div>
                       ) : (
                         <button className="text-xs bg-destructive text-destructive-foreground px-3 py-1.5 rounded hover:bg-destructive/90 font-bold transition-colors">
                           Acknowledge

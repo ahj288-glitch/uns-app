@@ -138,7 +138,7 @@ export function Waitlist() {
               
               <div className="bg-background rounded-2xl p-6 border border-white/5 inline-block min-w-[250px]">
                 <div className="text-xs text-muted-foreground uppercase tracking-widest mb-2 font-arabic">موقعك في القائمة</div>
-                <div className="text-5xl font-black text-gradient-gold">#{position?.toLocaleString("ar-SA") || "..."}</div>
+                <div className="text-5xl font-black text-gradient-mint">#{position?.toLocaleString("ar-SA") || "..."}</div>
               </div>
               
               <p className="text-sm text-muted-foreground mt-8 arabic-text">سنراسلك حين يكون رفيقك مستعداً.</p>

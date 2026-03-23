@@ -150,19 +150,19 @@ export default function AiConfig() {
 
           <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg">
             <div className="p-6 border-b border-border flex items-center gap-3 bg-muted/10">
-              <Heart className="w-5 h-5 text-emerald-500" />
+              <Heart className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-bold">Cultural Alignment</h2>
             </div>
             <div className="p-6 space-y-6">
-              <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+              <div className="flex items-center justify-between p-4 bg-primary/10 rounded-xl border border-primary/20">
                 <div>
-                  <div className="font-bold text-sm text-emerald-500">Spiritual Layer</div>
-                  <div className="text-xs text-emerald-500/80 mt-1 max-w-[200px]">Enables natural use of Dua and Quranic wisdom when comforting.</div>
+                  <div className="font-bold text-sm text-primary">Spiritual Layer</div>
+                  <div className="text-xs text-primary/80 mt-1 max-w-[200px]">Enables natural use of Dua and Quranic wisdom when comforting.</div>
                 </div>
                 <button 
                   type="button"
                   onClick={() => setValue("spiritualLayerEnabled", !spiritualLayer)}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${spiritualLayer ? 'bg-emerald-500' : 'bg-muted/50 border border-emerald-500/20'}`}
+                  className={`w-12 h-6 rounded-full transition-colors relative ${spiritualLayer ? 'bg-primary' : 'bg-muted/50 border border-primary/20'}`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${spiritualLayer ? 'left-6' : 'left-0.5'}`}></div>
                 </button>
@@ -174,7 +174,7 @@ export default function AiConfig() {
         {/* Engine & Prompts */}
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg">
           <div className="p-6 border-b border-border flex items-center gap-3 bg-muted/10">
-            <Brain className="w-5 h-5 text-purple-500" />
+            <Brain className="w-5 h-5 text-accent" />
             <h2 className="text-xl font-bold">Engine Configuration</h2>
           </div>
           <div className="p-6 space-y-6">
