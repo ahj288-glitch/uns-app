@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
@@ -47,9 +48,9 @@ function BreathingOrb() {
 
   return (
     <View style={styles.orbContainer}>
-      <Animated.View style={[styles.orbOuter, { transform: [{ scale: pulse }], opacity: glow }]} />
-      <Animated.View style={[styles.orbInner, { transform: [{ scale: pulse }] }]}>
-        <Feather name="feather" size={32} color={Colors.surface} />
+      <Animated.View style={[styles.orbOuter, { opacity: glow }]} />
+      <Animated.View style={[styles.orbMid, { transform: [{ scale: pulse }] }]}>
+        <Feather name="feather" size={32} color={Colors.primary} />
         <Text style={styles.orbLabel}>BREATHE</Text>
       </Animated.View>
     </View>
@@ -69,13 +70,13 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
-        <Pressable
-          style={styles.avatarBtn}
-          onPress={() => router.push("/(tabs)/profile")}
-        >
-          <View style={styles.avatarCircle}>
+        <Pressable onPress={() => router.push("/(tabs)/profile")} style={styles.avatarBtn}>
+          <LinearGradient
+            colors={[Colors.primaryContainer, Colors.surfaceContainerHigh]}
+            style={styles.avatarCircle}
+          >
             <Text style={styles.avatarText}>أ</Text>
-          </View>
+          </LinearGradient>
         </Pressable>
         <Text style={styles.headerLogo}>أُنْس</Text>
         <Feather name="align-right" size={20} color={Colors.muted} />
@@ -113,22 +114,27 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.featuredCard}>
-        <View style={styles.featuredCardInner}>
-          <Text style={styles.featuredLabel}>تأمل الليلة</Text>
-          <Text style={styles.featuredDesc}>
-            رحلة صوتية لمدة ١٠ دقائق لتهدئة العقل قبل النوم.
-          </Text>
-          <Pressable
+        <Text style={styles.featuredLabel}>تأمل الليلة</Text>
+        <Text style={styles.featuredDesc}>
+          رحلة صوتية لمدة ١٠ دقائق لتهدئة العقل قبل النوم.
+        </Text>
+        <Pressable
+          style={{ borderRadius: 999, overflow: "hidden", alignSelf: "flex-end", marginTop: 4 }}
+          onPress={() => {
+            if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/(tabs)/chat");
+          }}
+        >
+          <LinearGradient
+            colors={["#74C69D", "#1B4332"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
             style={styles.featuredBtn}
-            onPress={() => {
-              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push("/(tabs)/chat");
-            }}
           >
             <Feather name="play" size={14} color={Colors.surface} />
             <Text style={styles.featuredBtnText}>ابدأ الآن</Text>
-          </Pressable>
-        </View>
+          </LinearGradient>
+        </Pressable>
       </View>
 
       <View style={styles.metricsRow}>
@@ -159,11 +165,8 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.primaryContainer,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   avatarText: {
     fontFamily: "Tajawal_700Bold",
@@ -210,9 +213,9 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 90,
     backgroundColor: Colors.accent,
-    opacity: 0.15,
+    opacity: 0.12,
   },
-  orbInner: {
+  orbMid: {
     width: 148,
     height: 148,
     borderRadius: 74,
@@ -220,8 +223,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   orbLabel: {
     fontFamily: "BeVietnamPro_500Medium",
@@ -283,8 +284,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     backgroundColor: Colors.surfaceContainerHigh,
-  },
-  featuredCardInner: {
     padding: 20,
     alignItems: "flex-end",
     gap: 8,
@@ -306,11 +305,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: Colors.accent,
     borderRadius: 999,
     paddingHorizontal: 18,
     paddingVertical: 10,
-    marginTop: 4,
   },
   featuredBtnText: {
     fontFamily: "Tajawal_700Bold",

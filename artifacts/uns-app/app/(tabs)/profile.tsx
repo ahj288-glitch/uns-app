@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
@@ -39,7 +40,7 @@ function SettingRow({
   onPress,
   danger,
 }: {
-  icon: string;
+  icon: React.ComponentProps<typeof Feather>["name"];
   title: string;
   subtitle?: string;
   rightElement?: React.ReactNode;
@@ -49,7 +50,7 @@ function SettingRow({
   return (
     <Pressable style={styles.settingRow} onPress={onPress} disabled={!onPress}>
       <View style={[styles.settingIcon, { backgroundColor: danger ? Colors.error + "20" : Colors.surfaceContainerHigh }]}>
-        <Feather name={icon as any} size={16} color={danger ? Colors.error : Colors.accent} />
+        <Feather name={icon} size={16} color={danger ? Colors.error : Colors.accent} />
       </View>
       <View style={styles.settingContent}>
         <Text style={[styles.settingTitle, danger && { color: Colors.error }]}>{title}</Text>
@@ -113,11 +114,7 @@ export default function ProfileScreen() {
               key={d.id}
               style={[
                 styles.dialectChip,
-                dialect === d.id && {
-                  borderColor: Colors.accent + "80",
-                  backgroundColor: Colors.primaryContainer,
-                  borderWidth: 1.5,
-                },
+                dialect === d.id && styles.dialectChipActive,
               ]}
               onPress={() => {
                 setDialect(d.id);
@@ -232,16 +229,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryContainer,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1.5,
-    borderColor: Colors.ghostBorder,
   },
   mintRing: {
     position: "absolute",
-    inset: -4,
+    top: -4,
+    right: -4,
+    bottom: -4,
+    left: -4,
     borderRadius: 48,
-    borderWidth: 1,
-    borderColor: Colors.accent + "40",
-  } as any,
+  },
   avatarText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 36,
@@ -280,8 +276,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "transparent",
+  },
+  dialectChipActive: {
+    backgroundColor: Colors.primaryContainer,
   },
   dialectFlag: { fontSize: 16 },
   dialectLabel: {
@@ -298,8 +295,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.ghostBorder,
   },
   settingIcon: {
     width: 36,

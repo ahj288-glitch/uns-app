@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
+  type DimensionValue,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
@@ -58,7 +59,7 @@ function XPBar({ current, max }: { current: number; max: number }) {
     progress.value = withTiming(Math.min(current / max, 1), { duration: 1000 });
   }, [current, max]);
   const animStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%` as any,
+    width: `${progress.value * 100}%` as DimensionValue,
   }));
   return (
     <View style={styles.xpBarBg}>
@@ -157,7 +158,7 @@ export default function JourneyScreen() {
                 {isCurrent && (
                   <View style={styles.stageProgress}>
                     <View style={styles.progressBarBg}>
-                      <View style={[styles.progressBarFill, { width: `${progressForThis}%` as any }]} />
+                      <View style={[styles.progressBarFill, { width: `${progressForThis}%` as DimensionValue }]} />
                     </View>
                     <Text style={styles.progressLabel}>{progressForThis}% مكتمل</Text>
                   </View>
@@ -213,8 +214,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   streakBadgeText: {
     fontFamily: "Tajawal_400Regular",
@@ -236,8 +235,6 @@ const styles = StyleSheet.create({
   },
   stageCardCurrent: {
     backgroundColor: Colors.primaryContainer,
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   stageCardLocked: {
     opacity: 0.55,

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type DimensionValue,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -114,7 +115,7 @@ export default function InsightsScreen() {
           ].map((item) => (
             <View key={item.label} style={styles.moodPatternRow}>
               <View style={styles.moodBarTrack}>
-                <View style={[styles.moodBarFill, { width: `${item.pct * 100}%` as any, backgroundColor: item.color }]} />
+                <View style={[styles.moodBarFill, { width: `${item.pct * 100}%` as DimensionValue, backgroundColor: item.color }]} />
               </View>
               <Text style={styles.moodPatternLabel}>{item.label}</Text>
               <Text style={[styles.moodPatternPct, { color: item.color }]}>

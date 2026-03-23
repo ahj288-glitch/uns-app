@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import * as Haptics from "expo-haptics";
@@ -85,7 +87,6 @@ export default function ChatScreen() {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
-  const inputRef = useRef<TextInput>(null);
 
   const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
   const webTop = Platform.OS === "web" ? 67 : insets.top;
@@ -125,6 +126,8 @@ export default function ChatScreen() {
       setIsSending(false);
     }
   }
+
+  const canSend = input.trim().length > 0 && !isSending;
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
@@ -172,7 +175,7 @@ export default function ChatScreen() {
           />
         )}
 
-        {!isSending && messages.length > 0 || showWelcome ? (
+        {QUICK_REPLIES.length > 0 && (
           <View style={styles.quickRepliesRow}>
             {QUICK_REPLIES.map(q => (
               <Pressable key={q} style={styles.quickChip} onPress={() => sendMessage(q)}>
@@ -180,29 +183,37 @@ export default function ChatScreen() {
               </Pressable>
             ))}
           </View>
-        ) : null}
+        )}
 
         <View style={[styles.inputContainer, { paddingBottom: Math.max(webBottom + 72, 80) }]}>
+          <View style={styles.inputBar}>
+            <Pressable style={styles.attachBtn}>
+              <Feather name="plus" size={20} color={Colors.muted} />
+            </Pressable>
+            <TextInput
+              style={styles.input}
+              value={input}
+              onChangeText={setInput}
+              placeholder="اكتب ما يدور في خاطرك..."
+              placeholderTextColor={Colors.muted}
+              multiline
+              maxLength={500}
+              textAlign="right"
+            />
+          </View>
           <Pressable
-            style={[styles.sendBtn, { opacity: input.trim() && !isSending ? 1 : 0.5 }]}
+            style={{ borderRadius: 21, overflow: "hidden", opacity: canSend ? 1 : 0.45 }}
             onPress={() => sendMessage()}
-            disabled={!input.trim() || isSending}
+            disabled={!canSend}
           >
-            <Feather name="arrow-right" size={18} color={Colors.surface} />
-          </Pressable>
-          <TextInput
-            ref={inputRef}
-            style={styles.input}
-            value={input}
-            onChangeText={setInput}
-            placeholder="اكتب ما يدور في خاطرك..."
-            placeholderTextColor={Colors.muted}
-            multiline
-            maxLength={500}
-            textAlign="right"
-          />
-          <Pressable style={styles.attachBtn}>
-            <Feather name="plus" size={20} color={Colors.muted} />
+            <LinearGradient
+              colors={["#74C69D", "#1B4332"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.sendBtn}
+            >
+              <Feather name="arrow-right" size={18} color={Colors.surface} />
+            </LinearGradient>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -266,8 +277,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   avatarText: {
     fontFamily: "Tajawal_700Bold",
@@ -339,8 +348,6 @@ const styles = StyleSheet.create({
     gap: 5,
     marginTop: 6,
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: Colors.ghostBorder,
   },
   crisisText: {
     fontFamily: "Tajawal_400Regular",
@@ -389,33 +396,39 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     backgroundColor: Colors.surface,
   },
+  inputBar: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    backgroundColor: Colors.surfaceContainerHigh,
+    borderRadius: 22,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    gap: 6,
+  },
   attachBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.surfaceContainer,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   input: {
     flex: 1,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    paddingVertical: 11,
     fontSize: 15,
     color: Colors.onSurface,
     fontFamily: "Tajawal_400Regular",
-    minHeight: 44,
+    minHeight: 32,
     maxHeight: 120,
     textAlign: "right",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   sendBtn: {
     width: 42,
     height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.accent,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 21,
   },
 });

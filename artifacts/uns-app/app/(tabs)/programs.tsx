@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type DimensionValue,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -80,7 +81,7 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
         <View style={styles.progressBarBg}>
           <View
-            style={[styles.progressBarFill, { width: `${completion}%` as any, backgroundColor: cat.color }]}
+            style={[styles.progressBarFill, { width: `${completion}%` as DimensionValue, backgroundColor: cat.color }]}
           />
         </View>
       </Pressable>

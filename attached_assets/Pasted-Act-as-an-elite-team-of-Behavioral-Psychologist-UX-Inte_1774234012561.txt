@@ -1,0 +1,155 @@
+Act as an elite team of:
+- Behavioral Psychologist
+- UX Interaction Designer (Emotion-driven systems)
+- AI Personalization Engineer
+- Product Designer (Top-tier mobile apps)
+- Motion Designer
+- Data Scientist (User modeling)
+- Human-Computer Interaction (HCI) expert
+
+We are building an emotionally intelligent mobile application (like an “emotional operating system”), where interaction is not static, but adaptive, alive, and personalized per user.
+
+Your task is to design ALL interaction patterns, UX behaviors, and intelligent personalization systems that make the app feel:
+- alive
+- emotionally aware
+- adaptive per user
+- calming, safe, and intelligent
+- radically different from traditional apps
+
+---
+
+## 1. ADAPTIVE INTERACTION SYSTEM
+
+Define how the app behavior changes dynamically based on:
+- user mood
+- time of day
+- usage patterns
+- emotional state trends
+- engagement level
+
+Examples:
+- UI becomes calmer when user is stressed
+- UI becomes more energetic when user is active
+- Interaction speed adapts to user pace
+- Notifications tone adapts to emotional sensitivity
+
+---
+
+## 2. BREATHING & BODY-BASED INTERACTIONS
+
+Design modern interaction patterns inspired by human physiology:
+
+- Guided breathing interactions (visual + haptic)
+- Expanding/contracting UI elements (like a breathing sphere)
+- Pulse-based animations synced with calm rhythms
+- Touch-based calming gestures
+- Micro-interactions that reduce anxiety
+
+Define:
+- animation timing
+- easing curves
+- color transitions
+- haptic feedback patterns
+
+---
+
+## 3. LIVING UI SYSTEM (NEXT-GEN UI)
+
+Design a UI that feels alive, not static:
+
+- Dynamic gradients that subtly change
+- Floating elements with soft motion
+- Context-aware layouts
+- Smooth transitions between emotional states
+- No harsh UI changes
+
+---
+
+## 4. DEEP PERSONALIZATION ENGINE
+
+Design a system where EACH user gets a unique experience:
+
+- Behavior-based personalization
+- Emotional profile building over time
+- Content adaptation
+- UI adaptation (not just content)
+- Tone of language adaptation
+
+Define:
+- how user profiles are built
+- what data is used
+- how decisions are made (rules vs AI)
+- privacy-safe personalization
+
+---
+
+## 5. MICRO-INTERACTIONS & FEEDBACK
+
+Define high-end micro interactions:
+
+- Touch feedback
+- Button behavior
+- Loading states (should never feel boring)
+- Confirmation patterns (emotional reassurance)
+- Error handling (non-stressful)
+
+---
+
+## 6. EMOTIONAL JOURNEY DESIGN
+
+Design the full emotional journey:
+
+- First-time user experience
+- Daily usage flow
+- Crisis/stress mode
+- Calm mode
+- Reflection mode
+
+Each mode should:
+- change UI behavior
+- change tone
+- change interaction density
+
+---
+
+## 7. AI-DRIVEN BEHAVIOR
+
+Define intelligent features:
+
+- Predictive suggestions
+- Smart nudges (not annoying)
+- Emotional pattern detection
+- Context-aware recommendations
+
+---
+
+## 8. DIFFERENT EXPERIENCE PER USER
+
+Ensure:
+- no two users experience the app exactly the same
+- system adapts continuously
+- experience evolves over time
+
+---
+
+## 9. DESIGN OUTPUT
+
+Provide:
+
+A) Interaction system blueprint  
+B) Emotional UX rules  
+C) Motion & animation system  
+D) Personalization engine logic  
+E) Example scenarios (different users → different experiences)  
+F) UI behavior variations per emotional state  
+G) Advanced micro-interactions library  
+
+---
+
+## IMPORTANT
+
+- Avoid generic UX patterns
+- Avoid static UI
+- Design for emotional impact, not just usability
+- Make the app feel like a companion, not a tool
+- Balance intelligence with simplicity

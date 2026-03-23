@@ -14,6 +14,7 @@ import Animated, {
   FadeInUp,
   SlideInRight,
 } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
@@ -70,7 +71,7 @@ export default function OnboardingScreen() {
         {[0, 1, 2].map(i => (
           <View
             key={i}
-            style={[styles.dot, i === step && styles.dotActive, i < step && styles.dotComplete]}
+            style={[styles.dot, i === step && styles.dotActive, i < step && styles.dotDone]}
           />
         ))}
       </View>
@@ -106,7 +107,10 @@ export default function OnboardingScreen() {
             {DIALECTS.map(d => (
               <Pressable
                 key={d.key}
-                style={[styles.optionCard, dialect === d.key && styles.optionCardActive]}
+                style={[
+                  styles.optionCard,
+                  dialect === d.key && styles.optionCardActive,
+                ]}
                 onPress={() => {
                   setDialect(d.key);
                   if (Platform.OS !== "web") Haptics.selectionAsync();
@@ -131,7 +135,10 @@ export default function OnboardingScreen() {
             {INTENTIONS.map(int => (
               <Pressable
                 key={int.key}
-                style={[styles.intentionCard, intention === int.key && styles.intentionCardActive]}
+                style={[
+                  styles.intentionCard,
+                  intention === int.key && styles.intentionCardActive,
+                ]}
                 onPress={() => {
                   setIntention(int.key);
                   if (Platform.OS !== "web") Haptics.selectionAsync();
@@ -151,13 +158,20 @@ export default function OnboardingScreen() {
 
       <Animated.View entering={FadeInUp.duration(400)} style={styles.footer}>
         <Pressable
-          style={[styles.nextBtn, !canProceed && styles.nextBtnDisabled]}
+          style={{ borderRadius: 999, overflow: "hidden", opacity: canProceed ? 1 : 0.35 }}
           onPress={handleNext}
           disabled={!canProceed}
         >
-          <Text style={styles.nextBtnText}>
-            {step === 2 ? "ابدأ رحلتك مع أُنس ←" : "التالي ←"}
-          </Text>
+          <LinearGradient
+            colors={["#74C69D", "#1B4332"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.nextBtn}
+          >
+            <Text style={styles.nextBtnText}>
+              {step === 2 ? "ابدأ رحلتك مع أُنس ←" : "التالي ←"}
+            </Text>
+          </LinearGradient>
         </Pressable>
         {step > 0 && (
           <Pressable onPress={() => setStep(step - 1)} style={styles.secondaryBtn}>
@@ -197,10 +211,8 @@ const styles = StyleSheet.create({
     width: 28,
     backgroundColor: Colors.accent,
   },
-  dotComplete: {
+  dotDone: {
     backgroundColor: Colors.primaryContainer,
-    borderWidth: 1,
-    borderColor: Colors.accent + "60",
   },
   stepContent: {
     flex: 1,
@@ -276,11 +288,8 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     gap: 10,
-    borderWidth: 1.5,
-    borderColor: "transparent",
   },
   optionCardActive: {
-    borderColor: Colors.accent + "80",
     backgroundColor: Colors.primaryContainer,
   },
   optionIcon: { fontSize: 28 },
@@ -298,11 +307,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainer,
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1.5,
-    borderColor: "transparent",
   },
   intentionCardActive: {
-    borderColor: Colors.accent + "80",
     backgroundColor: Colors.primaryContainer,
   },
   intentionIcon: { fontSize: 22 },
@@ -320,12 +326,10 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   nextBtn: {
-    backgroundColor: Colors.accent,
     borderRadius: 999,
     paddingVertical: 18,
     alignItems: "center",
   },
-  nextBtnDisabled: { opacity: 0.35 },
   nextBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 17,

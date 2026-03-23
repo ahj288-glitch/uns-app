@@ -8,8 +8,8 @@ import {
   BeVietnamPro_500Medium,
   BeVietnamPro_600SemiBold,
   BeVietnamPro_700Bold,
-  useFonts,
 } from "@expo-google-fonts/be-vietnam-pro";
+import { useFonts } from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -45,7 +45,7 @@ export default function RootLayout() {
     BeVietnamPro_500Medium,
     BeVietnamPro_600SemiBold,
     BeVietnamPro_700Bold,
-  } as any);
+  });
 
   useEffect(() => {
     if (fontsLoaded || fontError) {

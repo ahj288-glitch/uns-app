@@ -1,0 +1,138 @@
+Act as a growth strategist, behavioral psychologist, viral product expert, and social UX designer.
+
+We are building a mobile app that should achieve explosive organic growth through user-driven sharing.
+
+Your task is to design a complete "Emotional Viral System" that encourages users to share their personal experience, emotional state, and identity in a natural, authentic, and non-cringey way.
+
+---
+
+## 1. PERSONAL EMOTIONAL FINGERPRINT (CORE VIRAL MECHANISM)
+
+Design a system where each user has a unique “emotional fingerprint” that can be shared externally.
+
+Examples:
+- daily emotional summary
+- mood aura / energy state
+- personal insight
+- emotional score or pattern
+- “who I am today” snapshot
+
+The fingerprint must be:
+- visually beautiful
+- minimal
+- meaningful
+- shareable as an image/story
+- not exposing sensitive data directly
+
+---
+
+## 2. SHAREABLE CONTENT DESIGN
+
+Design multiple share formats:
+
+- Instagram story format (vertical, premium look)
+- Snapchat-friendly quick share
+- WhatsApp card
+- Twitter/X post format
+
+Each should include:
+- subtle branding (not intrusive)
+- emotional message
+- personal insight
+- visually attractive gradients / motion
+
+---
+
+## 3. SMART COPYWRITING (CRITICAL)
+
+Define the exact tone of messages that appear when sharing:
+
+The tone must be:
+- deep
+- slightly mysterious
+- emotionally intelligent
+- positive but not fake
+- reflective
+- not cheesy
+
+Examples:
+- “Today, I chose calm over chaos.”
+- “Not everything heavy needs to be carried.”
+- “Some days, growth is just surviving quietly.”
+
+---
+
+## 4. TRIGGER MOMENTS FOR SHARING
+
+Define when the app prompts sharing:
+
+- after emotional insight
+- after completing a session (breathing / reflection)
+- after progress milestone
+- after a “breakthrough moment”
+
+IMPORTANT:
+- never interrupt
+- always feel natural
+- optional, never forced
+
+---
+
+## 5. VIRAL LOOP DESIGN
+
+Define how sharing leads to growth:
+
+- shared content sparks curiosity
+- viewer clicks → landing page / app download
+- onboarding references the shared content
+- new user creates their own fingerprint
+- loop repeats
+
+---
+
+## 6. SOCIAL PSYCHOLOGY MECHANICS
+
+Use:
+- identity expression
+- curiosity gap
+- subtle exclusivity
+- emotional relatability
+- aesthetic appeal
+
+Avoid:
+- spammy invites
+- forced referrals
+- fake rewards
+
+---
+
+## 7. ADVANCED VIRAL FEATURES
+
+Design additional ideas:
+
+- “Compare emotional journeys” (optional, safe)
+- anonymous community highlights
+- trending emotional states (aggregated)
+- shareable weekly reports
+- streak-based identity (“7 days of calm”)
+
+---
+
+## 8. PRIVACY-FIRST SHARING
+
+Define:
+- what is safe to share
+- what must never be shared
+- user control levels
+
+---
+
+## OUTPUT:
+
+A) Emotional fingerprint system  
+B) Shareable design formats  
+C) Copywriting system  
+D) Viral loop architecture  
+E) Trigger strategy  
+F) Privacy rules  
+G) Growth strategy roadmap  

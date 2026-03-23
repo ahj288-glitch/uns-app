@@ -19,6 +19,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
@@ -66,9 +67,7 @@ function MoodChip({
         style={[
           styles.moodChip,
           {
-            backgroundColor: selected ? mood.color + "25" : Colors.surfaceContainer,
-            borderColor: selected ? mood.color + "80" : "transparent",
-            borderWidth: selected ? 1.5 : 0,
+            backgroundColor: selected ? mood.color + "22" : Colors.surfaceContainer,
           },
         ]}
       >
@@ -265,15 +264,22 @@ export default function MoodScreen() {
             {selectedMood && (
               <Animated.View entering={FadeInDown.duration(600)} style={styles.saveSection}>
                 <Pressable
-                  style={[styles.saveBtn, { opacity: isSaving ? 0.7 : 1 }]}
+                  style={{ borderRadius: 999, overflow: "hidden", opacity: isSaving ? 0.7 : 1 }}
                   onPress={saveCheckin}
                   disabled={isSaving}
                 >
-                  {isSaving ? (
-                    <ActivityIndicator color={Colors.surface} />
-                  ) : (
-                    <Text style={styles.saveBtnText}>حفظ المشاعر ✨</Text>
-                  )}
+                  <LinearGradient
+                    colors={["#74C69D", "#1B4332"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.saveBtn}
+                  >
+                    {isSaving ? (
+                      <ActivityIndicator color={Colors.surface} />
+                    ) : (
+                      <Text style={styles.saveBtnText}>حفظ المشاعر ✨</Text>
+                    )}
+                  </LinearGradient>
                 </Pressable>
               </Animated.View>
             )}
@@ -385,7 +391,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 18,
     alignItems: "center",
-    backgroundColor: Colors.accent,
   },
   saveBtnText: {
     fontFamily: "Tajawal_700Bold",
@@ -420,8 +425,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 340,
     gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.ghostBorder,
   },
   winEmoji: { fontSize: 52 },
   winTitle: {
