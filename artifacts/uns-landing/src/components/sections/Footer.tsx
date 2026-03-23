@@ -2,7 +2,7 @@ import { Apple, Play } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-background py-16 border-t border-white/5 text-center" dir="rtl">
+    <footer className="bg-background py-16 text-center" dir="rtl">
       <div className="max-w-7xl mx-auto px-6">
         {/* Brand */}
         <div className="mb-6 flex items-center justify-center gap-4">

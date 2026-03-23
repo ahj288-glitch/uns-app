@@ -42,7 +42,7 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-32 bg-background border-y border-white/5 relative" dir="rtl">
+    <section className="py-32 bg-background relative" dir="rtl">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="text-center mb-20">

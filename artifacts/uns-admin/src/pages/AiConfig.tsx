@@ -210,7 +210,7 @@ export default function AiConfig() {
           <button 
             type="submit" 
             disabled={updateMutation.isPending}
-            className="flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 font-bold text-lg disabled:opacity-50 disabled:transform-none"
+            className="flex items-center gap-2 px-8 py-3.5 btn-gradient rounded-xl text-lg disabled:opacity-50 disabled:transform-none"
           >
             {updateMutation.isPending ? "Saving..." : (
               <>

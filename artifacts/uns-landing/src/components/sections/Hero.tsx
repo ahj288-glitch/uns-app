@@ -99,13 +99,13 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.9 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 w-full max-w-3xl mx-auto py-10 border-y border-white/5"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 w-full max-w-3xl mx-auto py-10"
         >
-          <div className="flex flex-col items-center md:border-r border-white/5">
+          <div className="flex flex-col items-center">
             <span className="text-4xl font-bold text-foreground mb-1">٤٠٠م+</span>
             <span className="text-sm text-muted-foreground arabic-text">متحدث عربي حول العالم</span>
           </div>
-          <div className="flex flex-col items-center md:border-r border-white/5">
+          <div className="flex flex-col items-center">
             <span className="text-4xl font-bold text-foreground mb-1">٠</span>
             <span className="text-sm text-muted-foreground arabic-text">بدائل ثقافية حقيقية</span>
           </div>

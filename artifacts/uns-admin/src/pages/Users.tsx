@@ -98,7 +98,7 @@ export default function Users() {
                   <Filter className="w-4 h-4 text-muted-foreground" />
                   Filter
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 font-bold">
+                <button className="flex items-center gap-2 px-4 py-2.5 btn-gradient rounded-xl">
                   <UserPlus className="w-4 h-4" />
                   Invite Top 100
                 </button>

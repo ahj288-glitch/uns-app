@@ -114,4 +114,8 @@
   .mint-glow {
     box-shadow: 0 0 24px rgba(116, 198, 157, 0.15);
   }
+
+  .btn-gradient {
+    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332] text-[#041710] font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all;
+  }
 }

@@ -125,7 +125,7 @@ export default function Programs() {
         </div>
         <button 
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 font-bold"
+          className="flex items-center gap-2 px-5 py-3 btn-gradient rounded-xl"
         >
           <Plus className="w-5 h-5" />
           Add Program

@@ -44,10 +44,10 @@ const MOOD_LABELS: Record<string, string> = {
 };
 
 const MOOD_COLORS: Record<string, string> = {
-  anxiety: "#6B7FD7",
+  anxiety: "#ffb4ab",
   gratitude: "#74C69D",
-  reflection: "#10B981",
-  support: "#D97757",
+  reflection: "#a5d0b9",
+  support: "#85d7ad",
 };
 
 export default function Community() {

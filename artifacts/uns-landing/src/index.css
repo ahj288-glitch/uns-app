@@ -69,16 +69,8 @@
   .text-gradient-mint {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] via-[#a5d0b9] to-[#74C69D];
   }
-
-  .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] via-[#a5d0b9] to-[#74C69D];
-  }
   
   .bg-gradient-mint {
-    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332];
-  }
-
-  .bg-gradient-gold {
     @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332];
   }
 
