@@ -1,0 +1,86 @@
+I am sharing with you a set of redesigned sample screens that represent the new approved visual identity and product experience direction for the app.
+
+Your task is to treat these samples as the new source of truth for the product UI/UX language, and then propagate this identity consistently across all existing and future screens.
+
+What I need from you:
+
+1) Deeply analyze the attached redesigned screens and extract the full design DNA, including but not limited to:
+- visual style
+- layout logic
+- spacing system
+- typography hierarchy
+- color system
+- card styles
+- button styles
+- input fields
+- iconography
+- motion/animation direction
+- tone of voice in microcopy
+- emotional experience principles
+- trust-building elements
+- data storytelling style
+- safety/reassurance patterns
+- interaction patterns
+- onboarding logic
+- empty states
+- feedback states
+- confirmation patterns
+
+2) Convert those samples into a reusable design system / UI language document that clearly defines:
+- the design principles
+- component rules
+- page structure rules
+- visual consistency rules
+- UX behavior rules
+- do’s and don’ts
+- accessibility considerations
+- trust and emotional design standards
+
+3) Then apply this extracted identity across all app screens, not by copying blindly, but by interpreting the intention behind the new identity and redesigning every screen so that:
+- all pages feel like one unified product
+- the new identity is consistently reflected everywhere
+- the product feels premium, intelligent, emotionally warm, safe, and highly credible
+- no legacy styling remains unless it is intentionally preserved for a strong reason
+
+4) For every screen you redesign, ensure alignment with the same product DNA shown in the samples:
+- emotionally intelligent
+- minimal but expressive
+- elegant and modern
+- trustworthy and calm
+- data-informed but human
+- safe and non-intrusive
+- conversion-aware
+- retention-oriented
+
+5) When applying the identity to the remaining screens:
+- preserve functional clarity
+- improve UX where necessary
+- remove visual inconsistency
+- unify all components and patterns
+- strengthen the feeling that the app is a complete “emotional operating system,” not a collection of separate screens
+
+6) Before redesigning, produce:
+- a Design DNA summary
+- a UI system summary
+- a component inventory
+- a screen-by-screen transformation plan
+
+7) Then redesign all remaining pages based on that system.
+
+Important constraints:
+- Do not create random variations from page to page
+- Do not revert to generic modern app design
+- Do not dilute the distinct character shown in the samples
+- Do not overcomplicate the UI
+- Maintain premium simplicity
+- Maintain consistency in rhythm, spacing, and emotional tone
+
+Output format:
+A) Extracted brand/design identity
+B) Design system rules
+C) Component library definition
+D) Screen transformation strategy
+E) Updated screens / wireframes / UI descriptions for all pages
+F) Final consistency review highlighting how each page now aligns with the approved identity
+
+Treat the attached redesigned screens as the approved benchmark and apply them as the governing standard across the entire app.
