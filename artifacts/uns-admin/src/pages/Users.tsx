@@ -148,7 +148,7 @@ export default function Users() {
                   </tbody>
                 </table>
               </div>
-              <div className="p-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground bg-muted/20">
+              <div className="p-4 flex items-center justify-between text-sm text-muted-foreground bg-muted/20 rounded-b-2xl">
                 <span>Showing 1 to 5 of {waitlistStats?.count || 0} entries</span>
                 <div className="flex gap-2">
                   <button className="px-3 py-1 border border-border rounded hover:bg-muted disabled:opacity-50" disabled>Prev</button>

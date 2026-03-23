@@ -4,7 +4,7 @@ export function Privacy() {
   return (
     <section className="py-20 bg-background" dir="rtl">
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-card border border-white/5 flex items-center justify-center mx-auto mb-8 shadow-lg">
+        <div className="w-16 h-16 rounded-full bg-card ghost-border flex items-center justify-center mx-auto mb-8 shadow-lg">
           <Shield className="w-8 h-8 text-primary" />
         </div>
         

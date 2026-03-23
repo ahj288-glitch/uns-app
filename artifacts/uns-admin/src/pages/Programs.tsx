@@ -266,7 +266,7 @@ export default function Programs() {
             </label>
           </div>
 
-          <div className="pt-4 border-t border-border flex justify-end gap-3">
+          <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={closeModal} className="px-5 py-2.5 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors">
               Cancel
             </button>

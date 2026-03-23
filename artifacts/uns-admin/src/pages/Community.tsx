@@ -131,15 +131,15 @@ export default function Community() {
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-border">
+      <div className="flex gap-2 bg-muted/10 rounded-xl p-1">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-3 font-arabic text-sm font-medium border-b-2 transition-colors ${
+            className={`px-4 py-2 font-arabic text-sm font-medium rounded-lg transition-colors ${
               activeTab === tab.key
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
             }`}
           >
             {tab.label}

@@ -72,7 +72,8 @@ export function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="bg-card/30 border border-white/5 hover:border-primary/30 hover:bg-card/60 transition-all p-8 rounded-3xl group"
+              className="bg-card/30 hover:bg-card/60 transition-all p-8 rounded-3xl group"
+              style={{ border: '1px solid rgba(116, 198, 157, 0.08)' }}
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
                 <f.icon className="w-6 h-6" />

@@ -7,16 +7,17 @@
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
+  --color-border: rgba(116, 198, 157, var(--border-opacity, 0.08));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
+  --color-card-high: hsl(var(--card-high));
 
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-container: hsl(var(--primary-container));
   
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
@@ -32,7 +33,7 @@
 
   --color-sidebar: hsl(var(--sidebar));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-border: rgba(116, 198, 157, 0.06);
   --color-sidebar-primary: hsl(var(--sidebar-primary));
   --color-sidebar-accent: hsl(var(--sidebar-accent));
 
@@ -45,49 +46,52 @@
 
 :root {
   /* Midnight Garden — Forest Green Admin */
+  /* bg: #041710 = hsl(158 70% 5%) */
   --background: 158 70% 5%;
   --foreground: 147 40% 93%;
   
+  /* Surface layers */
+  /* card: #10231c = surfaceContainer */
   --card: 158 37% 10%;
   --card-foreground: 147 40% 93%;
-  --card-border: 156 28% 14%;
+  /* card-high: #1a2e26 = surfaceContainerHigh */
+  --card-high: 157 28% 14%;
 
-  /* Mint Primary */
+  /* Mint Primary: #a5d0b9 */
   --primary: 150 42% 62%;
   --primary-foreground: 158 70% 5%;
-  
+  /* Primary container: #1B4332 */
+  --primary-container: 158 38% 17%;
+
   --secondary: 156 28% 14%;
   --secondary-foreground: 147 40% 93%;
 
   --muted: 156 28% 14%;
   --muted-foreground: 145 24% 38%;
 
-  /* Secondary mint accent */
-  --accent: 149 51% 68%;
+  /* Secondary Mint Accent: #74C69D */
+  --accent: 149 51% 62%;
   --accent-foreground: 158 70% 5%;
 
+  /* Error */
   --destructive: 4 74% 85%;
   --destructive-foreground: 158 70% 5%;
 
-  --border: 156 28% 14%;
+  /* Ghost mint border */
+  --border-opacity: 0.08;
   --input: 156 28% 14%;
   --ring: 150 42% 62%;
 
-  /* Darker sidebar */
+  /* Sidebar — slightly deeper than bg */
   --sidebar: 158 60% 4%;
   --sidebar-foreground: 147 40% 93%;
-  --sidebar-border: 156 28% 10%;
   --sidebar-primary: 150 42% 62%;
-  --sidebar-accent: 149 51% 68%;
+  --sidebar-accent: 149 51% 62%;
 
   color-scheme: dark;
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
@@ -100,15 +104,22 @@
 
 @layer utilities {
   .glass-panel {
-    @apply bg-card/80 backdrop-blur-xl border border-[#74C69D]/10 shadow-2xl;
+    background: rgba(16, 35, 28, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(116, 198, 157, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
   
+  .ghost-border {
+    border: 1px solid rgba(116, 198, 157, 0.08);
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#74C69D] to-[#a5d0b9];
   }
 
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30;
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl;
   }
 
   .mint-glow {
@@ -116,6 +127,6 @@
   }
 
   .btn-gradient {
-    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332] text-[#041710] font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all;
+    @apply bg-gradient-to-r from-[#74C69D] to-[#1B4332] text-[#041710] font-bold shadow-lg shadow-black/20 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all rounded-full;
   }
 }

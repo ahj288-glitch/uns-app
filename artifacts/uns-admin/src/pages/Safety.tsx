@@ -44,7 +44,7 @@ export default function Safety() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
-          <div className="p-6 border-b border-border flex justify-between items-center bg-muted/10">
+          <div className="p-6 flex justify-between items-center bg-muted/20 rounded-t-2xl">
             <h3 className="font-bold text-lg">Recent Safety Events</h3>
           </div>
           <div className="overflow-x-auto">
