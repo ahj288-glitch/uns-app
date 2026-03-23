@@ -81,7 +81,7 @@ export default function OnboardingScreen() {
           <Text style={styles.brandMark}>أُنْس</Text>
           <Text style={styles.heroTitle}>رفيقك العاطفي{"\n"}الأول من نوعه</Text>
           <Text style={styles.heroSub}>
-            لست وحدك. أُنس هنا معك كل يوم —{"\n"}يستمع، يتذكر، ويكون معك.
+            لست وحدك. أُنْس هنا معك كل يوم —{"\n"}يستمع، يتذكر، ويكون معك.
           </Text>
           <View style={styles.featureRow}>
             {[
@@ -102,7 +102,7 @@ export default function OnboardingScreen() {
         <Animated.View entering={SlideInRight.duration(400)} style={styles.stepContent}>
           <Text style={styles.stepNumLabel}>١ / ٢</Text>
           <Text style={styles.heroTitle}>ما هي لهجتك{"\n"}المفضّلة؟</Text>
-          <Text style={styles.heroSub}>أُنس يتكيّف معك — اختر ما تشعر فيه بالراحة</Text>
+          <Text style={styles.heroSub}>أُنْس يتكيّف معك — اختر ما تشعر فيه بالراحة</Text>
           <View style={styles.optionsGrid}>
             {DIALECTS.map(d => (
               <Pressable
@@ -169,7 +169,7 @@ export default function OnboardingScreen() {
             style={styles.nextBtn}
           >
             <Text style={styles.nextBtnText}>
-              {step === 2 ? "ابدأ رحلتك مع أُنس ←" : "التالي ←"}
+              {step === 2 ? "ابدأ رحلتك مع أُنْس ←" : "التالي ←"}
             </Text>
           </LinearGradient>
         </Pressable>
