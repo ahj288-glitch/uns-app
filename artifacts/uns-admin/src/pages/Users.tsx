@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useGetWaitlistCount } from "@workspace/api-client-react";
-import { Clock, Filter, Search, UserPlus } from "lucide-react";
+import { useFetchWithAuth } from "@/lib/api";
+import { Clock, Filter, Search, UserPlus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Mock data since API doesn't expose the full list in generated hooks, just the count
+const BASE = "/api";
+
+interface WaitlistStats {
+  count: number;
+}
+
 const MOCK_WAITLIST = [
   { id: "1", email: "ahmed.k@example.com", name: "Ahmed", dialect: "gulf", position: 1, date: "2024-05-12" },
   { id: "2", email: "sarah.m@example.com", name: "Sarah M.", dialect: "levant", position: 2, date: "2024-05-12" },
@@ -13,9 +18,20 @@ const MOCK_WAITLIST = [
   { id: "5", email: "khalid_z@example.com", name: "Khalid", dialect: "gulf", position: 5, date: "2024-05-14" },
 ];
 
-export default function Users() {
+export default function UsersPage() {
   const [activeTab, setActiveTab] = useState<"waitlist" | "active">("waitlist");
-  const { data: waitlistStats, isLoading } = useGetWaitlistCount();
+  const { fetchWithAuth } = useFetchWithAuth();
+  const [waitlistStats, setWaitlistStats] = useState<WaitlistStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchWithAuth(`${BASE}/waitlist/count`)
+      .then(r => r.json())
+      .then(d => setWaitlistStats(d as WaitlistStats))
+      .catch(() => setWaitlistStats(null))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   return (
     <div className="space-y-8">

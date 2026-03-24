@@ -1,11 +1,41 @@
-import React from "react";
-import { useGetAdminSafety } from "@workspace/api-client-react";
-import { ShieldAlert, AlertCircle, CheckCircle, Phone, Globe } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ShieldAlert, CheckCircle, Phone, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
+import { useFetchWithAuth } from "@/lib/api";
+
+const BASE = "/api";
+
+interface SafetyEvent {
+  id: string;
+  severity: "high" | "medium" | "low";
+  type: string;
+  region: string;
+  createdAt: string;
+  resolvedAt: string | null;
+}
+
+interface SafetyData {
+  eventsThisWeek: number;
+  eventsThisMonth: number;
+  crisisResponseRate: number;
+  recentEvents: SafetyEvent[];
+  regionBreakdown: { region: string; count: number }[];
+}
 
 export default function Safety() {
-  const { data: safety, isLoading } = useGetAdminSafety();
+  const { fetchWithAuth } = useFetchWithAuth();
+  const [safety, setSafety] = useState<SafetyData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchWithAuth(`${BASE}/admin/safety`)
+      .then(r => r.json())
+      .then(d => setSafety(d as SafetyData))
+      .catch(() => setSafety(null))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   if (isLoading || !safety) {
     return (

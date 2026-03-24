@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useGetAiConfig, useUpdateAiConfig, getGetAiConfigQueryKey } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useFetchWithAuth } from "@/lib/api";
 import { Brain, Save, Shield, Settings2, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const BASE = "/api";
 
 const configSchema = z.object({
   defaultDialect: z.enum(["gulf", "levant", "egyptian", "maghrebi", "msa"]),
@@ -20,38 +21,23 @@ const configSchema = z.object({
 type ConfigForm = z.infer<typeof configSchema>;
 
 export default function AiConfig() {
-  const { data: config, isLoading } = useGetAiConfig();
-  const queryClient = useQueryClient();
+  const { fetchWithAuth } = useFetchWithAuth();
   const { toast } = useToast();
-  
-  const updateMutation = useUpdateAiConfig({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetAiConfigQueryKey() });
-        toast({
-          title: "Configuration Saved",
-          description: "AI Companion settings have been updated successfully.",
-        });
-      },
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Failed to update configuration.",
-          variant: "destructive",
-        });
-      }
-    }
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { register, handleSubmit, reset, watch, setValue } = useForm<ConfigForm>({
     resolver: zodResolver(configSchema),
   });
 
   useEffect(() => {
-    if (config) {
-      reset(config);
-    }
-  }, [config, reset]);
+    setIsLoading(true);
+    fetchWithAuth(`${BASE}/admin/ai-config`)
+      .then(r => r.json())
+      .then(d => reset(d as ConfigForm))
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const spiritualLayer = watch("spiritualLayerEnabled");
   const familyMode = watch("familyModeEnabled");
@@ -65,8 +51,30 @@ export default function AiConfig() {
     );
   }
 
-  const onSubmit = (data: ConfigForm) => {
-    updateMutation.mutate({ data });
+  const onSubmit = async (data: ConfigForm) => {
+    setIsSaving(true);
+    try {
+      const res = await fetchWithAuth(`${BASE}/admin/ai-config`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        toast({
+          title: "Configuration Saved",
+          description: "AI Companion settings have been updated successfully.",
+        });
+      } else {
+        throw new Error("save failed");
+      }
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to update configuration.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -209,10 +217,10 @@ export default function AiConfig() {
         <div className="flex justify-end pt-4">
           <button 
             type="submit" 
-            disabled={updateMutation.isPending}
+            disabled={isSaving}
             className="flex items-center gap-2 px-8 py-3.5 btn-gradient rounded-xl text-lg disabled:opacity-50 disabled:transform-none"
           >
-            {updateMutation.isPending ? "Saving..." : (
+            {isSaving ? "Saving..." : (
               <>
                 <Save className="w-5 h-5" />
                 Save Configuration

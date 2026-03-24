@@ -5,6 +5,7 @@ import {
   Zap, Flame, Star, Trophy
 } from "lucide-react";
 import { useGetAdminOverview } from "@workspace/api-client-react";
+import { useFetchWithAuth } from "@/lib/api";
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar
@@ -21,11 +22,12 @@ interface GamificationStats {
 
 function GamificationSection() {
   const [stats, setStats] = useState<GamificationStats | null>(null);
+  const { fetchWithAuth } = useFetchWithAuth();
 
   useEffect(() => {
-    fetch(`${BASE}/gamification/stats`)
+    fetchWithAuth(`${BASE}/gamification/stats`)
       .then(r => r.json())
-      .then(d => setStats(d))
+      .then(d => setStats(d as GamificationStats))
       .catch(() => setStats({
         totalXpAwarded: 0,
         avgStreak: 0,

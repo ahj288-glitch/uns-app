@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import {
   Home,
   Users,
@@ -78,6 +79,7 @@ const ALL_NAV_ITEMS = NAV_SECTIONS.flatMap(s => s.items);
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { logout } = useAdminAuth();
 
   const closeMobile = () => setIsMobileOpen(false);
 
@@ -157,9 +159,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
         {/* Footer */}
         <div className="p-4 border-t border-sidebar-border shrink-0">
-          <button className="flex items-center gap-3 text-sidebar-foreground/60 hover:text-destructive transition-colors w-full px-3 py-2.5 rounded-xl hover:bg-destructive/8 font-arabic">
+          <button
+            onClick={logout}
+            className="flex items-center gap-3 text-sidebar-foreground/60 hover:text-destructive transition-colors w-full px-3 py-2.5 rounded-xl hover:bg-destructive/8 font-arabic"
+          >
             <LogOut className="w-4 h-4 shrink-0" />
-            <span className="text-sm">تسجيل الخروج</span>
+            <span className="text-sm">تسجيل الخروج <span className="opacity-50 font-normal">/ Logout</span></span>
           </button>
         </div>
       </aside>
