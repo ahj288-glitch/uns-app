@@ -1,0 +1,567 @@
+Act as a world-class product team building and refining a premium Arabic-first emotional wellness mobile app called "أُنس".
+
+Your role includes:
+- Senior Mobile UX/UI Designer
+- Design System Architect
+- Frontend / App Engineer
+- Arabic UX Writer
+- AI Conversation Designer
+- Growth Product Designer
+- Onboarding Specialist
+- Admin / Control Panel Architect
+
+IMPORTANT:
+This is NOT a prototype task.
+This is a production-grade refinement and systemization task.
+
+You must use the provided Google Stitch screens as the GOLDEN VISUAL REFERENCE for the app.
+Do NOT reinterpret them loosely.
+Do NOT replace their beauty with generic mobile UI.
+Do NOT simplify the visual direction.
+
+Your mission is to make the CURRENT and FUTURE app screens match the same beauty, elegance, softness, and premium emotional identity shown in the Stitch designs.
+
+==================================================
+1) CORE PRODUCT IDENTITY
+==================================================
+
+"أُنس" is an emotionally intelligent Arabic wellness app.
+It must feel like:
+- warm
+- safe
+- calm
+- elegant
+- premium
+- human-centered
+- emotionally supportive
+- visually refined
+- consistent across all pages
+
+The app is NOT:
+- a generic productivity app
+- a dashboard
+- a harsh technical system
+- a random social tool
+
+The app IS:
+- a safe emotional space
+- a daily companion
+- a personal reflective environment
+- a beautiful Arabic-first premium product
+
+==================================================
+2) GOLDEN DESIGN REFERENCE (MANDATORY)
+==================================================
+
+The Stitch designs I shared are the visual source of truth.
+
+You must:
+1. Analyze those Stitch screens carefully
+2. Extract their design language
+3. Adopt that exact beauty and identity across:
+   - current screens
+   - future screens
+   - empty states
+   - onboarding
+   - registration
+   - share cards
+   - any new flows
+
+Do NOT build approximate UI.
+Do NOT build “developer shortcut” interfaces.
+Do NOT keep visually inconsistent legacy screens.
+
+The final app must feel like all screens belong to one premium product with one soul.
+
+==================================================
+3) UNIFIED DESIGN SYSTEM
+==================================================
+
+Build and enforce a global design system based on the Stitch references.
+
+Apply consistently to all screens:
+- same color system
+- same spacing rhythm
+- same corner radius logic
+- same typography hierarchy
+- same shadows and softness
+- same card language
+- same icon language
+- same motion style
+- same emotional tone
+
+Required visual qualities:
+- soft light emotional identity
+- mint / sage / warm-beige / soft cream tones
+- subtle gradients
+- gentle glow when appropriate
+- soft shadows
+- rounded components
+- elegant premium cards
+- airy layouts with comfortable breathing space
+
+No random dark/purple/green drift between pages unless it is part of a clearly defined theme system.
+
+==================================================
+4) FIX THE CURRENT UI PROBLEMS FIRST
+==================================================
+
+Before adding anything new, fix the current issues:
+
+4.1 Text clipping / broken typography / cropped text
+There is a serious issue where Arabic text appears cut off from the top or does not display fully on many screens.
+
+You must fix this globally by reviewing:
+- line-height
+- font rendering
+- text container sizing
+- padding and vertical alignment
+- Arabic glyph clipping
+- heading containers
+- custom font metrics
+- safe area / top spacing interactions
+
+Arabic text must render fully, clearly, and elegantly on all screens.
+No cut-off titles.
+No clipped diacritics.
+No broken baseline alignment.
+No top cropping.
+No compressed lines.
+
+4.2 Visual inconsistency
+Different screens currently feel like different apps.
+This must be corrected immediately by enforcing a single design system across the entire product.
+
+==================================================
+5) REGISTRATION / ACCOUNT CREATION FLOW
+==================================================
+
+Create a clean, elegant, low-friction sign-up experience at the beginning of the app.
+
+IMPORTANT:
+Do NOT request unnecessary personal information.
+
+Required registration fields only:
+- الاسم
+- البريد الإلكتروني
+- تاريخ الميلاد
+- الجنس
+
+Do NOT ask for:
+- phone number
+- full personal profile
+- extra unnecessary details
+
+The registration page must feel:
+- premium
+- soft
+- calm
+- trustworthy
+- simple
+- welcoming
+
+==================================================
+6) EMAIL VERIFICATION FLOW
+==================================================
+
+Implement a smart email verification flow before full app access.
+
+Required mechanism:
+- after registration, send a verification code / OTP to the email
+- user enters the code to activate the account
+- clearly communicate why verification matters
+- make the flow elegant and simple
+
+UX principles:
+- no friction overload
+- clear steps
+- reassuring copy
+- resend code option
+- countdown / retry logic
+- graceful error handling
+
+Goal:
+Account must be activated via email verification before using core services.
+
+==================================================
+7) FIRST-TIME ONBOARDING / QUICK TOUR
+==================================================
+
+After successful registration and verification, show a first-time onboarding experience.
+
+This should be a short, elegant guided tour introducing the app.
+
+The onboarding must explain the core product clearly, including:
+- ما هو أُنس
+- كيف يساعد المستخدم
+- التنفس الموجّه
+- تسجيل الحالة النفسية
+- الرؤى والتحليلات
+- خريطة النمو / الرحلة
+- المحادثة الذكية
+- البصمة والمشاركة
+- الخصوصية
+- كيف يتطور التطبيق مع المستخدم
+
+Design requirements:
+- visually beautiful
+- concise
+- emotionally warm
+- not overloaded
+- swipeable or step-based
+- clear CTA to continue / skip
+
+This must feel like a polished product intro, not a boring tutorial.
+
+==================================================
+8) REMOVE MANUAL DIALECT SETTINGS
+==================================================
+
+In settings, remove manual dialect / accent selection options.
+
+New requirement:
+The app should infer the user’s language style automatically over time from conversation patterns.
+
+This means:
+- do not ask the user to choose a dialect manually
+- infer tone / phrasing style from chat context
+- adapt gradually and intelligently
+- preserve professionalism and emotional clarity
+
+This should feel invisible and smart.
+
+==================================================
+9) SMART AI PERSONALITY
+==================================================
+
+"أُنس" should speak like:
+- calm
+- empathetic
+- intelligent
+- gentle
+- non-judgmental
+- human
+- emotionally aware
+
+It should not sound:
+- robotic
+- overly formal
+- commanding
+- generic
+- random
+
+It should adapt according to:
+- mood
+- context
+- user history
+- gender
+- time of day
+- conversation style
+
+Gender-aware Arabic must be applied everywhere when relevant.
+
+Examples:
+Male:
+- كيف تشعر اليوم؟
+- حزين / متعب / مرهق / هادئ
+
+Female:
+- كيف تشعرين اليوم؟
+- حزينة / متعبة / مرهقة / هادئة
+
+This logic must be reusable across the app.
+
+==================================================
+10) SHARE PAGE MUST BE COMPLETELY REDESIGNED
+==================================================
+
+The current share page is too manual, fragmented, and not emotionally intelligent enough.
+It currently relies on random text generation and too many selectable options.
+
+This must be redesigned completely.
+
+New goal:
+The app should automatically generate a unique emotional fingerprint / "بصمة" for each user and convert it into a beautifully designed share card that is worth sharing socially.
+
+The share experience should feel:
+- elegant
+- emotionally meaningful
+- visually premium
+- simple
+- highly shareable
+- identity-driven
+- marketing-friendly without feeling cheap
+
+==================================================
+11) USER FINGERPRINT SYSTEM (بصمة المستخدم)
+==================================================
+
+The app should automatically generate the user’s emotional fingerprint based on analysis such as:
+- mood patterns
+- consistency
+- breathing sessions
+- calmness trends
+- self-care streaks
+- reflection style
+- chat interactions
+- growth stage
+- emotional strengths
+- preferred emotional tone
+
+This fingerprint must NOT be random.
+It must be meaningful and personalized.
+
+Examples of fingerprint directions:
+- هادئ بوعي
+- طمأنينة متصاعدة
+- نور داخلي
+- اتزان عميق
+- سكينة نامية
+- حضور دافئ
+- صفاء متجدد
+
+The system should intelligently derive a short branded phrase / identity that feels special to the user.
+
+==================================================
+12) SHARE CARD DESIGN SYSTEM
+==================================================
+
+Design a premium share card system to be used inside the app and on social media.
+
+IMPORTANT:
+Sharing must not be text-only anymore.
+
+When the user shares, the app must generate and export a visual card containing:
+- the user fingerprint / بصمته
+- a related quote / حكمة / مقولة مناسبة للبصمة
+- elegant background
+- subtle visual identity of "أُنس"
+- beautiful typography
+- optional tiny emotional status markers if relevant
+- optionally the brand mark/logo in a tasteful way
+
+The share card should feel beautiful enough that the user wants to share it.
+It should also act as organic marketing for the app.
+
+Design language for share card:
+- premium
+- emotional
+- minimal
+- soft gradients
+- calm visuals
+- elegant typography
+- social-post-ready
+- story-friendly
+- portrait-mobile optimized
+
+Different card templates may exist, but all must belong to one unified brand system.
+
+==================================================
+13) SHARE FLOW SIMPLIFICATION
+==================================================
+
+Remove the current overly branched, manual share options if they reduce elegance.
+
+Instead, create a smart share flow:
+
+1. user opens share
+2. app analyzes current emotional fingerprint
+3. app proposes a ready-made beautiful share card
+4. app shows preview
+5. user can:
+   - share directly
+   - save image
+   - regenerate if desired
+6. the shared output must be the CARD, not text only
+
+The text/quote inside the card should be generated intelligently based on the user fingerprint and emotional context.
+
+This should be emotionally rewarding and friction-light.
+
+==================================================
+14) SHARE CONTENT INTELLIGENCE
+==================================================
+
+The quote / wisdom shown inside the share card must not be random filler.
+It must match the user’s emotional fingerprint and current state.
+
+Example:
+If fingerprint suggests calm growth:
+- use a quote around presence, stillness, self-trust
+
+If fingerprint suggests resilience:
+- use a quote around endurance, softness, recovery
+
+If fingerprint suggests hopeful recovery:
+- use something uplifting and warm
+
+The system should generate or select suitable quotes automatically.
+
+==================================================
+15) MARKETING VALUE OF SHARE CARDS
+==================================================
+
+The share card is also a growth mechanism.
+
+It should:
+- make the recipient curious
+- carry the spirit of "أُنس"
+- feel personal, not spammy
+- subtly encourage downloads or interest
+
+This means:
+- tasteful brand presence
+- high visual quality
+- no tacky promotional style
+- no overcrowding
+
+The share card must function as both:
+- self-expression
+- elegant product marketing
+
+==================================================
+16) ADMIN / CONTROL PANEL REQUIREMENTS
+==================================================
+
+Create or prepare a scalable control panel structure to manage dynamic content and future personalization.
+
+Admin must be able to manage:
+- daily quotes / recipes / reflections
+- onboarding content
+- share card template variants
+- quote libraries
+- fingerprint label libraries
+- program cards
+- community cards
+- mood content
+- breathing session presets
+- feature toggles
+- image uploads
+- screen content sections
+- activation / deactivation of modules
+
+For share system specifically, admin should be able to manage:
+- fingerprint categories
+- quote sets per emotional category
+- share card visual templates
+- backgrounds / assets
+- visibility rules if needed
+
+==================================================
+17) HOME / CHAT / INSIGHTS / JOURNEY / SHARE / FUTURE SCREENS
+==================================================
+
+All screens must be brought into the new unified identity.
+This includes:
+- Home
+- Chat
+- Insights
+- Journey
+- Share
+- Onboarding
+- Registration
+- Verification
+- Settings
+- Empty states
+- Future modules
+
+Use the Stitch reference quality across all of them.
+
+==================================================
+18) BREATHING EXPERIENCE
+==================================================
+
+The breathing experience must remain premium and intentional.
+
+Requirements:
+- "تنفّس" in Arabic, clear and prominent
+- no English "BREATHE"
+- must not start abruptly
+- clear start permission flow:
+  - pre-start state
+  - "ابدأ"
+  - short preparation
+  - then guided session
+
+Session structure example:
+- شهيق
+- احتفظ بالنفس
+- زفير
+
+With smooth animation, counter, and guidance.
+
+==================================================
+19) ONGOING UX PRINCIPLES
+==================================================
+
+Across the whole app:
+- reduce clutter
+- reduce random decisions
+- automate intelligently where useful
+- preserve calmness
+- preserve beauty
+- prioritize emotional clarity
+- prioritize Arabic readability
+- prioritize premium user trust
+
+==================================================
+20) IMPLEMENTATION PRIORITY
+==================================================
+
+Work in this order:
+
+1. Analyze all provided Stitch designs and extract the visual system
+2. Build a global design system and theme foundation
+3. Fix Arabic text clipping / top-cutting problem globally
+4. Refactor current screens to match the Stitch identity exactly
+5. Build registration page
+6. Build email verification flow
+7. Build first-time onboarding / guided tour
+8. Remove dialect settings and make conversational style adaptive
+9. Redesign the share page into an intelligent fingerprint share system
+10. Build share card generator and sharing as image/card instead of text only
+11. Create needed admin/control-panel structures
+12. Review all current and future screens for consistency
+
+==================================================
+21) OUTPUT FORMAT
+==================================================
+
+Before coding, provide:
+1. analysis of current UI problems
+2. extracted design identity from Stitch
+3. unified design system summary
+4. plan to fix text clipping
+5. registration + verification flow
+6. onboarding flow
+7. smart share fingerprint logic
+8. share card design approach
+9. admin panel structure
+10. step-by-step implementation plan
+
+Then implement.
+
+==================================================
+22) FINAL QUALITY BAR
+==================================================
+
+The final result must feel:
+- premium
+- emotionally intelligent
+- cohesive
+- beautiful
+- Arabic-native
+- app-store quality
+- investor-demo quality
+- scalable for future pages
+
+It must NOT feel:
+- generic
+- fragmented
+- text-broken
+- random
+- overly manual
+- low-fidelity
+- inconsistent with the Stitch designs
+
+Use the Stitch designs exactly as the beauty benchmark for all present and future pages.
