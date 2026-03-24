@@ -14,6 +14,7 @@ import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors, { useTokens } from "@/constants/colors";
+import EmptyState from "@/components/EmptyState";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -324,10 +325,11 @@ export default function ProgramsScreen() {
           <Text style={styles.errorText}>{error}</Text>
         </Pressable>
       ) : programs.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Feather name="book-open" size={40} color={T.muted} />
-          <Text style={styles.emptyText}>لا توجد برامج بعد</Text>
-        </View>
+        <EmptyState
+          icon="layers"
+          title="لا توجد برامج متاحة"
+          subtitle="ستظهر هنا البرامج العلاجية عند إطلاقها"
+        />
       ) : (
         programs.map((p, i) => <ProgramCard key={p.id} program={p} index={i} />)
       )}
@@ -386,16 +388,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: T.error,
-  },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    gap: 12,
-  },
-  emptyText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 18,
-    color: T.muted,
   },
   });
 }

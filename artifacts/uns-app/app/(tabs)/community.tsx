@@ -18,6 +18,7 @@ import { Feather } from "@expo/vector-icons";
 import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import * as Haptics from "expo-haptics";
+import EmptyState from "@/components/EmptyState";
 
 const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
   ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
@@ -534,18 +535,26 @@ export default function CommunityScreen() {
         <Text style={styles.sectionTitle}>حلقات مباشرة</Text>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.liveScrollContent}
-        style={styles.liveScroll}
-      >
-        {loading ? (
-          <ActivityIndicator color={"#74C69D"} style={{ marginLeft: 16, marginTop: 40 }} />
-        ) : sessions.map(session => (
-          <LiveSessionCard key={session.id} session={session} onEnter={() => enterSession(session)} />
-        ))}
-      </ScrollView>
+      {loading ? (
+        <ActivityIndicator color={"#74C69D"} style={{ marginLeft: 16, marginTop: 40, marginBottom: 20 }} />
+      ) : sessions.length === 0 ? (
+        <EmptyState
+          icon="users"
+          title="لا توجد دوائر حالياً"
+          subtitle="ستظهر هنا دوائر المجتمع الآمنة عند إضافتها"
+        />
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.liveScrollContent}
+          style={styles.liveScroll}
+        >
+          {sessions.map(session => (
+            <LiveSessionCard key={session.id} session={session} onEnter={() => enterSession(session)} />
+          ))}
+        </ScrollView>
+      )}
 
       {sessionReflections.length > 0 && (
         <>

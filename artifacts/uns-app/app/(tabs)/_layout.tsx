@@ -1,9 +1,10 @@
 import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "@/constants/colors";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
@@ -19,6 +20,27 @@ function TabIcon({ name, color, focused }: { name: FeatherIconName; color: strin
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem("@uns_onboarding_complete").then(value => {
+      if (!value) {
+        router.replace("/onboarding");
+      } else {
+        setChecking(false);
+      }
+    }).catch(() => {
+      setChecking(false);
+    });
+  }, []);
+
+  if (checking) {
+    return (
+      <View style={{ flex: 1, backgroundColor: Colors.surface, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator color={Colors.accent} size="large" />
+      </View>
+    );
+  }
 
   return (
     <Tabs

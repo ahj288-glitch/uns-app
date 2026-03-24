@@ -22,6 +22,7 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
+import EmptyState from "@/components/EmptyState";
 
 const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
   ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
@@ -132,6 +133,22 @@ export default function JourneyScreen() {
   const currentKey = data?.currentLevel?.key ?? "awareness";
   const currentLevel = LEVELS.find(l => l.key === currentKey) ?? LEVELS[0];
   const progressPct = data?.currentLevel?.progressPercent ?? 0;
+
+  const isEmpty = xp === 0 && (!data?.recentWins || data.recentWins.length === 0);
+
+  if (isEmpty) {
+    return (
+      <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
+        <EmptyState
+          icon="map"
+          title="رحلتك تبدأ الآن"
+          subtitle="ابدأ بتسجيل مشاعرك لتبني مسيرتك نحو التوازن"
+          ctaLabel="ابدأ الرحلة"
+          onCta={() => router.push("/(tabs)/mood")}
+        />
+      </LinearGradient>
+    );
+  }
 
   return (
     <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>

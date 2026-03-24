@@ -20,17 +20,7 @@ import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import BreathingSession from "@/components/BreathingSession";
 import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
-
-const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
-
-interface DailyRecipe {
-  id: string;
-  title: string;
-  summary: string;
-  content: string;
-  imageUrl: string | null;
-  category: string;
-}
+import { useGetDailyRecipe, useRecordMoodCheckin } from "@workspace/api-client-react";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "هدوء": "🌅",
@@ -123,6 +113,9 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
       onPress={() => {
         if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       }}
+      accessibilityLabel="ابدأ جلسة التنفس"
+      accessibilityRole="button"
+      accessibilityHint="اضغط لفتح جلسة التنفس العميق"
     >
       <Animated.View style={[orbStyles.outerRing, { opacity: glow, transform: [{ rotate: spin }], borderColor: orbColors[0] }]} />
       <Animated.View style={[orbStyles.greenLayer, { opacity: glowHalf, backgroundColor: orbColors[0] }]} />
@@ -226,16 +219,13 @@ export default function HomeScreen() {
 
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [breathingOpen, setBreathingOpen] = useState(false);
-  const [recipe, setRecipe] = useState<DailyRecipe | null>(null);
+
+  const { data: recipeData } = useGetDailyRecipe();
+  const recipe = recipeData?.recipe ?? null;
+
+  const { mutate: recordMood } = useRecordMoodCheckin();
 
   const MOODS = MOOD_OPTIONS[gender];
-
-  useEffect(() => {
-    fetch(`${BASE}/api/daily-recipe`)
-      .then(r => r.json())
-      .then(d => { if (d.recipe) setRecipe(d.recipe); })
-      .catch(() => {});
-  }, []);
 
   const handleMoodSelect = (idx: number) => {
     setSelectedMood(idx);
@@ -266,11 +256,7 @@ export default function HomeScreen() {
           onClose={(completed, postMood) => {
             setBreathingOpen(false);
             if (completed && postMood && sessionId) {
-              fetch(`${BASE}/api/mood`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sessionId, mood: postMood, intensity: 3, notes: "بعد جلسة التنفس", source: "breathing" }),
-              }).catch(() => {});
+              recordMood({ data: { sessionId, moodWord: postMood, intensity: 3, notes: "بعد جلسة التنفس" } });
               setLastMoodWord(postMood);
             }
             if (completed) router.push("/(tabs)/insights");
@@ -336,6 +322,8 @@ export default function HomeScreen() {
                       selectedMood === i && { backgroundColor: m.color + "33" },
                     ]}
                     onPress={() => handleMoodSelect(i)}
+                    accessibilityLabel={m.word}
+                    accessibilityRole="button"
                   >
                     <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
                       <Text style={styles.moodEmoji}>{m.emoji}</Text>
@@ -359,6 +347,8 @@ export default function HomeScreen() {
                       selectedMood === i && { backgroundColor: m.color + "33" },
                     ]}
                     onPress={() => handleMoodSelect(i)}
+                    accessibilityLabel={m.word}
+                    accessibilityRole="button"
                   >
                     <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
                       <Text style={styles.moodEmoji}>{m.emoji}</Text>
@@ -394,8 +384,6 @@ export default function HomeScreen() {
                 style={styles.dailyCTA}
                 onPress={() => {
                   if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  // Route the CTA based on recipe category — breathing for تأمل/هدوء,
-                  // chat companion for other types
                   const isBreathingCategory = recipe?.category === "تأمل" || recipe?.category === "هدوء" || !recipe;
                   if (isBreathingCategory) {
                     setBreathingOpen(true);
@@ -403,6 +391,12 @@ export default function HomeScreen() {
                     router.push("/(tabs)/chat");
                   }
                 }}
+                accessibilityLabel={
+                  recipe?.category === "تأمل" || recipe?.category === "هدوء" || !recipe
+                    ? "تأمل لمدة ٥ دقائق"
+                    : "تحدّث مع رفيقك"
+                }
+                accessibilityRole="button"
               >
                 <Text style={styles.dailyCTAText}>
                   {recipe?.category === "تأمل" || recipe?.category === "هدوء" || !recipe

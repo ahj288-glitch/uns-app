@@ -12,9 +12,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
+import EmptyState from "@/components/EmptyState";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -140,6 +142,14 @@ export default function InsightsScreen() {
           <ActivityIndicator color={T.primary} size="large" />
           <Text style={styles.loadingText}>جاري تحليل مشاعرك...</Text>
         </View>
+      ) : !data || (!data.gamification && (!data.weeklyDays || data.weeklyDays.every(d => !d.hasEntry))) ? (
+        <EmptyState
+          icon="bar-chart-2"
+          title="لا توجد إحصائيات بعد"
+          subtitle="سجّل حالتك المزاجية لأول مرة لترى تقدمك هنا"
+          ctaLabel="سجّل حالتك الآن"
+          onCta={() => router.push("/(tabs)/mood")}
+        />
       ) : (
         <>
           {g && (

@@ -126,6 +126,89 @@ export function useHealthCheck<
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export interface DailyRecipe {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  imageUrl: string | null;
+  category: string;
+}
+
+export interface DailyRecipeResponse {
+  recipe: DailyRecipe | null;
+}
+
+export const getDailyRecipeUrl = () => {
+  return `/api/daily-recipe`;
+};
+
+export const getDailyRecipe = async (
+  options?: RequestInit,
+): Promise<DailyRecipeResponse> => {
+  return customFetch<DailyRecipeResponse>(getDailyRecipeUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getDailyRecipeQueryKey = () => {
+  return [`/api/daily-recipe`] as const;
+};
+
+export const getDailyRecipeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDailyRecipe>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getDailyRecipe>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getDailyRecipeQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDailyRecipe>>> = ({
+    signal,
+  }) => getDailyRecipe({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 60000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDailyRecipe>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetDailyRecipeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDailyRecipe>>
+>;
+export type GetDailyRecipeQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get the daily recipe / flash card
+ */
+export function useGetDailyRecipe<
+  TData = Awaited<ReturnType<typeof getDailyRecipe>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getDailyRecipe>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getDailyRecipeQueryOptions(options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+  query.queryKey = queryOptions.queryKey;
+  return query;
+}
+
 /**
  * @summary Join the waitlist
  */
