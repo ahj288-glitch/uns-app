@@ -144,7 +144,7 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: 
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId, greeting, gender, lastMoodWord } = useSession();
+  const { sessionId, greeting, gender, lastMoodWord, authFetch } = useSession();
   const { theme } = useThemeContext();
   const T = useTokens();
   const styles = makeStyles(T);
@@ -316,7 +316,7 @@ export default function ChatScreen() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-        const res = await fetch(`${BASE}/api/companion/chat`, {
+        const res = await authFetch(`${BASE}/api/companion/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId, message: msg }),

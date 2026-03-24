@@ -212,7 +212,7 @@ const orbStyles = StyleSheet.create({
 // ─── Home Screen ──────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { greeting, gender, sessionId, setLastMoodWord } = useSession();
+  const { greeting, gender, sessionId, setLastMoodWord, authFetch } = useSession();
   const { theme } = useThemeContext();
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;

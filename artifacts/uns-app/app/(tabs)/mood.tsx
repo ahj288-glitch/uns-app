@@ -141,7 +141,7 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
 
 export default function MoodScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId } = useSession();
+  const { sessionId, authFetch } = useSession();
   const T = useTokens();
   const styles = makeStyles(T);
   const [selectedMood, setSelectedMood] = useState<(typeof MOODS)[0] | null>(null);
@@ -183,7 +183,7 @@ export default function MoodScreen() {
 
     setIsSaving(true);
     try {
-      const res = await fetch(`${BASE}/api/moods/checkin`, {
+      const res = await authFetch(`${BASE}/api/moods/checkin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -196,7 +196,7 @@ export default function MoodScreen() {
       });
       if (!res.ok && res.status !== 201) throw new Error("checkin_failed");
 
-      const progressRes = await fetch(`${BASE}/api/gamification/checkin-complete`, {
+      const progressRes = await authFetch(`${BASE}/api/gamification/checkin-complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, moodWord: selectedMood.en }),

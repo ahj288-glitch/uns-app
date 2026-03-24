@@ -15,6 +15,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors, { useTokens } from "@/constants/colors";
 import EmptyState from "@/components/EmptyState";
+import { useSession } from "@/contexts/SessionContext";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -274,6 +275,7 @@ export default function ProgramsScreen() {
   const insets = useSafeAreaInsets();
   const T = useTokens();
   const styles = makeStyles(T);
+  const { authFetch } = useSession();
   const [programs, setPrograms] = React.useState<Program[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -282,7 +284,7 @@ export default function ProgramsScreen() {
 
   async function loadPrograms() {
     try {
-      const res = await fetch(`${BASE}/api/admin/programs`);
+      const res = await authFetch(`${BASE}/api/admin/programs`);
       const data = await res.json();
       setPrograms(data.programs ?? []);
     } catch {

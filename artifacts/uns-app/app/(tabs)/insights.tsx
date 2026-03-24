@@ -93,7 +93,7 @@ function XpBar({ progress, color }: { progress: number; color: string }) {
 
 export default function InsightsScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId } = useSession();
+  const { sessionId, authFetch } = useSession();
   const { theme } = useThemeContext();
   const T = useTokens();
   const styles = makeStyles(T);
@@ -106,7 +106,7 @@ export default function InsightsScreen() {
     if (!sessionId) return;
     setLoading(true);
     try {
-      const r = await fetch(`${BASE}/api/insights?sessionId=${encodeURIComponent(sessionId)}`);
+      const r = await authFetch(`${BASE}/api/insights?sessionId=${encodeURIComponent(sessionId)}`);
       if (!r.ok) throw new Error("fetch failed");
       const d = await r.json();
       setData(d);
