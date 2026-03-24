@@ -45,6 +45,7 @@ const globalLimiter = rateLimit({
 });
 
 // Strict: 10 req / min per session for AI companion (prevents OpenAI cost abuse)
+// Keyed by session-id header; falls back to "anon" (not IP) to avoid IPv6 issues
 const companionLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
@@ -52,7 +53,8 @@ const companionLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Companion rate limit reached. Please wait a moment.", code: "COMPANION_RATE_LIMITED" },
   keyGenerator: (req: Request) =>
-    (req.headers["x-session-id"] as string | undefined) ?? req.ip ?? "unknown",
+    (req.headers["x-session-id"] as string | undefined) ?? "anon",
+  validate: { keyGeneratorIpFallback: false },
 });
 
 app.use(globalLimiter);

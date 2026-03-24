@@ -22,9 +22,10 @@ export function generateToken(
   expiresIn: string | number,
 ): string {
   const secret = getSecret();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return jwt.sign({ sub: payload.sub, role: payload.role }, secret, {
     algorithm: "HS256",
-    expiresIn: expiresIn as string,
+    expiresIn: expiresIn as any,
   });
 }
 
