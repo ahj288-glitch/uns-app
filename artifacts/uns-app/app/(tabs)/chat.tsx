@@ -19,6 +19,7 @@ import { router } from "expo-router";
 import Colors from "@/constants/colors";
 import { ERRORS, LIMITS, formatError } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
+import { getContextualSuggestions } from "@/lib/gender";
 import * as Haptics from "expo-haptics";
 import ErrorToast from "@/components/ui/ErrorToast";
 import NetworkBanner from "@/components/ui/NetworkBanner";
@@ -52,7 +53,6 @@ const CRISIS_RESOURCES = [
   { country: "مصر", number: "08008880700" },
 ];
 
-const QUICK_REPLIES = ["أحتاج هدوء", "تفريغ", "تعزيز الطاقة"];
 
 // Daily limit loaded from shared config (admin-configurable)
 const DAILY_LIMIT = LIMITS.CHAT_MAX_DAILY_MESSAGES;
@@ -132,7 +132,8 @@ function MessageBubble({ message }: { message: Message }) {
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId, greeting } = useSession();
+  const { sessionId, greeting, gender, lastMoodWord } = useSession();
+  const quickReplies = getContextualSuggestions(gender, lastMoodWord, new Date().getHours());
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -488,9 +489,9 @@ export default function ChatScreen() {
           />
         )}
 
-        {!dailyLimitReached && QUICK_REPLIES.length > 0 && (
+        {!dailyLimitReached && quickReplies.length > 0 && (
           <View style={styles.quickRepliesRow}>
-            {QUICK_REPLIES.map(q => (
+            {quickReplies.map(q => (
               <Pressable
                 key={q}
                 style={[styles.quickChip, rateLimitCountdown > 0 && styles.quickChipDisabled]}

@@ -7,6 +7,7 @@ import insightsRouter from "./insights";
 import adminRouter from "./admin";
 import gamificationRouter from "./gamification";
 import communityRouter from "./community";
+import dailyRecipesRouter from "./daily-recipes";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(insightsRouter);
 router.use(adminRouter);
 router.use("/gamification", gamificationRouter);
 router.use(communityRouter);
+router.use(dailyRecipesRouter);
 
 export default router;

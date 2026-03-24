@@ -17,15 +17,27 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
+import BreathingSession from "@/components/BreathingSession";
+import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
 
-// ─── Moods ────────────────────────────────────────────────────────────────
-const MOODS = [
-  { word: "مرتاح", emoji: "😌", color: "#74C69D" },
-  { word: "هادئ", emoji: "🙂", color: "#9ECBFF" },
-  { word: "مضغوط", emoji: "😟", color: "#D4B896" },
-  { word: "متعب", emoji: "😔", color: "#C4A8D8" },
-  { word: "حزين", emoji: "😢", color: "#A8C8E8" },
-];
+const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+
+interface DailyRecipe {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  imageUrl: string | null;
+  category: string;
+}
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  "هدوء": "🌅",
+  "تحفيز": "✨",
+  "تأمل": "🌿",
+  "نمو ذاتي": "🌱",
+};
+
 
 // ─── IridescentOrb ────────────────────────────────────────────────────────
 function IridescentOrb() {
@@ -195,14 +207,27 @@ const orbStyles = StyleSheet.create({
 // ─── Home Screen ──────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { greeting } = useSession();
+  const { greeting, gender, setLastMoodWord } = useSession();
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [breathingOpen, setBreathingOpen] = useState(false);
+  const [recipe, setRecipe] = useState<DailyRecipe | null>(null);
+
+  const MOODS = MOOD_OPTIONS[gender];
+
+  useEffect(() => {
+    fetch(`${BASE}/api/daily-recipe`)
+      .then(r => r.json())
+      .then(d => { if (d.recipe) setRecipe(d.recipe); })
+      .catch(() => {});
+  }, []);
 
   const handleMoodSelect = (idx: number) => {
     setSelectedMood(idx);
+    const moodEn = MOODS[idx]?.en ?? null;
+    setLastMoodWord(moodEn);
     if (Platform.OS !== "web") Haptics.selectionAsync();
     setTimeout(() => router.push("/(tabs)/mood"), 300);
   };
@@ -212,6 +237,9 @@ export default function HomeScreen() {
     router.push("/(tabs)/share");
   };
 
+  const moodQuestion = getMoodQuestion(gender);
+  const recipeEmoji = CATEGORY_EMOJI[recipe?.category ?? ""] ?? "🌅";
+
   return (
     <LinearGradient
       colors={["#7DB89A", "#A8C4A0", "#C8B99A", "#D4C4A0"]}
@@ -219,6 +247,13 @@ export default function HomeScreen() {
       end={{ x: 0.4, y: 1 }}
       style={styles.gradientBg}
     >
+      <BreathingSession
+        visible={breathingOpen}
+        onClose={(completed) => {
+          setBreathingOpen(false);
+          if (completed) router.push("/(tabs)/insights");
+        }}
+      />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: webBottom + 90 }}
@@ -241,14 +276,20 @@ export default function HomeScreen() {
 
         <View style={styles.greetingSection}>
           <Text style={styles.greetingTitle}>
-            {greeting || "أهلاً بك في مساحتك الخاصة، سارة"}
+            {greeting || "أهلاً بك في مساحتك الخاصة"}
           </Text>
         </View>
 
         <IridescentOrb />
 
         <View style={styles.breatheSubRow}>
-          <Pressable style={styles.playBtn} onPress={() => router.push("/(tabs)/chat")}>
+          <Pressable
+            style={styles.playBtn}
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setBreathingOpen(true);
+            }}
+          >
             <Feather name="play" size={14} color="rgba(255,255,255,0.9)" />
           </Pressable>
           <Text style={styles.breatheLabel}>تنفس بعمق... شهيق، زفير</Text>
@@ -256,7 +297,7 @@ export default function HomeScreen() {
 
         {Platform.OS !== "web" ? (
           <BlurView intensity={40} tint="light" style={styles.moodCard}>
-            <Text style={styles.moodQuestion}>كيف تشعرين اليوم؟</Text>
+            <Text style={styles.moodQuestion}>{moodQuestion}</Text>
             <View style={styles.moodChipsRow}>
               {MOODS.map((m, i) => (
                 <Pressable
@@ -279,7 +320,7 @@ export default function HomeScreen() {
           </BlurView>
         ) : (
           <View style={[styles.moodCard, styles.moodCardWeb]}>
-            <Text style={styles.moodQuestion}>كيف تشعرين اليوم؟</Text>
+            <Text style={styles.moodQuestion}>{moodQuestion}</Text>
             <View style={styles.moodChipsRow}>
               {MOODS.map((m, i) => (
                 <Pressable
@@ -309,19 +350,19 @@ export default function HomeScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.dailyThumbnail}
           >
-            <Text style={styles.dailyThumbnailEmoji}>🌅</Text>
+            <Text style={styles.dailyThumbnailEmoji}>{recipeEmoji}</Text>
           </LinearGradient>
           <View style={styles.dailyContent}>
-            <Text style={styles.dailyTitle}>الومضة اليومية</Text>
-            <Text style={styles.dailyQuote}>
-              "الهدوء ليس غياب العاصفة، بل السكينة داخلها"
+            <Text style={styles.dailyTitle}>{recipe?.title ?? "الومضة اليومية"}</Text>
+            <Text style={styles.dailyQuote} numberOfLines={3}>
+              "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
             </Text>
             <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
             <Pressable
               style={styles.dailyCTA}
               onPress={() => {
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push("/(tabs)/chat");
+                setBreathingOpen(true);
               }}
             >
               <Text style={styles.dailyCTAText}>تأمل لمدة ٥ دقائق</Text>

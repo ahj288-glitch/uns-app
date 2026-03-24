@@ -1,0 +1,257 @@
+Act as a senior mobile product engineer + UX designer specialized in wellness apps.
+
+Your task is to build a screen IDENTICAL to the provided reference (Home screen of "أُنس") with HIGH fidelity.
+
+This is NOT approximate design.
+This is pixel-accurate implementation.
+
+---
+
+## 1) UI REQUIREMENTS
+
+Recreate the screen exactly with:
+
+- Soft gradient background (calm pastel green + warm tones)
+- Glassmorphism container (rounded, soft blur, subtle borders)
+- Center breathing orb (main focal element)
+- Arabic RTL layout
+- Mood selector section
+- Daily recommendation card
+- Bottom navigation
+
+Style must feel:
+- Calm
+- Premium
+- Emotional
+- Minimal
+- Not generic
+
+---
+
+## 2) BREATHING EXPERIENCE (CORE FEATURE)
+
+When user taps "تنفس" (play button):
+
+Trigger a FULL guided breathing session.
+
+### Breathing pattern (recommended scientifically for relaxation):
+
+Cycle duration: 15 seconds
+
+Step 1: Inhale (شهيق)
+- Duration: 4 seconds
+- Animation: orb EXPANDS slowly
+- Text: "شهيق"
+- Counter visible (4 → 0)
+
+Step 2: Hold (حبس النفس)
+- Duration: 4 seconds
+- Animation: orb stays expanded with subtle glow
+- Text: "احتفظ بالنفس"
+- Counter (4 → 0)
+
+Step 3: Exhale (زفير)
+- Duration: 6 seconds
+- Animation: orb SHRINKS slowly
+- Text: "زفير"
+- Counter (6 → 0)
+
+Step 4: Rest (اختياري)
+- Duration: 1 second
+- Neutral state
+
+Total cycle: 15 seconds
+
+---
+
+### SESSION LOGIC:
+
+- Default session: 5 cycles (≈ 75 seconds)
+- Option to extend later
+
+---
+
+### ANIMATION DETAILS:
+
+- Smooth easing (ease-in-out)
+- Glow pulse synced with breathing
+- Slight blur increase during inhale
+- Calm transitions (no sharp motion)
+
+---
+
+### AUDIO (optional but recommended):
+
+- Soft ambient sound
+- Subtle inhale/exhale cues
+
+---
+
+### HAPTIC:
+
+- Light vibration at phase switch (optional)
+
+---
+
+## 3) TEXT & GENDER SYSTEM (CRITICAL FIX)
+
+Fix inconsistency between question and answers.
+
+### Rule:
+
+IF user.gender == female:
+- Question: "كيف تشعرين اليوم؟"
+- Answers:
+  - حزينة
+  - متعبة
+  - مرهقة
+  - هادئة
+  - مرتاحة
+
+IF user.gender == male:
+- Question: "كيف تشعر اليوم؟"
+- Answers:
+  - حزين
+  - متعب
+  - مرهق
+  - هادئ
+  - مرتاح
+
+---
+
+### IMPLEMENTATION:
+
+Create dynamic language system:
+
+function getGenderText(maleText, femaleText)
+
+Apply it across:
+- Mood selector
+- Messages
+- Notifications
+- Chat
+
+---
+
+## 4) MOOD SELECTOR UX
+
+- Rounded buttons
+- Soft shadows
+- Selected state:
+  - slight scale
+  - color highlight
+  - glow effect
+
+---
+
+## 5) DAILY RECIPE (الوصفة اليومية)
+
+### UI:
+
+Card contains:
+- Title
+- Short text
+- Image (right side)
+- CTA button
+
+---
+
+## 6) ADMIN PANEL REQUIREMENT (VERY IMPORTANT)
+
+Create a configurable system for "الوصفة اليومية":
+
+Admin can:
+
+- Upload image
+- Add title
+- Add short description
+- Add full story (long text)
+- Select category:
+  - تحفيز
+  - هدوء
+  - تأمل
+  - نمو ذاتي
+
+- Schedule display (optional)
+
+---
+
+### DATA STRUCTURE:
+
+{
+  title: string,
+  summary: string,
+  content: string,
+  image: url,
+  category: string,
+  created_at: date
+}
+
+---
+
+### APP BEHAVIOR:
+
+- Show summary in card
+- Open full content when clicked
+- Smooth transition
+
+---
+
+## 7) CHAT SCREEN IMPROVEMENT
+
+REMOVE static suggestions:
+- تعزيز الطاقة
+- تفريغ
+- احتاج هدوء
+
+---
+
+### Replace with:
+
+Option A (best):
+Dynamic suggestions based on:
+- mood
+- time
+- recent activity
+
+Example:
+- "واضح أنك متعب… تبغى نرتب يومك؟"
+- "خلنا نهدأ سوا شوي"
+
+Option B:
+Remove suggestions entirely
+
+---
+
+## 8) COMPONENTS
+
+Build reusable components:
+
+- BreathingOrb
+- MoodSelector
+- DailyRecipeCard
+- GlassContainer
+- PrimaryButton
+- BottomNav
+
+---
+
+## 9) QUALITY STANDARD
+
+This must feel like:
+- Calm / Headspace / Apple-level UI
+- NOT prototype
+- NOT generic
+
+---
+
+## 10) OUTPUT
+
+Provide:
+
+1. UI breakdown
+2. Components
+3. Breathing logic implementation
+4. Gender system logic
+5. Admin panel structure
+6. Final code
