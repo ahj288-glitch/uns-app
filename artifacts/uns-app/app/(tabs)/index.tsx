@@ -47,6 +47,13 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
   const rotate = useRef(new Animated.Value(0)).current;
   const layer2Rotate = useRef(new Animated.Value(0)).current;
 
+  // Derived animated values computed once at mount — not inside render.
+  // Calling Animated.multiply() inside render creates new nodes every cycle
+  // which defeats useNativeDriver and accumulates memory.
+  const glowHalf = useRef(Animated.multiply(glow, 0.5)).current;
+  const glowFour = useRef(Animated.multiply(glow, 0.4)).current;
+  const glowThreeFive = useRef(Animated.multiply(glow, 0.35)).current;
+
   useEffect(() => {
     const breatheIn = Animated.timing(pulse, {
       toValue: 1.08,
@@ -118,11 +125,11 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
       }}
     >
       <Animated.View style={[orbStyles.outerRing, { opacity: glow, transform: [{ rotate: spin }], borderColor: orbColors[0] }]} />
-      <Animated.View style={[orbStyles.greenLayer, { opacity: Animated.multiply(glow, 0.5), backgroundColor: orbColors[0] }]} />
+      <Animated.View style={[orbStyles.greenLayer, { opacity: glowHalf, backgroundColor: orbColors[0] }]} />
       <Animated.View
         style={[
           orbStyles.goldLayer,
-          { opacity: Animated.multiply(glow, 0.4), transform: [{ rotate: spinReverse }], backgroundColor: orbColors[1] },
+          { opacity: glowFour, transform: [{ rotate: spinReverse }], backgroundColor: orbColors[1] },
         ]}
       />
       <Animated.View style={[orbStyles.orbMid, { transform: [{ scale: pulse }] }]}>
@@ -135,7 +142,7 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
           <Animated.View
             style={[
               orbStyles.pearlOverlay,
-              { opacity: Animated.multiply(glow, 0.35), transform: [{ rotate: spin }] },
+              { opacity: glowThreeFive, transform: [{ rotate: spin }] },
             ]}
           />
           <Text style={orbStyles.orbLabel}>تنفّس</Text>
@@ -379,15 +386,29 @@ export default function HomeScreen() {
               <Text style={styles.dailyQuote} numberOfLines={3}>
                 "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
               </Text>
-              <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
+              {/* Only show static attribution when no recipe is loaded */}
+              {!recipe && (
+                <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
+              )}
               <Pressable
                 style={styles.dailyCTA}
                 onPress={() => {
                   if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setBreathingOpen(true);
+                  // Route the CTA based on recipe category — breathing for تأمل/هدوء,
+                  // chat companion for other types
+                  const isBreathingCategory = recipe?.category === "تأمل" || recipe?.category === "هدوء" || !recipe;
+                  if (isBreathingCategory) {
+                    setBreathingOpen(true);
+                  } else {
+                    router.push("/(tabs)/chat");
+                  }
                 }}
               >
-                <Text style={styles.dailyCTAText}>تأمل لمدة ٥ دقائق</Text>
+                <Text style={styles.dailyCTAText}>
+                  {recipe?.category === "تأمل" || recipe?.category === "هدوء" || !recipe
+                    ? "تأمل لمدة ٥ دقائق"
+                    : "تحدّث مع رفيقك"}
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -558,16 +579,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 20,
-    backgroundColor: "#FFFFFF",
+    // Translucent surface — fits Midnight Garden/light gradient instead of stark white
+    backgroundColor: "rgba(255,255,255,0.82)",
     padding: 16,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6,
+    // Soft green-tinted shadow aligned with the design system palette
+    shadowColor: "rgba(27,67,50,0.15)",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   dailyThumbnail: {
     width: 72,
@@ -603,7 +626,8 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   dailyCTA: {
-    backgroundColor: "#3AAFA9",
+    // Midnight Garden mint — replaces the off-palette teal #3AAFA9
+    backgroundColor: Colors.accent,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,

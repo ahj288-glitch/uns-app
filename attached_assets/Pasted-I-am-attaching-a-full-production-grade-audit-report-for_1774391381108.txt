@@ -1,0 +1,219 @@
+I am attaching a full production-grade audit report for the repository. Your job is NOT to summarize it. Your job is to EXECUTE the remediation work across the codebase and begin fixing all findings professionally, safely, and systematically.
+
+Primary instruction:
+Read the attached audit report carefully, treat it as the source of truth, and start implementing the fixes directly in the project with production-quality standards.
+
+Mission:
+Transform the current codebase from “Early Alpha / Pre-Beta with critical blockers” into a secure, stable, maintainable pre-launch candidate.
+
+Execution mode:
+- Act like a combined team of:
+  - Staff Software Architect
+  - Senior Backend Engineer
+  - Senior React Native Engineer
+  - Senior Web Admin Engineer
+  - DevSecOps Engineer
+  - QA Architect
+  - Performance Engineer
+  - Privacy/Security Engineer
+  - Product-minded UX Engineer
+- Do not stop at surface-level fixes.
+- Do not patch blindly.
+- Fix root causes properly.
+- Preserve the product identity, Arabic-first nature, Midnight Garden design system, and emotional UX philosophy.
+- Keep the codebase clean, typed, modular, and scalable.
+
+Critical working rules:
+1. Start by reading the audit report completely.
+2. Then inspect the repository and map each finding to actual files, components, routes, middleware, contexts, schemas, and configs.
+3. Then create a prioritized remediation plan inside the project.
+4. Then begin implementation immediately.
+5. Do not ask me to manually break down the tasks unless absolutely necessary.
+6. Make grounded engineering decisions when details are missing.
+7. Prefer secure-by-default and maintainable solutions.
+8. Preserve existing good architecture decisions:
+   - pnpm monorepo
+   - TypeScript project references
+   - OpenAPI → Orval → Zod / React Query pipeline
+   - Drizzle ORM
+   - Arabic-first UX and theming
+9. Avoid introducing hacks, dead code, placeholder security, or fake admin behavior.
+10. Wherever frontend features claim capability (RBAC, audit logs, config engine, feature flags, provider failover), either wire them properly to backend logic or clearly refactor them into an honest interim state.
+
+Top priority:
+Treat the following as P0 blockers and start with them first:
+
+P0 Security / Launch blockers:
+- Implement authentication on API endpoints
+- Lock down admin panel with real login and auth guard
+- Add server-side authorization enforcement
+- Replace weak session model with proper signed auth/session model
+- Restrict CORS to explicit allowlist
+- Add rate limiting, especially on companion / OpenAI routes
+- Add helmet and essential security headers
+- Validate critical environment variables at startup
+- Add onboarding/session navigation guards
+- Add error tracking / observability foundation
+- Prevent sensitive logging leakage
+
+Required implementation approach:
+
+PHASE 1 — Audit-to-Code Mapping
+- Read the attached report
+- Produce an internal remediation checklist mapped to exact repository files
+- Group work by:
+  1. Backend security
+  2. Admin authentication / authorization
+  3. Mobile app session + onboarding flow
+  4. API client consistency
+  5. Reliability / testing
+  6. Design system compliance
+  7. Performance / logging / observability
+- Identify any report items that appear partially implemented vs fully missing
+- Then begin code changes
+
+PHASE 2 — Security Foundation
+Implement a proper auth architecture.
+
+Backend:
+- Add auth module/routes and middleware
+- Introduce signed JWT access tokens and a secure refresh/session strategy
+- Protect all /api/* endpoints appropriately
+- Protect admin routes with admin-only authorization checks
+- Enforce server-side authorization, not frontend-only RBAC
+- Add role-aware middleware for admin resources
+- Ensure session/token expiry is handled correctly
+- Add origin allowlist CORS
+- Add rate limiting strategy:
+  - strict for companion endpoints
+  - reasonable defaults for mutation endpoints
+- Add helmet
+- Add validation for required env vars at startup
+- Add secure error handling shape for API responses
+- Add request logging redaction for sensitive fields
+- Add baseline input sanitization where needed, especially community/user-generated content
+
+Admin panel:
+- Add real login screen
+- Add auth persistence
+- Add auth guard hook / route guard
+- Ensure every admin API call includes token
+- Remove any assumption that frontend role matrix is sufficient
+- Wire RBAC to actual backend enforcement
+
+PHASE 3 — Mobile App Session / Onboarding / API Consistency
+React Native app:
+- Add startup guard so user cannot enter main tabs without valid onboarding/session state
+- Ensure onboarding flow creates or restores a valid authenticated session cleanly
+- Prevent duplicate or broken onboarding re-entry behavior
+- Replace weak plain-UUID session logic with proper token-based flow
+- Add recovery flow if session becomes invalid
+- Add configuration failure screen for missing EXPO_PUBLIC_DOMAIN or equivalent env issues
+- Replace raw fetch() usage in screens/contexts with generated typed API client/hooks wherever applicable
+- Keep React Query as the single consistent data-fetching pattern
+
+PHASE 4 — Reliability / QA / Observability
+- Add baseline tests immediately:
+  - auth middleware
+  - crisis detection logic
+  - XP / gamification calculations
+  - onboarding guard
+  - session initialization / invalid-session recovery
+- Add error tracking foundation (Sentry or equivalent)
+- Normalize API error responses
+- Add safer async cleanup patterns (AbortController / mounted guards where needed)
+- Eliminate silent catch blocks
+- Ensure loading / empty / error states exist on all data-dependent screens
+
+PHASE 5 — Design System Compliance
+Preserve the Midnight Garden system and fix violations without damaging product identity.
+
+Specifically:
+- Fix the white Daily Flash Card design violation
+- Fix off-palette CTA colors
+- Remove hardcoded/fake personalization where identified
+- Ensure CTA behavior reflects real recipe/action type
+- Keep Arabic-first premium emotional tone
+- Improve UX consistency while keeping current strengths intact
+
+PHASE 6 — Performance / Maintainability
+- Fix animated value misuse (e.g. derived animated nodes created in render)
+- Reduce unnecessary refetching by setting sane React Query defaults
+- Reduce repeated duplicated UI patterns into reusable components
+- Review heavy animated/theme wrappers for unnecessary re-render cost
+- Keep performance especially in mind for older Android devices
+- Maintain clean module boundaries
+- Avoid introducing duplicated config logic across admin / landing / app
+
+Important product constraints:
+- Do not weaken the Arabic-first experience
+- Do not replace the design identity with generic UI
+- Do not remove culturally-aware dialect support
+- Do not remove safety-related UX
+- Do not “fake” enterprise features in the admin panel
+- Do not keep frontend-only operational claims unless backend support exists
+
+Expected outputs from you in the workspace:
+1. Implement the fixes directly in code
+2. Create a remediation plan document in the repo, for example:
+   /docs/remediation-plan.md
+3. Create a progress tracker, for example:
+   /docs/audit-fixes-status.md
+4. For each major change, document:
+   - issue addressed
+   - files changed
+   - approach taken
+   - security / UX / performance impact
+5. Add TODO markers only when absolutely necessary, and only with clear rationale
+6. If something from the report cannot be completed due to a real dependency gap, state exactly:
+   - what is blocked
+   - why
+   - what is the recommended next implementation step
+
+Quality bar:
+- Production-grade TypeScript
+- Clean abstractions
+- No dead code
+- No fake mocks pretending to be real security
+- No insecure shortcuts
+- No console-noise debugging left behind
+- Minimal regression risk
+- Backward-compatible where sensible
+- Strong code comments only where useful, not verbose clutter
+
+Decision framework:
+When choosing between a quick patch and a proper scalable fix, prefer the proper scalable fix for:
+- auth
+- admin security
+- session model
+- logging/privacy
+- rate limiting
+- error handling
+- core API patterns
+
+When choosing between speed and polish, prioritize in this order:
+1. Security
+2. Correctness
+3. Reliability
+4. Maintainability
+5. UX refinement
+6. Visual polish
+
+Definition of done for this task:
+- P0 security blockers are addressed in code
+- admin is no longer publicly accessible
+- auth/session flow is real and enforced
+- API routes are protected appropriately
+- raw fetch anti-pattern is being removed in key paths
+- onboarding/session guard works
+- critical env misconfiguration fails safely
+- sensitive logs are redacted
+- baseline tests exist
+- progress is documented clearly
+
+Now begin:
+1. Read the attached audit report fully
+2. Inspect the repository
+3. Create the remediation plan
+4. Start implementing the P0 and P1 fixes immediately
+5. Continue iteratively until all critical and high-priority findings are addressed or explicitly documented with blockers
