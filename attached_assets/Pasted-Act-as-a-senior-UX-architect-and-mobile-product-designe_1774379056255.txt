@@ -1,0 +1,201 @@
+Act as a senior UX architect and mobile product designer.
+
+You must FIX critical issues in the "أُنس" app:
+
+1) INCONSISTENT DESIGN IDENTITY
+2) BROKEN BREATHING EXPERIENCE UX
+
+Do NOT add new features before fixing these foundations.
+
+---
+
+## 1) DESIGN CONSISTENCY FIX (CRITICAL)
+
+Problem:
+Different screens use different themes (green, purple, dark, light).
+This breaks the emotional experience.
+
+---
+
+### REQUIRED SOLUTION:
+
+Create a SINGLE GLOBAL DESIGN SYSTEM and enforce it across ALL screens.
+
+---
+
+### RULES:
+
+1. One base theme only:
+   → Soft light emotional theme (green + warm beige)
+
+2. Remove random purple/dark themes from screens.
+
+3. All screens must use:
+   - same background logic
+   - same spacing system
+   - same card style
+   - same shadows
+   - same typography
+
+4. If dark mode exists:
+   - it must be a SYSTEM mode
+   - not per-screen random color
+
+---
+
+### IMPLEMENT:
+
+- Create global theme config:
+  ThemeProvider / DesignTokens
+
+- Apply it to:
+  Home, Insights, Journey, Chat, Community, Paths
+
+---
+
+## 2) BREATHING UX FIX (VERY IMPORTANT)
+
+Problem:
+- "BREATHE" is in English
+- no clear CTA
+- starts instantly without preparation
+- feels like a button, not an experience
+
+---
+
+### REQUIRED EXPERIENCE:
+
+This must feel like a guided emotional ritual.
+
+---
+
+### STEP 1: PRE-START STATE
+
+Center orb shows:
+
+"تنفّس"
+
+NOT "BREATHE"
+
+Below it:
+"جلسة هدوء لمدة دقيقة"
+
+Main CTA button:
+"ابدأ"
+
+Secondary:
+"اختيار مدة"
+
+---
+
+### STEP 2: START CONFIRMATION
+
+When user taps "ابدأ":
+
+Show a soft transition screen:
+
+"خلنا نبدأ بهدوء…"
+
+Then:
+
+3… 2… 1…
+
+---
+
+### STEP 3: BREATHING SESSION
+
+Cycle:
+
+شهيق (4s)
+احتفظ (4s)
+زفير (6s)
+
+Visual:
+- orb expands
+- glow increases
+- smooth motion
+
+Text must be Arabic:
+- شهيق
+- احتفظ بالنفس
+- زفير
+
+Counter visible.
+
+---
+
+### STEP 4: DURING SESSION
+
+Add subtle guidance:
+
+- "خذ نفس بعمق"
+- "لا تستعجل"
+- "أخرج التوتر مع الزفير"
+
+---
+
+### STEP 5: END STATE
+
+After session:
+
+"كيف تشعر الآن؟"
+
+Then show mood selector again.
+
+---
+
+## 3) CTA FIX (IMPORTANT)
+
+Replace small play icon with:
+
+- clear primary button
+- large tap area
+- centered
+
+---
+
+## 4) LANGUAGE FIX
+
+Replace ALL English:
+
+- BREATHE → تنفّس
+- XP → تجربة / نقاط
+- Trending → الأكثر تداولًا
+
+Everything must be Arabic-first.
+
+---
+
+## 5) UI CONSISTENCY RULES
+
+- same corner radius everywhere
+- same card style
+- same icon style
+- no random colors
+- no mismatched components
+
+---
+
+## 6) OUTPUT
+
+Provide:
+
+1. What was wrong
+2. New unified theme
+3. Updated breathing UX flow
+4. Components updated
+5. Screens fixed
+
+---
+
+IMPORTANT:
+
+Do NOT continue building features.
+
+Fix the foundation first.
+
+This app must feel:
+- consistent
+- calm
+- premium
+- intentional
