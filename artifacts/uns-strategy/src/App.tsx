@@ -28,6 +28,7 @@ import { MonetizationArchitecture } from "@/components/sections/MonetizationArch
 import { DataGovernance } from "@/components/sections/DataGovernance";
 import { LocalizationEnterprise } from "@/components/sections/LocalizationEnterprise";
 import { BrandAndSupport } from "@/components/sections/BrandAndSupport";
+import { NativeIOSStrategy } from "@/components/sections/NativeIOSStrategy";
 import { useState } from "react";
 import { NAV_SECTIONS } from "@/data/strategy";
 
@@ -106,6 +107,7 @@ function App() {
             <DataGovernance />
             <LocalizationEnterprise />
             <BrandAndSupport />
+            <NativeIOSStrategy />
           </div>
           <footer className="py-12 px-8 lg:px-16 border-t border-border/30 text-center">
             <div className="text-2xl gold-gradient font-bold mb-2">أُنس | UNS</div>

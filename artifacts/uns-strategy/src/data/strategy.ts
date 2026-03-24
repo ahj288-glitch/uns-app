@@ -27,6 +27,7 @@ export const NAV_SECTIONS = [
   { id: "data-governance", num: "26", title: "Data Governance, Experimentation & Analytics", arabic: "حوكمة البيانات والتجريب" },
   { id: "localization-enterprise", num: "27", title: "Localization, Enterprise & Platform Compliance", arabic: "التوطين والمؤسسات والامتثال" },
   { id: "brand-and-support", num: "28", title: "Brand Voice, Design System & Support Ops", arabic: "هوية العلامة ودعم العملاء" },
+  { id: "native-ios-strategy", num: "29", title: "Native iOS Architecture & Technology Strategy", arabic: "معمارية iOS الأصيلة" },
 ];
 
 export const COMPETITORS = [

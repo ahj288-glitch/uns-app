@@ -1,0 +1,194 @@
+Build Unns as a Native iOS App First, Not Cross-Platform
+
+You are working on Unns, an emotionally intelligent product that aims to become a category-defining Emotional Operating System.
+Because of the product’s depth, sensitivity, UX quality requirements, performance expectations, and long-term ambition, I want you to follow a native-first mobile strategy.
+
+Strategic Direction
+
+Do not build Unns as a cross-platform application at this stage.
+Do not use Flutter, React Native, or any other cross-platform framework for the main app experience.
+
+Instead:
+
+Build Unns as a fully native iOS application first using Apple’s native stack and best practices.
+
+The Android version is not part of the current execution scope.
+Once the iOS product reaches a high level of maturity, quality, stability, and product-market clarity, I will explicitly request that Android development begin as a separate phase.
+
+⸻
+
+Why This Decision Must Be Followed
+
+This is not a casual preference. It is a strategic product and engineering decision.
+
+Unns requires:
+	•	exceptional performance
+	•	premium UX quality
+	•	refined animations and interaction fidelity
+	•	strong privacy and security implementation
+	•	deep integration with native iOS capabilities
+	•	better reliability for emotionally sensitive user journeys
+	•	more control over app behavior and system-level experiences
+	•	a polished Apple-grade product feel from day one
+
+Because of this, I want the product built in the most robust way possible for iOS first, without compromise.
+
+⸻
+
+Mandatory Technical Direction
+
+You must use a native iOS architecture and native Apple technologies wherever applicable.
+
+Preferred direction:
+	•	Swift
+	•	SwiftUI where appropriate
+	•	Native iOS design patterns
+	•	Native state management and architecture
+	•	Native integrations for:
+	•	notifications
+	•	secure storage
+	•	audio
+	•	haptics
+	•	accessibility
+	•	local persistence where needed
+	•	performance optimization
+	•	Apple ecosystem readiness
+
+You may propose the exact architecture pattern if justified properly, such as MVVM, Clean Architecture, modular architecture, or similar, but the implementation must remain fully native.
+
+⸻
+
+Scope of Current Phase
+
+The current phase is:
+
+Build the iOS app only
+
+This includes:
+	•	designing the app architecture for iOS
+	•	implementing the product natively on iPhone first
+	•	ensuring the product is stable, elegant, scalable, and maintainable
+	•	preparing the codebase and architecture for future growth
+
+This does not include:
+	•	Android development
+	•	cross-platform abstraction for the sake of future Android reuse
+	•	compromising iOS quality in order to “support both platforms later”
+
+Do not optimize prematurely for Android in a way that harms iOS quality or development clarity.
+
+⸻
+
+Important Constraint
+
+You must not frame cross-platform as the default recommendation here.
+
+Even if cross-platform might appear faster initially, I am intentionally choosing native iOS first because I value:
+	•	product quality
+	•	long-term maintainability
+	•	superior user experience
+	•	deeper platform excellence
+	•	stronger technical foundations
+
+Your job is to execute this strategy well, not to redirect it toward lower-control approaches.
+
+⸻
+
+Future Android Phase
+
+Android will come later, but only after:
+	•	the iOS product is mature
+	•	the UX is validated
+	•	the emotional product flows are refined
+	•	the AI experience is stable
+	•	retention systems are proven
+	•	the architecture is operationally solid
+	•	the product vision is implemented at a high standard
+
+At that stage, Android will be treated as a new execution phase, not as a reason to weaken the current iOS build.
+
+Therefore, the current instruction is:
+
+Focus fully on building an excellent native iOS app first.
+
+⸻
+
+Product Quality Expectations
+
+The iOS app must feel premium, emotionally intelligent, and operationally mature.
+
+This includes:
+	•	polished transitions and micro-interactions
+	•	high responsiveness
+	•	stable navigation flows
+	•	elegant loading, empty, and error states
+	•	excellent typography and spacing
+	•	accessibility support
+	•	safe and secure handling of sensitive user interactions
+	•	Apple-grade interaction quality
+	•	no rough MVP feel in the core experience
+
+This product must feel intentional, calm, and world-class.
+
+⸻
+
+Architecture Expectations
+
+Build the app in a way that supports:
+	•	modular growth
+	•	maintainability
+	•	testability
+	•	clean separation of concerns
+	•	integration with backend APIs
+	•	AI feature evolution
+	•	analytics instrumentation
+	•	experimentation readiness
+	•	future scaling of the iOS codebase
+
+Again, this should be done as a strong native iOS system, not as a pseudo-shared code compromise.
+
+⸻
+
+Final Execution Instruction
+
+So from this point onward, treat the mobile app strategy as follows:
+
+Phase 1:
+
+Native iOS app only
+
+Phase 2:
+
+After full maturity and explicit approval, begin Android as a separate native phase
+
+Until then:
+	•	do not build cross-platform
+	•	do not suggest converting to Flutter or React Native
+	•	do not optimize architecture around dual-platform shortcuts
+	•	do not mix the current scope with future Android assumptions
+
+Build Unns for iOS first, and build it exceptionally well.
+
+⸻
+
+Final Deliverables Required from You
+
+As part of this direction, provide:
+	1.	The recommended native iOS architecture
+	2.	The recommended technology choices within the Apple ecosystem
+	3.	The initial module breakdown for the iOS app
+	4.	Any iOS-native capabilities that should be leveraged to elevate the product
+	5.	A note on how to keep the backend platform-agnostic while keeping the mobile app itself fully native
+
+⸻
+
+Final Mindset
+
+Do not build a generic app.
+
+Build:
+
+A premium native iOS product that can become the gold-standard emotional companion experience in the market.
+
+We are prioritizing excellence first.
+Android will come later, once the product deserves to be expanded.
