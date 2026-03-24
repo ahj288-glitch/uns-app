@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/colors";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
@@ -23,6 +24,24 @@ const CATEGORY_CONFIG: Record<string, { ar: string; color: string }> = {
   ramadan: { ar: "رمضان", color: Colors.accent },
   general: { ar: "عام", color: Colors.secondary },
   spiritual: { ar: "روحاني", color: Colors.primary },
+};
+
+const CARD_GRADIENTS: Record<string, [string, string]> = {
+  anxiety: ["#3AAFA9", "#2C6B9E"],
+  grief: ["#7B68B5", "#4A3A8A"],
+  sleep: ["#2D5A6B", "#3D5A7A"],
+  ramadan: ["#D4776A", "#E8936A"],
+  general: ["#D4776A", "#E8936A"],
+  spiritual: ["#3A8A6B", "#2C6B50"],
+};
+
+const CARD_ILLUSTRATIONS: Record<string, string> = {
+  anxiety: "🧘",
+  grief: "🌸",
+  sleep: "🌙",
+  ramadan: "🌙",
+  general: "💫",
+  spiritual: "🌿",
 };
 
 interface Program {
@@ -38,56 +57,218 @@ interface Program {
   completionRate: number;
 }
 
-function ProgramCard({ program, index }: { program: Program; index: number }) {
-  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: Colors.accent };
-  const isPremium = program.tier === "premium";
-  const completion = Math.round(program.completionRate * 100);
-
+function HeroBanner() {
   return (
-    <Animated.View entering={FadeInDown.delay(index * 80).duration(400)}>
-      <Pressable style={styles.card} onPress={() => {}}>
-        <View style={styles.cardTop}>
-          <View style={[styles.categoryBadge, { backgroundColor: cat.color + "18" }]}>
-            <View style={[styles.categoryDot, { backgroundColor: cat.color }]} />
-            <Text style={[styles.categoryText, { color: cat.color }]}>{cat.ar}</Text>
-          </View>
-          {isPremium && (
-            <View style={styles.premiumBadge}>
-              <Feather name="star" size={10} color={Colors.accent} />
-              <Text style={styles.premiumText}>متقدم</Text>
-            </View>
-          )}
+    <Animated.View entering={FadeInDown.duration(500)} style={heroStyles.container}>
+      <LinearGradient
+        colors={["#E8D5B7", "#F0E2C8"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={heroStyles.gradient}
+      >
+        <View style={heroStyles.illustrationArea}>
+          <Text style={heroStyles.illustrationEmoji}>🌿</Text>
+          <Text style={heroStyles.illustrationSmall}>✨</Text>
         </View>
-
-        <Text style={styles.cardTitle}>{program.titleAr}</Text>
-        {program.descriptionAr && (
-          <Text style={styles.cardDesc} numberOfLines={2}>{program.descriptionAr}</Text>
-        )}
-
-        <View style={styles.cardStats}>
-          <View style={styles.stat}>
-            <Feather name="calendar" size={12} color={Colors.muted} />
-            <Text style={styles.statText}>{program.durationDays} يوم</Text>
-          </View>
-          <View style={styles.stat}>
-            <Feather name="users" size={12} color={Colors.muted} />
-            <Text style={styles.statText}>{program.enrolledCount.toLocaleString()}</Text>
-          </View>
-          <View style={styles.stat}>
-            <Feather name="check-circle" size={12} color={Colors.accent} />
-            <Text style={[styles.statText, { color: Colors.accent }]}>{completion}%</Text>
-          </View>
+        <View style={heroStyles.textArea}>
+          <Text style={heroStyles.heroTitle}>{"رحلتك نحو\nالصحة النفسية\nتبدأ هنا"}</Text>
+          <Text style={heroStyles.heroSub}>اختر برنامجاً يناسبك</Text>
         </View>
-
-        <View style={styles.progressBarBg}>
-          <View
-            style={[styles.progressBarFill, { width: `${completion}%` as DimensionValue, backgroundColor: cat.color }]}
-          />
-        </View>
-      </Pressable>
+      </LinearGradient>
     </Animated.View>
   );
 }
+
+const heroStyles = StyleSheet.create({
+  container: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  gradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    minHeight: 130,
+  },
+  illustrationArea: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255,255,255,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  illustrationEmoji: { fontSize: 36 },
+  illustrationSmall: {
+    fontSize: 18,
+    position: "absolute",
+    top: -4,
+    right: -4,
+  },
+  textArea: {
+    flex: 1,
+    alignItems: "flex-end",
+    paddingRight: 12,
+  },
+  heroTitle: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 20,
+    color: "#3D2B1A",
+    textAlign: "right",
+    lineHeight: 32,
+  },
+  heroSub: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 13,
+    color: "#7A5C3A",
+    textAlign: "right",
+    marginTop: 4,
+  },
+});
+
+function ProgramCard({ program, index }: { program: Program; index: number }) {
+  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: Colors.accent };
+  const gradientColors = CARD_GRADIENTS[program.category] ?? ["#3AAFA9", "#2C7873"] as [string, string];
+  const illustration = CARD_ILLUSTRATIONS[program.category] ?? "💫";
+  const completion = Math.round(program.completionRate * 100);
+  const durationWeeks = Math.max(1, Math.round(program.durationDays / 7));
+  const weekLabels: Record<number, string> = { 1: "١", 2: "٢", 3: "٣", 4: "٤", 5: "٥", 6: "٦", 7: "٧", 8: "٨" };
+  const weekLabel = weekLabels[durationWeeks] ?? String(durationWeeks);
+  const hasProgress = completion > 0;
+
+  return (
+    <Animated.View entering={FadeInDown.delay(index * 100).duration(400)} style={cardStyles.wrapper}>
+      <LinearGradient
+        colors={gradientColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={cardStyles.card}
+      >
+        <View style={cardStyles.illustrationCircle}>
+          <Text style={cardStyles.illustrationEmoji}>{illustration}</Text>
+        </View>
+
+        <View style={cardStyles.contentArea}>
+          <Text style={cardStyles.title}>{program.titleAr}</Text>
+
+          {hasProgress && (
+            <View style={cardStyles.progressSection}>
+              <View style={cardStyles.progressBarBg}>
+                <View
+                  style={[
+                    cardStyles.progressBarFill,
+                    { width: `${completion}%` as DimensionValue },
+                  ]}
+                />
+              </View>
+              <Text style={cardStyles.progressLabel}>{completion}%</Text>
+            </View>
+          )}
+
+          <View style={cardStyles.bottomRow}>
+            <Text style={cardStyles.durationLabel}>برنامج {weekLabel} أسابيع</Text>
+            <Pressable style={cardStyles.ctaBtn}>
+              <Text style={cardStyles.ctaBtnText}>{hasProgress ? "تابع" : "ابدأ الآن"}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </LinearGradient>
+    </Animated.View>
+  );
+}
+
+const cardStyles = StyleSheet.create({
+  wrapper: {
+    marginHorizontal: 16,
+    marginBottom: 14,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 18,
+    gap: 14,
+  },
+  illustrationCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  illustrationEmoji: { fontSize: 36 },
+  contentArea: {
+    flex: 1,
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  title: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 20,
+    color: "#FFFFFF",
+    textAlign: "right",
+  },
+  progressSection: {
+    width: "100%",
+    gap: 4,
+    alignItems: "flex-end",
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    borderRadius: 2,
+    overflow: "hidden",
+    width: "100%",
+  },
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 2,
+  },
+  progressLabel: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 11,
+    color: "rgba(255,255,255,0.8)",
+  },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  durationLabel: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 12,
+    color: "rgba(255,255,255,0.75)",
+  },
+  ctaBtn: {
+    backgroundColor: "rgba(255,255,255,0.25)",
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 12,
+  },
+  ctaBtnText: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+    color: "#FFFFFF",
+  },
+});
 
 export default function ProgramsScreen() {
   const insets = useSafeAreaInsets();
@@ -114,168 +295,100 @@ export default function ProgramsScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.surface }]}
+      style={styles.container}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={[styles.header, { paddingTop: webTop + 16 }]}>
-        <Text style={styles.headerTitle}>برامج الرفاه</Text>
-        <Text style={styles.headerSub}>رحلات مصممة لك</Text>
+      <View style={[styles.headerBar, { paddingTop: webTop + 8 }]}>
+        <Pressable style={styles.headerBtn}>
+          <Feather name="settings" size={18} color="#555555" />
+        </Pressable>
+        <Text style={styles.headerTitle}>مسارات أُنْس</Text>
+        <Pressable style={styles.headerBtn}>
+          <Feather name="chevron-right" size={20} color="#555555" />
+        </Pressable>
       </View>
 
-      <View style={styles.filterRow}>
-        {Object.entries(CATEGORY_CONFIG).map(([key, conf]) => (
-          <Pressable key={key} style={styles.filterChip}>
-            <View style={[styles.filterDot, { backgroundColor: conf.color }]} />
-            <Text style={styles.filterText}>{conf.ar}</Text>
-          </Pressable>
-        ))}
-      </View>
+      <HeroBanner />
 
-      <View style={styles.list}>
-        {isLoading ? (
-          <View style={styles.loadingState}>
-            <ActivityIndicator color={Colors.accent} />
-            <Text style={styles.loadingText}>جاري التحميل...</Text>
-          </View>
-        ) : error ? (
-          <Pressable style={styles.errorState} onPress={loadPrograms}>
-            <Feather name="refresh-cw" size={24} color={Colors.muted} />
-            <Text style={styles.errorText}>{error}</Text>
-          </Pressable>
-        ) : programs.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Feather name="book-open" size={40} color={Colors.muted} />
-            <Text style={styles.emptyText}>لا توجد برامج بعد</Text>
-          </View>
-        ) : (
-          programs.map((p, i) => <ProgramCard key={p.id} program={p} index={i} />)
-        )}
-      </View>
+      {isLoading ? (
+        <View style={styles.loadingState}>
+          <ActivityIndicator color={Colors.accent} />
+          <Text style={styles.loadingText}>جاري التحميل...</Text>
+        </View>
+      ) : error ? (
+        <Pressable style={styles.errorState} onPress={loadPrograms}>
+          <Feather name="refresh-cw" size={24} color={Colors.muted} />
+          <Text style={styles.errorText}>{error}</Text>
+        </Pressable>
+      ) : programs.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Feather name="book-open" size={40} color={Colors.muted} />
+          <Text style={styles.emptyText}>لا توجد برامج بعد</Text>
+        </View>
+      ) : (
+        programs.map((p, i) => <ProgramCard key={p.id} program={p} index={i} />)
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: "#F7F3EC",
+  },
+  headerBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
     paddingBottom: 16,
-    alignItems: "flex-end",
+  },
+  headerBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
-    fontSize: 32,
-    color: Colors.onSurface,
-    textAlign: "right",
-    letterSpacing: -0.5,
+    fontSize: 20,
+    color: "#2D2D2D",
+    textAlign: "center",
   },
-  headerSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
-    color: Colors.muted,
-    marginTop: 4,
-  },
-  filterRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    justifyContent: "flex-end",
-  },
-  filterChip: {
-    flexDirection: "row",
+  loadingState: {
     alignItems: "center",
-    gap: 5,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 60,
+    gap: 12,
   },
-  filterDot: { width: 6, height: 6, borderRadius: 3 },
-  filterText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
-    color: Colors.primary,
-  },
-  list: { paddingHorizontal: 16, gap: 12 },
-  card: {
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 20,
-    padding: 18,
-    gap: 10,
-  },
-  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  categoryBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  categoryDot: { width: 6, height: 6, borderRadius: 3 },
-  categoryText: { fontFamily: "Tajawal_400Regular", fontSize: 11 },
-  premiumBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: Colors.accent + "18",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  premiumText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 10,
-    color: Colors.accent,
-  },
-  cardTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 22,
-    color: Colors.onSurface,
-    textAlign: "right",
-    lineHeight: 32,
-  },
-  cardDesc: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
-    color: Colors.muted,
-    textAlign: "right",
-    lineHeight: 22,
-  },
-  cardStats: {
-    flexDirection: "row",
-    gap: 16,
-    justifyContent: "flex-end",
-  },
-  stat: { flexDirection: "row", alignItems: "center", gap: 4 },
-  statText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
-    color: Colors.muted,
-  },
-  progressBarBg: {
-    height: 3,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  progressBarFill: { height: "100%", borderRadius: 2 },
-  loadingState: { alignItems: "center", paddingVertical: 60, gap: 12 },
   loadingText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: "#888888",
   },
-  errorState: { alignItems: "center", paddingVertical: 60, gap: 12 },
+  errorState: {
+    alignItems: "center",
+    paddingVertical: 60,
+    gap: 12,
+  },
   errorText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: Colors.error,
   },
-  emptyState: { alignItems: "center", paddingVertical: 60, gap: 12 },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 60,
+    gap: 12,
+  },
   emptyText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 18,

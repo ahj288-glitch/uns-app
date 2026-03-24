@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
@@ -55,46 +56,250 @@ interface Post {
   createdAt: string;
 }
 
-function SessionCard({ session, onEnter }: { session: Session; onEnter: () => void }) {
-  const color = MOOD_THEME_COLORS[session.moodTheme] ?? Colors.accent;
-  const icon = MOOD_THEME_ICONS[session.moodTheme] ?? "💫";
-  const isFull = session.participantCount >= session.maxParticipants;
+const AVATAR_COLORS = ["#9BD4C0", "#A8C8E8", "#F4B8A0", "#C4A8D8", "#E8C4A0"];
 
+function GroupAvatars() {
   return (
-    <Pressable style={styles.sessionCard} onPress={onEnter}>
-      <View style={[styles.sessionIconCircle, { backgroundColor: color + "20" }]}>
-        <Text style={styles.sessionIcon}>{icon}</Text>
-      </View>
-      <View style={styles.sessionInfo}>
-        <Text style={styles.sessionTitle}>{session.titleAr}</Text>
-        <Text style={styles.sessionDesc} numberOfLines={2}>{session.descriptionAr}</Text>
-        <View style={styles.sessionMeta}>
-          <Feather name="users" size={11} color={color} />
-          <Text style={[styles.sessionMetaText, { color }]}>{session.participantCount} مشارك</Text>
-          <Feather name="clock" size={11} color={Colors.muted} />
-          <Text style={styles.sessionMetaGrey}>{session.durationMinutes} دقيقة</Text>
+    <View style={liveCardStyles.avatarStack}>
+      {AVATAR_COLORS.map((color, i) => (
+        <View
+          key={i}
+          style={[
+            liveCardStyles.avatarCircle,
+            {
+              backgroundColor: color,
+              marginRight: i > 0 ? -10 : 0,
+              zIndex: 5 - i,
+            },
+          ]}
+        >
+          <Text style={liveCardStyles.avatarEmoji}>🧍</Text>
         </View>
+      ))}
+    </View>
+  );
+}
+
+function LiveSessionCard({ session, onEnter }: { session: Session; onEnter: () => void }) {
+  return (
+    <Pressable style={liveCardStyles.card} onPress={onEnter}>
+      <GroupAvatars />
+      <Text style={liveCardStyles.title} numberOfLines={2}>{session.titleAr}</Text>
+      <View style={liveCardStyles.hostRow}>
+        <Feather name="mic" size={12} color="#6B7FD7" />
+        <Text style={liveCardStyles.hostText}>{session.participantCount} مشارك</Text>
       </View>
-      <View style={[styles.joinBtn, { backgroundColor: color + "20" }]}>
-        <Text style={[styles.joinBtnText, { color }]}>{isFull ? "ممتلئ" : "ادخل"}</Text>
-      </View>
+      <LinearGradient
+        colors={["#3AAFA9", "#2C7873"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={liveCardStyles.joinBtn}
+      >
+        <Text style={liveCardStyles.joinBtnText}>
+          {session.participantCount >= session.maxParticipants ? "ممتلئ" : "انضم"}
+        </Text>
+      </LinearGradient>
     </Pressable>
   );
 }
 
+const liveCardStyles = StyleSheet.create({
+  card: {
+    width: 160,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 14,
+    marginLeft: 12,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  avatarStack: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+  avatarCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#F5F0E8",
+  },
+  avatarEmoji: { fontSize: 14 },
+  title: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+    color: "#2D2D2D",
+    textAlign: "right",
+    lineHeight: 20,
+  },
+  hostRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    justifyContent: "flex-end",
+  },
+  hostText: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 11,
+    color: "#6B7FD7",
+  },
+  joinBtn: {
+    borderRadius: 10,
+    paddingVertical: 8,
+    alignItems: "center",
+  },
+  joinBtnText: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+    color: "#FFFFFF",
+  },
+});
+
+const MOOD_AUTHOR_LABELS: Record<string, string> = {
+  anxiety: "في دائرة القلق",
+  gratitude: "مع الامتنان",
+  reflection: "لحظة تأمل",
+  support: "طلب دعم",
+};
+
+function ReflectionPostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
+  const [hearted, setHearted] = useState(false);
+  const initial = post.anonymousName?.charAt(0) ?? "أ";
+  const bgColors = ["#9BD4C0", "#A8C8E8", "#F4B8A0", "#C4A8D8", "#E8C4A0"];
+  const bgColor = bgColors[post.anonymousName?.charCodeAt(0) % bgColors.length] ?? "#9BD4C0";
+  const authorLabel = post.moodTag
+    ? (MOOD_AUTHOR_LABELS[post.moodTag] ?? post.anonymousName)
+    : post.anonymousName;
+
+  return (
+    <Animated.View entering={FadeInDown.duration(400)} style={reflStyles.card}>
+      <View style={reflStyles.row}>
+        <View style={reflStyles.textCol}>
+          <Text style={reflStyles.title} numberOfLines={1}>{post.anonymousName}</Text>
+          <Text style={reflStyles.author}>{authorLabel}</Text>
+          <Text style={reflStyles.preview} numberOfLines={2}>{post.contentAr}</Text>
+          <View style={reflStyles.footerRow}>
+            <Pressable
+              style={reflStyles.actionBtn}
+              onPress={() => {
+                if (!hearted) {
+                  setHearted(true);
+                  if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onHeart();
+                }
+              }}
+            >
+              <Feather name="heart" size={14} color={hearted ? "#E94D6D" : "#AAAAAA"} />
+              <Text style={[reflStyles.actionCount, hearted && { color: "#E94D6D" }]}>
+                {hearted ? post.hearts + 1 : post.hearts}
+              </Text>
+            </Pressable>
+            <View style={reflStyles.actionBtn}>
+              <Feather name="message-circle" size={14} color="#AAAAAA" />
+              <Text style={reflStyles.actionCount}>0</Text>
+            </View>
+          </View>
+        </View>
+        <View style={[reflStyles.avatarCircle, { backgroundColor: bgColor }]}>
+          <Text style={reflStyles.avatarInitial}>{initial}</Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
+const reflStyles = StyleSheet.create({
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  textCol: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
+  avatarCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  avatarInitial: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 18,
+    color: "#FFFFFF",
+  },
+  title: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 14,
+    color: "#2D2D2D",
+    textAlign: "right",
+  },
+  author: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 11,
+    color: "#888888",
+    textAlign: "right",
+    marginTop: 1,
+  },
+  preview: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 13,
+    color: "#555555",
+    textAlign: "right",
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  footerRow: {
+    flexDirection: "row",
+    gap: 14,
+    marginTop: 8,
+    justifyContent: "flex-end",
+  },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  actionCount: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 12,
+    color: "#AAAAAA",
+  },
+});
+
 function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
   const [hearted, setHearted] = useState(false);
   return (
-    <Animated.View entering={FadeInDown.duration(400)} style={styles.postCard}>
-      <View style={styles.postHeader}>
-        <Text style={styles.postName}>{post.anonymousName}</Text>
-        <Text style={styles.postTime}>
+    <Animated.View entering={FadeInDown.duration(400)} style={inSessionStyles.postCard}>
+      <View style={inSessionStyles.postHeader}>
+        <Text style={inSessionStyles.postName}>{post.anonymousName}</Text>
+        <Text style={inSessionStyles.postTime}>
           {new Date(post.createdAt).toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
         </Text>
       </View>
-      <Text style={styles.postContent}>{post.contentAr}</Text>
+      <Text style={inSessionStyles.postContent}>{post.contentAr}</Text>
       <Pressable
-        style={styles.heartBtn}
+        style={inSessionStyles.heartBtn}
         onPress={() => {
           if (!hearted) {
             setHearted(true);
@@ -104,13 +309,57 @@ function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
         }}
       >
         <Feather name="heart" size={16} color={hearted ? "#E94D6D" : Colors.muted} />
-        <Text style={[styles.heartCount, hearted && { color: "#E94D6D" }]}>
+        <Text style={[inSessionStyles.heartCount, hearted && { color: "#E94D6D" }]}>
           {hearted ? post.hearts + 1 : post.hearts}
         </Text>
       </Pressable>
     </Animated.View>
   );
 }
+
+const inSessionStyles = StyleSheet.create({
+  postCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 14,
+    gap: 8,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  postHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  postName: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 13,
+    color: Colors.accent,
+  },
+  postTime: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 11,
+    color: "#888888",
+  },
+  postContent: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 14,
+    color: "#2D2D2D",
+    lineHeight: 22,
+    textAlign: "right",
+  },
+  heartBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-start",
+  },
+  heartCount: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 13,
+    color: "#888888",
+  },
+});
 
 export default function CommunityScreen() {
   const insets = useSafeAreaInsets();
@@ -169,13 +418,13 @@ export default function CommunityScreen() {
   if (activeSession) {
     return (
       <KeyboardAvoidingView
-        style={[styles.container, { paddingTop: webTop }]}
+        style={[styles.containerActive, { paddingTop: webTop }]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={insets.bottom + 80}
       >
         <View style={styles.sessionHeader}>
           <Pressable onPress={() => setActiveSession(null)} style={styles.backBtn}>
-            <Feather name="arrow-right" size={20} color={Colors.muted} />
+            <Feather name="arrow-right" size={20} color="#555555" />
           </Pressable>
           <View style={{ flex: 1, alignItems: "flex-end" }}>
             <Text style={styles.sessionHeaderTitle}>{activeSession.titleAr}</Text>
@@ -218,7 +467,7 @@ export default function CommunityScreen() {
             value={newPost}
             onChangeText={setNewPost}
             placeholder="شارك ما تشعر به... أنت في أمان هنا"
-            placeholderTextColor={Colors.muted}
+            placeholderTextColor="#AAAAAA"
             multiline
             maxLength={500}
             textAlign="right"
@@ -229,8 +478,8 @@ export default function CommunityScreen() {
             disabled={!newPost.trim() || posting}
           >
             {posting
-              ? <ActivityIndicator size="small" color={Colors.surface} />
-              : <Feather name="send" size={18} color={Colors.surface} />
+              ? <ActivityIndicator size="small" color="#FFFFFF" />
+              : <Feather name="send" size={18} color="#FFFFFF" />
             }
           </Pressable>
         </View>
@@ -238,195 +487,164 @@ export default function CommunityScreen() {
     );
   }
 
+  const sessionReflections: Post[] = sessions.map(s => ({
+    id: s.id,
+    anonymousName: s.titleAr,
+    contentAr: s.descriptionAr,
+    moodTag: s.moodTheme,
+    hearts: s.participantCount,
+    createdAt: new Date().toISOString(),
+  }));
+
   return (
     <ScrollView
-      style={[styles.container, { paddingTop: webTop }]}
+      style={styles.container}
       contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
-        <Text style={styles.screenTitle}>المساحة الآمنة</Text>
-        <Text style={styles.screenSubtitle}>لست وحدك في هذا</Text>
-      </Animated.View>
+      <View style={[styles.headerBar, { paddingTop: webTop + 8 }]}>
+        <Pressable style={styles.headerBtn}>
+          <Feather name="chevron-right" size={20} color="#555555" />
+        </Pressable>
+        <Text style={styles.headerTitle}>أُنْس: واحة الأمان</Text>
+        <Pressable style={styles.headerBtn}>
+          <Feather name="user" size={20} color="#555555" />
+        </Pressable>
+      </View>
 
-      <Animated.View entering={FadeInDown.duration(500).delay(100)} style={styles.principlesCard}>
-        {[
-          { icon: "👤", text: "هوية مجهولة تماماً" },
-          { icon: "🤝", text: "استماع بلا حكم" },
-          { icon: "🛡️", text: "مراقبة ذكاء اصطناعي" },
-        ].map(p => (
-          <View key={p.text} style={styles.principleRow}>
-            <Text style={styles.principleIcon}>{p.icon}</Text>
-            <Text style={styles.principleText}>{p.text}</Text>
-          </View>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionSeeAll}>See All</Text>
+        <Text style={styles.sectionTitle}>حلقات مباشرة</Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.liveScrollContent}
+        style={styles.liveScroll}
+      >
+        {loading ? (
+          <ActivityIndicator color={Colors.accent} style={{ marginLeft: 16, marginTop: 40 }} />
+        ) : sessions.map(session => (
+          <LiveSessionCard key={session.id} session={session} onEnter={() => enterSession(session)} />
         ))}
-      </Animated.View>
+      </ScrollView>
 
-      <Text style={styles.listTitle}>الدوائر المفتوحة</Text>
+      {sessionReflections.length > 0 && (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTrending}>Trending</Text>
+            <Text style={styles.sectionTitle}>تأملات يومية</Text>
+          </View>
 
-      {loading ? (
-        <ActivityIndicator color={Colors.accent} style={{ marginTop: 40 }} />
-      ) : sessions.map((session, i) => (
-        <Animated.View key={session.id} entering={FadeInDown.duration(500).delay(150 + i * 80)}>
-          <SessionCard session={session} onEnter={() => enterSession(session)} />
-        </Animated.View>
-      ))}
-
-      <Animated.View entering={FadeInDown.duration(500).delay(500)} style={styles.reflectionCard}>
-        <Text style={styles.reflectionTitle}>✦ تذكّر</Text>
-        <Text style={styles.reflectionText}>
-          ما تشعر به الآن لا يُعرّفك. أنت أكثر مما تمر به في هذه اللحظة.
-        </Text>
-      </Animated.View>
+          <View style={styles.reflectionsList}>
+            {sessionReflections.map(post => (
+              <ReflectionPostCard
+                key={post.id}
+                post={post}
+                onHeart={() => {}}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface },
-  header: { padding: 24, paddingBottom: 8, alignItems: "flex-end" },
-  screenTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 32,
-    color: Colors.onSurface,
-    letterSpacing: -0.5,
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F0E8",
   },
-  screenSubtitle: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
-    color: Colors.muted,
-    marginTop: 4,
+  containerActive: {
+    flex: 1,
+    backgroundColor: "#F5F0E8",
   },
-  principlesCard: {
-    margin: 16,
-    marginTop: 8,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 20,
-    padding: 16,
-    gap: 12,
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  principleRow: { alignItems: "center", gap: 6, flex: 1 },
-  principleIcon: { fontSize: 20 },
-  principleText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
-    color: Colors.primary,
-    textAlign: "center",
-  },
-  listTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
-    color: Colors.onSurface,
-    textAlign: "right",
-    marginHorizontal: 16,
-    marginBottom: 8,
-  },
-  sessionCard: {
+  headerBar: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginHorizontal: 16,
-    marginBottom: 10,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 20,
-    padding: 16,
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
-  sessionIconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  headerBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    flexShrink: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  sessionIcon: { fontSize: 24 },
-  sessionInfo: { flex: 1 },
-  sessionTitle: {
+  headerTitle: {
     fontFamily: "Tajawal_700Bold",
-    fontSize: 16,
-    color: Colors.onSurface,
-    textAlign: "right",
+    fontSize: 18,
+    color: "#2D2D2D",
+    textAlign: "center",
   },
-  sessionDesc: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
-    color: Colors.muted,
-    textAlign: "right",
-    marginTop: 4,
-    lineHeight: 18,
-  },
-  sessionMeta: {
+  sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
-    gap: 6,
-    marginTop: 8,
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 10,
   },
-  sessionMetaText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
-  },
-  sessionMetaGrey: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
-    color: Colors.muted,
-  },
-  joinBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  joinBtnText: {
+  sectionTitle: {
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
-  },
-  reflectionCard: {
-    margin: 16,
-    marginTop: 8,
-    backgroundColor: Colors.primaryContainer,
-    borderRadius: 20,
-    padding: 20,
-    alignItems: "flex-end",
-    gap: 8,
-  },
-  reflectionTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
-    color: Colors.accent,
+    fontSize: 18,
+    color: "#2D2D2D",
     textAlign: "right",
   },
-  reflectionText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 15,
-    color: Colors.primary,
-    textAlign: "right",
-    lineHeight: 26,
+  sectionSeeAll: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 12,
+    color: "#3AAFA9",
+  },
+  sectionTrending: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 12,
+    color: "#888888",
+  },
+  liveScroll: {
+    marginBottom: 4,
+  },
+  liveScrollContent: {
+    paddingRight: 16,
+    paddingLeft: 4,
+  },
+  reflectionsList: {
+    paddingHorizontal: 16,
   },
   sessionHeader: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     gap: 12,
+    backgroundColor: "#F5F0E8",
   },
   backBtn: { padding: 8 },
   sessionHeaderTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: Colors.onSurface,
+    color: "#2D2D2D",
   },
   sessionHeaderSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: "#888888",
     marginTop: 2,
   },
   safetyBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: "#E8F5EE",
     paddingHorizontal: 16,
     paddingVertical: 8,
     justifyContent: "flex-end",
@@ -436,54 +654,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.accent,
   },
-  postCard: {
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 16,
-    padding: 14,
-    gap: 8,
-  },
-  postHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  postName: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
-    color: Colors.accent,
-  },
-  postTime: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
-    color: Colors.muted,
-  },
-  postContent: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
-    color: Colors.onSurface,
-    lineHeight: 22,
-    textAlign: "right",
-  },
-  heartBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "flex-start",
-  },
-  heartCount: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
-    color: Colors.muted,
-  },
   postInputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 10,
     padding: 12,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 4,
   },
   postInput: {
     flex: 1,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: "#F5F0E8",
     borderRadius: 16,
     padding: 12,
-    color: Colors.onSurface,
+    color: "#2D2D2D",
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     minHeight: 44,
@@ -499,5 +687,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  sendBtnDisabled: { opacity: 0.4 },
+  sendBtnDisabled: {
+    opacity: 0.4,
+  },
 });
