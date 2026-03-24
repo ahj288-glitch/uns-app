@@ -151,34 +151,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      const body: Record<string, string> = { dialect: resolvedDialect };
-      if (storedId) {
-        body["sessionId"] = storedId;
-      }
-
-      const res = await fetch(`${BASE}/api/auth/session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-        signal,
-      });
-
-      if (signal.aborted || !mountedRef.current) return;
-      if (!res.ok) throw new Error(`Session creation failed (${res.status})`);
-
-      const data = await res.json();
-      if (signal.aborted || !mountedRef.current) return;
-
-      await Promise.all([
-        AsyncStorage.setItem("uns_session_id", data.sessionId),
-        AsyncStorage.setItem("uns_access_token", data.accessToken),
-        AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
-      ]);
-
-      setSessionId(data.sessionId);
-      setAuthToken(data.accessToken);
-      authTokenRef.current = data.accessToken;
-      setGreeting(data.greeting);
+      // No stored credentials — leave sessionId null so onboarding guard redirects to registration
     } catch (e) {
       if ((e as { name?: string }).name === "AbortError") return;
       if (!mountedRef.current) return;

@@ -23,14 +23,17 @@ export default function TabLayout() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem("@uns_onboarding_complete").then(value => {
-      if (!value) {
+    Promise.all([
+      AsyncStorage.getItem("@uns_onboarding_complete"),
+      AsyncStorage.getItem("uns_access_token"),
+    ]).then(([onboardingComplete, accessToken]) => {
+      if (!onboardingComplete || !accessToken) {
         router.replace("/onboarding");
       } else {
         setChecking(false);
       }
     }).catch(() => {
-      setChecking(false);
+      router.replace("/onboarding");
     });
   }, []);
 
