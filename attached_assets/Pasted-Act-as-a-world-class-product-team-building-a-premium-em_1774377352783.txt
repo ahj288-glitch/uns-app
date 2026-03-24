@@ -1,0 +1,386 @@
+Act as a world-class product team building a premium emotional wellness mobile app called "أُنس".
+
+You are responsible for:
+- UI/UX Design
+- Design System
+- Motion Design
+- AI Personality
+- Dynamic Theming
+- Content Architecture
+- Admin Panel System
+
+This is NOT a prototype.
+This is a production-grade emotional product.
+
+The app must feel like:
+Calm + Headspace + Apple-level polish — but Arabic-first and emotionally warmer.
+
+==================================================
+1) CORE IDENTITY (MANDATORY)
+==================================================
+
+"أُنس" is NOT a tool.
+It is a safe emotional space and a companion.
+
+The UI must feel:
+- warm
+- soft
+- calm
+- human
+- emotionally supportive
+- elegant
+- premium
+
+DO NOT use:
+- dark heavy UI as default
+- sharp edges
+- harsh contrast
+- generic mobile UI
+
+==================================================
+2) PRIMARY THEME (DEFAULT)
+==================================================
+
+Use a LIGHT EMOTIONAL THEME as the default.
+
+### Background:
+- soft gradient:
+  mint green → warm beige
+
+Example:
+linear-gradient(180deg, #E6F4EE → #F4EDE4)
+
+### Surfaces:
+- glassmorphism (soft blur)
+- semi-transparent layers
+- subtle borders
+
+### Colors:
+- soft green
+- warm beige
+- muted blue/lavender accents
+
+### Shadows:
+- soft, diffused
+- very light
+- premium feel
+
+### Corners:
+- highly rounded (24–32px)
+
+### Spacing:
+- very breathable
+- not dense
+
+==================================================
+3) DYNAMIC THEME SYSTEM (CRITICAL)
+==================================================
+
+The UI must adapt based on:
+
+- mood
+- time of day
+
+Implement themes:
+
+### 😰 anxious
+- softer green
+- more blur
+- slower animation
+
+### 😔 sad
+- warmer beige
+- low contrast
+- comforting tone
+
+### 🙂 calm/happy
+- brighter gradients
+- slightly more light
+
+### 🌙 night mode
+- soft dark (NOT black)
+- bluish/purple tone
+- calm, quiet
+
+Transitions between themes must be:
+- smooth
+- animated
+- not abrupt
+
+==================================================
+4) MOTION SYSTEM
+==================================================
+
+Everything must feel like it “breathes”.
+
+Rules:
+- ease-in-out animations
+- duration: 0.5s → 2s
+- no sharp motion
+
+Examples:
+- subtle scaling
+- glow pulses
+- soft fades
+
+==================================================
+5) HOME SCREEN (REFERENCE)
+==================================================
+
+Build EXACTLY like the approved design:
+
+Includes:
+- greeting (personalized)
+- breathing orb (centerpiece)
+- play button
+- mood selector
+- daily recipe card
+- bottom navigation
+
+Style:
+- soft gradient background
+- glass container
+- emotional tone
+
+==================================================
+6) BREATHING EXPERIENCE (CORE)
+==================================================
+
+When user taps “تنفس”:
+
+Start guided breathing:
+
+Cycle:
+- شهيق: 4s (expand)
+- احتفاظ: 4s (hold)
+- زفير: 6s (shrink)
+- pause: 1s
+
+Total cycle: 15s  
+Default: 5 cycles
+
+Must include:
+- animated orb
+- text guidance
+- counter
+- optional sound
+- optional haptic
+
+==================================================
+7) MOOD + GENDER SYSTEM
+==================================================
+
+Dynamic Arabic text:
+
+IF female:
+- كيف تشعرين اليوم؟
+- حزينة، متعبة…
+
+IF male:
+- كيف تشعر اليوم؟
+- حزين، متعب…
+
+Apply globally.
+
+==================================================
+8) PATHS SCREEN (مسارات)
+==================================================
+
+Transform into emotional journey:
+
+### Hero:
+- illustration (flower + nature)
+- greeting
+
+### Cards:
+Each includes:
+- illustration
+- title
+- progress
+- duration
+- CTA
+
+Style:
+- gradient cards
+- rounded
+- soft shadow
+
+==================================================
+9) COMMUNITY SCREEN
+==================================================
+
+Make it feel alive:
+
+### Live sessions:
+- group illustration
+- title
+- host
+- participants
+- join button
+
+### Reflection posts:
+- avatar
+- title
+- author
+- likes/comments
+
+==================================================
+10) CONTENT SYSTEM (VERY IMPORTANT)
+==================================================
+
+Everything must be dynamic.
+
+Admin can control:
+
+### Programs:
+- title
+- duration
+- image
+- gradient
+- progress
+
+### Live sessions:
+- title
+- host
+- time
+- image
+
+### Reflections:
+- title
+- content
+- author
+
+### Daily recipe:
+- image
+- title
+- summary
+- full content
+- category
+
+==================================================
+11) VISUAL CONTENT RULES
+==================================================
+
+Use:
+- nature visuals
+- soft illustrations
+- calm imagery
+
+Avoid:
+- generic icons
+- corporate style
+- harsh visuals
+
+==================================================
+12) AI PERSONALITY
+==================================================
+
+"أُنس" speaks like:
+
+- calm
+- empathetic
+- gentle
+- non-judgmental
+
+Examples:
+
+Sad:
+"واضح أن اليوم كان صعب… أنا معك"
+
+Anxious:
+"خذ نفس… ما فيه شيء مستعجل"
+
+Happy:
+"جميل… خلنا نحافظ على هذا الشعور"
+
+==================================================
+13) CHAT IMPROVEMENT
+==================================================
+
+Remove static buttons like:
+- تعزيز الطاقة
+
+Replace with:
+- dynamic suggestions
+based on mood + context
+
+OR remove completely.
+
+==================================================
+14) INSIGHTS SCREEN
+==================================================
+
+Soft analytics:
+- weekly mood
+- trends
+- improvements
+
+Must feel:
+- calm
+- readable
+- not technical
+
+==================================================
+15) GAMIFICATION
+==================================================
+
+Add:
+- streaks
+- achievements
+- journey stages
+
+Style:
+- subtle
+- elegant
+- not childish
+
+==================================================
+16) COMPONENT SYSTEM
+==================================================
+
+Build reusable components:
+
+- BreathingOrb
+- MoodSelector
+- ProgramCard
+- ReflectionCard
+- LiveSessionCard
+- GlassContainer
+- CTAButton
+- BottomNav
+
+==================================================
+17) ADMIN PANEL
+==================================================
+
+Create configurable backend:
+
+Admin can:
+- add/edit content
+- upload images
+- control sections
+- activate/deactivate features
+
+==================================================
+18) FINAL RULE
+==================================================
+
+DO NOT build generic UI.
+
+Everything must feel:
+- alive
+- emotional
+- premium
+- consistent
+
+==================================================
+OUTPUT:
+==================================================
+
+1. Design system
+2. Theme logic
+3. Components
+4. Screens
+5. Data models
+6. Admin system
+7. Implementation
