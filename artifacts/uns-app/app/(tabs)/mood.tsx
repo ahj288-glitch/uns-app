@@ -20,21 +20,21 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 import { ERRORS, LIMITS } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
 import ErrorToast from "@/components/ui/ErrorToast";
 import CharCounter from "@/components/ui/CharCounter";
 
 const MOODS = [
-  { word: "سعيد", en: "happy", color: Colors.accent, intensity: 4 },
-  { word: "هادئ", en: "calm", color: Colors.secondary, intensity: 3 },
+  { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
+  { word: "هادئ", en: "calm", color: "#A8C5B2", intensity: 3 },
   { word: "ممتنّ", en: "grateful", color: "#9B59B6", intensity: 4 },
-  { word: "متعب", en: "tired", color: Colors.muted, intensity: 2 },
+  { word: "متعب", en: "tired", color: "#7A9A8A", intensity: 2 },
   { word: "قلق", en: "anxious", color: "#6B7FD7", intensity: 3 },
   { word: "حزين", en: "sad", color: "#5D6D8A", intensity: 2 },
-  { word: "غاضب", en: "angry", color: Colors.error, intensity: 2 },
-  { word: "متفائل", en: "hopeful", color: Colors.accent, intensity: 4 },
+  { word: "غاضب", en: "angry", color: "#B00020", intensity: 2 },
+  { word: "متفائل", en: "hopeful", color: "#74C69D", intensity: 4 },
 ];
 
 const MICRO_WIN_LABELS: Record<string, string> = {
@@ -54,6 +54,8 @@ function MoodChip({
   selected: boolean;
   onPress: () => void;
 }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -70,12 +72,12 @@ function MoodChip({
         style={[
           styles.moodChip,
           {
-            backgroundColor: selected ? mood.color + "22" : Colors.surfaceContainer,
+            backgroundColor: selected ? mood.color + "22" : T.surfaceContainer,
           },
         ]}
       >
         <View style={[styles.moodDot, { backgroundColor: mood.color, opacity: selected ? 1 : 0.5 }]} />
-        <Text style={[styles.moodWord, { color: selected ? mood.color : Colors.primary }]}>
+        <Text style={[styles.moodWord, { color: selected ? mood.color : T.primary }]}>
           {mood.word}
         </Text>
       </Pressable>
@@ -91,6 +93,8 @@ interface WinResult {
 }
 
 function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => void }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const isLevelUp = !!result?.levelUp;
   const LEVEL_NAMES: Record<string, string> = {
     awareness: "الإدراك",
@@ -111,7 +115,7 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
           ) : (
             <>
               <Text style={styles.winEmoji}>✨</Text>
-              <Text style={styles.winTitle}>+{result.xpEarned} نقطة</Text>
+              <Text style={styles.winTitle}>+{result.xpEarned} نقاط</Text>
             </>
           )}
           {result.streakDays > 0 && (
@@ -138,6 +142,8 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
 export default function MoodScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId } = useSession();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const [selectedMood, setSelectedMood] = useState<(typeof MOODS)[0] | null>(null);
   const [intensity, setIntensity] = useState(3);
   const [notes, setNotes] = useState("");
@@ -221,9 +227,9 @@ export default function MoodScreen() {
   }
 
   return (
-    <>
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
       <ScrollView
-        style={[styles.container, { backgroundColor: Colors.surface }]}
+        style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: webBottom + 80 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -266,7 +272,7 @@ export default function MoodScreen() {
                       style={[
                         styles.intensityDot,
                         {
-                          backgroundColor: i <= intensity ? Colors.accent : Colors.surfaceContainerHigh,
+                          backgroundColor: i <= intensity ? T.accent : T.surfaceContainerHigh,
                           transform: [{ scale: i <= intensity ? 1 : 0.8 }],
                         },
                       ]}
@@ -291,7 +297,7 @@ export default function MoodScreen() {
                     setNotes(text);
                   }}
                   placeholder="أخبرني أكثر عن شعورك..."
-                  placeholderTextColor={Colors.muted}
+                  placeholderTextColor={T.muted}
                   multiline
                   numberOfLines={3}
                   textAlign="right"
@@ -316,7 +322,7 @@ export default function MoodScreen() {
                     style={styles.saveBtn}
                   >
                     {isSaving ? (
-                      <ActivityIndicator color={Colors.surface} />
+                      <ActivityIndicator color={T.surface} />
                     ) : (
                       <Text style={styles.saveBtnText}>حفظ المشاعر ✨</Text>
                     )}
@@ -342,11 +348,12 @@ export default function MoodScreen() {
         severity={toast.severity}
         onDismiss={() => setToast(t => ({ ...t, visible: false }))}
       />
-    </>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1 },
   header: {
     paddingHorizontal: 24,
@@ -356,35 +363,35 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 28,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
     letterSpacing: -0.3,
   },
   headerSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
     marginTop: 4,
     textAlign: "right",
   },
   savedCard: {
     margin: 24,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     borderRadius: 20,
     padding: 32,
     alignItems: "center",
     gap: 8,
   },
-  savedIcon: { fontSize: 40, color: Colors.accent },
+  savedIcon: { fontSize: 40, color: T.accent },
   savedText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 22,
-    color: Colors.onSurface,
+    color: T.onSurface,
   },
   savedSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
   },
   moodGrid: {
     flexDirection: "row",
@@ -410,7 +417,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 15,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
     marginBottom: 12,
   },
@@ -420,14 +427,14 @@ const styles = StyleSheet.create({
   intensityLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
   },
   notesSection: { paddingHorizontal: 24, marginBottom: 16 },
   notesInput: {
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 16,
     padding: 16,
-    color: Colors.onSurface,
+    color: T.onSurface,
     fontFamily: "Tajawal_400Regular",
     fontSize: 15,
     minHeight: 100,
@@ -435,7 +442,7 @@ const styles = StyleSheet.create({
   },
   notesInputError: {
     borderWidth: 1,
-    borderColor: Colors.error + "66",
+    borderColor: T.error + "66",
   },
   saveSection: { paddingHorizontal: 24, marginBottom: 16 },
   saveBtn: {
@@ -446,18 +453,18 @@ const styles = StyleSheet.create({
   saveBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 17,
-    color: Colors.surface,
+    color: T.surface,
   },
   historySection: { paddingHorizontal: 24, marginTop: 8 },
   infoCard: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     padding: 16,
   },
   infoText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
     lineHeight: 22,
     textAlign: "right",
   },
@@ -469,7 +476,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   winModal: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 28,
     padding: 28,
     alignItems: "center",
@@ -481,15 +488,15 @@ const styles = StyleSheet.create({
   winTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 24,
-    color: Colors.onSurface,
+    color: T.onSurface,
   },
   winLevel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 20,
-    color: Colors.accent,
+    color: T.accent,
   },
   streakBadge: {
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -497,7 +504,7 @@ const styles = StyleSheet.create({
   streakBadgeText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: Colors.accent,
+    color: T.accent,
   },
   winRow: {
     flexDirection: "row",
@@ -508,24 +515,24 @@ const styles = StyleSheet.create({
   winRowLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.primary,
+    color: T.primary,
     flex: 1,
     textAlign: "right",
   },
   winRowPoints: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 14,
-    color: Colors.accent,
+    color: T.accent,
   },
   winEncouragement: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
     lineHeight: 22,
   },
   winCloseBtn: {
-    backgroundColor: Colors.accent,
+    backgroundColor: T.accent,
     borderRadius: 999,
     paddingHorizontal: 28,
     paddingVertical: 12,
@@ -534,6 +541,7 @@ const styles = StyleSheet.create({
   winCloseBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 15,
-    color: Colors.surface,
+    color: T.surface,
   },
-});
+  });
+}

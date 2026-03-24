@@ -138,8 +138,8 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
               { opacity: Animated.multiply(glow, 0.35), transform: [{ rotate: spin }] },
             ]}
           />
-          <Feather name="feather" size={28} color="rgba(255,255,255,0.9)" />
-          <Text style={orbStyles.orbLabel}>BREATHE</Text>
+          <Text style={orbStyles.orbLabel}>تنفّس</Text>
+          <Text style={orbStyles.orbSub}>جلسة هدوء</Text>
         </LinearGradient>
       </Animated.View>
     </Pressable>
@@ -195,17 +195,24 @@ const orbStyles = StyleSheet.create({
     borderRadius: 76,
   },
   orbLabel: {
-    fontFamily: "BeVietnamPro_500Medium",
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 20,
+    color: "rgba(255,255,255,0.97)",
+    textAlign: "center",
+  },
+  orbSub: {
+    fontFamily: "Tajawal_400Regular",
     fontSize: 10,
-    color: "rgba(255,255,255,0.95)",
-    letterSpacing: 3,
+    color: "rgba(255,255,255,0.75)",
+    textAlign: "center",
+    letterSpacing: 0.5,
   },
 });
 
 // ─── Home Screen ──────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { greeting, gender, setLastMoodWord } = useSession();
+  const { greeting, gender, sessionId, setLastMoodWord } = useSession();
   const { theme } = useThemeContext();
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
@@ -249,8 +256,16 @@ export default function HomeScreen() {
       >
         <BreathingSession
           visible={breathingOpen}
-          onClose={(completed) => {
+          onClose={(completed, postMood) => {
             setBreathingOpen(false);
+            if (completed && postMood && sessionId) {
+              fetch(`${BASE}/api/mood`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sessionId, mood: postMood, intensity: 3, notes: "بعد جلسة التنفس", source: "breathing" }),
+              }).catch(() => {});
+              setLastMoodWord(postMood);
+            }
             if (completed) router.push("/(tabs)/insights");
           }}
         />
@@ -283,16 +298,23 @@ export default function HomeScreen() {
           <IridescentOrb orbColors={theme.orbColors} />
 
           <View style={styles.breatheSubRow}>
+            <Text style={styles.breatheLabel}>جلسة هدوء لمدة دقيقة</Text>
             <Pressable
-              style={styles.playBtn}
+              style={styles.startNowBtn}
               onPress={() => {
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setBreathingOpen(true);
               }}
             >
-              <Feather name="play" size={14} color="rgba(255,255,255,0.9)" />
+              <LinearGradient
+                colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.startNowBtnGrad}
+              >
+                <Text style={styles.startNowText}>ابدأ الآن</Text>
+              </LinearGradient>
             </Pressable>
-            <Text style={styles.breatheLabel}>تنفس بعمق... شهيق، زفير</Text>
           </View>
 
           {Platform.OS !== "web" ? (
@@ -455,26 +477,38 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   breatheSubRow: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 12,
     marginBottom: 20,
     marginTop: 6,
-  },
-  playBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 24,
   },
   breatheLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     color: "rgba(255,255,255,0.85)",
     textAlign: "center",
+  },
+  startNowBtn: {
+    borderRadius: 24,
+    overflow: "hidden",
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
+  },
+  startNowBtnGrad: {
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 24,
+  },
+  startNowText: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 18,
+    color: "#FFFFFF",
+    letterSpacing: 0.5,
   },
   moodCard: {
     marginHorizontal: 16,

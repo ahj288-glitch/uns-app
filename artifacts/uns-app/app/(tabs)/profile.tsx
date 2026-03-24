@@ -14,7 +14,8 @@ import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSession } from "@/contexts/SessionContext";
 
 const DIALECTS = [
@@ -47,22 +48,26 @@ function SettingRow({
   onPress?: () => void;
   danger?: boolean;
 }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   return (
     <Pressable style={styles.settingRow} onPress={onPress} disabled={!onPress}>
-      <View style={[styles.settingIcon, { backgroundColor: danger ? Colors.error + "20" : Colors.surfaceContainerHigh }]}>
-        <Feather name={icon} size={16} color={danger ? Colors.error : Colors.accent} />
+      <View style={[styles.settingIcon, { backgroundColor: danger ? T.error + "20" : T.surfaceContainerHigh }]}>
+        <Feather name={icon} size={16} color={danger ? T.error : T.accent} />
       </View>
       <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, danger && { color: Colors.error }]}>{title}</Text>
+        <Text style={[styles.settingTitle, danger && { color: T.error }]}>{title}</Text>
         {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
-      {rightElement ?? (onPress ? <Feather name="chevron-right" size={16} color={Colors.muted} /> : null)}
+      {rightElement ?? (onPress ? <Feather name="chevron-right" size={16} color={T.muted} /> : null)}
     </Pressable>
   );
 }
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const { dialect, setDialect } = useSession();
   const [notifications, setNotifications] = useState(true);
   const [spiritual, setSpiritual] = useState(true);
@@ -90,8 +95,9 @@ export default function ProfileScreen() {
   }
 
   return (
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.surface }]}
+      style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
@@ -122,7 +128,7 @@ export default function ProfileScreen() {
               }}
             >
               <Text style={styles.dialectFlag}>{d.flag}</Text>
-              <Text style={[styles.dialectLabel, { color: dialect === d.id ? Colors.accent : Colors.primary }]}>
+              <Text style={[styles.dialectLabel, { color: dialect === d.id ? T.accent : T.primary }]}>
                 {d.ar}
               </Text>
             </Pressable>
@@ -141,8 +147,8 @@ export default function ProfileScreen() {
               <Switch
                 value={notifications}
                 onValueChange={v => { setNotifications(v); Haptics.selectionAsync(); }}
-                trackColor={{ false: Colors.surfaceContainerHigh, true: Colors.accent }}
-                thumbColor={Colors.onSurface}
+                trackColor={{ false: T.surfaceContainerHigh, true: T.accent }}
+                thumbColor={T.onSurface}
               />
             }
           />
@@ -154,8 +160,8 @@ export default function ProfileScreen() {
               <Switch
                 value={spiritual}
                 onValueChange={v => { setSpiritual(v); Haptics.selectionAsync(); }}
-                trackColor={{ false: Colors.surfaceContainerHigh, true: Colors.accent }}
-                thumbColor={Colors.onSurface}
+                trackColor={{ false: T.surfaceContainerHigh, true: T.accent }}
+                thumbColor={T.onSurface}
               />
             }
           />
@@ -179,7 +185,7 @@ export default function ProfileScreen() {
         <View style={styles.privacyCard}>
           {PRIVACY_ITEMS.map((item, i) => (
             <View key={i} style={styles.privacyItem}>
-              <Feather name="shield" size={14} color={Colors.accent} />
+              <Feather name="shield" size={14} color={T.accent} />
               <Text style={styles.privacyText}>{item}</Text>
             </View>
           ))}
@@ -189,7 +195,7 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>أزمات نفسية؟</Text>
         <View style={styles.crisisCard}>
-          <Feather name="phone" size={20} color={Colors.error} />
+          <Feather name="phone" size={20} color={T.error} />
           <Text style={styles.crisisTitle}>خطوط الدعم النفسي</Text>
           {[
             { country: "السعودية", num: "920033360" },
@@ -216,10 +222,12 @@ export default function ProfileScreen() {
 
       <Text style={styles.footer}>أُنْس  •  v1.0.0{"\n"}نحن لا نبيع مشاعرك.</Text>
     </ScrollView>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1 },
   header: {
     alignItems: "center",
@@ -232,7 +240,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -247,23 +255,23 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 36,
-    color: Colors.accent,
+    color: T.accent,
   },
   userName: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 24,
-    color: Colors.onSurface,
+    color: T.onSurface,
   },
   userSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: Colors.muted,
+    color: T.muted,
   },
   section: { paddingHorizontal: 20, paddingTop: 20, gap: 12 },
   sectionTitle: {
     fontFamily: "Tajawal_500Medium",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "right",
     letterSpacing: 0.5,
     textTransform: "uppercase",
@@ -278,13 +286,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   dialectChipActive: {
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
   },
   dialectFlag: { fontSize: 16 },
   dialectLabel: {
@@ -292,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   settingsList: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     overflow: "hidden",
   },
@@ -313,16 +321,16 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 16,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
   },
   settingSubtitle: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
   },
   privacyCard: {
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     borderRadius: 16,
     padding: 16,
     gap: 10,
@@ -336,12 +344,12 @@ const styles = StyleSheet.create({
   privacyText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.primary,
+    color: T.primary,
     flex: 1,
     textAlign: "right",
   },
   crisisCard: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     padding: 16,
     gap: 10,
@@ -350,26 +358,27 @@ const styles = StyleSheet.create({
   crisisTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
   },
   crisisLine: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
   crisisCountry: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: Colors.muted,
+    color: T.muted,
   },
   crisisNum: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 14,
-    color: Colors.error,
+    color: T.error,
   },
   footer: {
     fontFamily: "BeVietnamPro_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
     paddingVertical: 32,
     lineHeight: 20,
   },
-});
+  });
+}

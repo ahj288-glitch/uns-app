@@ -20,7 +20,8 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
-import Colors from "@/constants/colors";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTokens } from "@/constants/colors";
 
 const PROMPTS = [
   "ما الذي يشغل تفكيرك الآن؟",
@@ -74,11 +75,13 @@ const SAMPLE_ENTRIES = [
   },
 ];
 
-type View = "list" | "write" | "entry";
+type JournalView = "list" | "write" | "entry";
 
 export default function JournalScreen() {
   const insets = useSafeAreaInsets();
-  const [view, setView] = useState<View>("list");
+  const T = useTokens();
+  const styles = makeStyles(T);
+  const [view, setView] = useState<JournalView>("list");
   const [text, setText] = useState("");
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [prompt, setPrompt] = useState(PROMPTS[Math.floor(Math.random() * PROMPTS.length)]);
@@ -116,13 +119,13 @@ export default function JournalScreen() {
   if (view === "write") {
     return (
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: Colors.background }}
+        style={{ flex: 1, backgroundColor: T.surface }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <View style={[styles.writeHeader, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity onPress={() => { setView("list"); setText(""); setSelectedMood(null); }} style={styles.backBtn}>
-            <Feather name="x" size={20} color={Colors.textMuted} />
+            <Feather name="x" size={20} color={T.muted} />
           </TouchableOpacity>
           <Text style={styles.writeTitle}>تدوينة جديدة</Text>
           <Animated.View style={saveAnimStyle}>
@@ -131,7 +134,7 @@ export default function JournalScreen() {
               style={[styles.saveBtn, !text.trim() && styles.saveBtnDisabled]}
               disabled={!text.trim()}
             >
-              <Text style={[styles.saveBtnText, !text.trim() && { color: Colors.textMuted }]}>حفظ</Text>
+              <Text style={[styles.saveBtnText, !text.trim() && { color: T.muted }]}>حفظ</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -150,10 +153,10 @@ export default function JournalScreen() {
                 <TouchableOpacity
                   key={m.key}
                   onPress={() => setSelectedMood(m.key === selectedMood ? null : m.key)}
-                  style={[styles.moodChip, selectedMood === m.key && { backgroundColor: Colors.primaryContainer, borderColor: Colors.primary }]}
+                  style={[styles.moodChip, selectedMood === m.key && { backgroundColor: T.primaryContainer, borderColor: T.primary }]}
                 >
                   <Text style={styles.moodEmoji}>{m.emoji}</Text>
-                  <Text style={[styles.moodLabel, selectedMood === m.key && { color: Colors.primary }]}>{m.label}</Text>
+                  <Text style={[styles.moodLabel, selectedMood === m.key && { color: T.primary }]}>{m.label}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -163,11 +166,11 @@ export default function JournalScreen() {
           <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.promptBox}>
             <View style={styles.promptRow}>
               <TouchableOpacity onPress={refreshPrompt} style={styles.promptRefreshBtn}>
-                <Feather name="refresh-cw" size={13} color={Colors.primary} />
+                <Feather name="refresh-cw" size={13} color={T.primary} />
               </TouchableOpacity>
               <Text style={styles.promptLabel}>اقتراح</Text>
             </View>
-            <Text style={styles.promptText} dir="rtl">{prompt}</Text>
+            <Text style={styles.promptText}>{prompt}</Text>
           </Animated.View>
 
           {/* Text input */}
@@ -178,7 +181,7 @@ export default function JournalScreen() {
               value={text}
               onChangeText={setText}
               placeholder="ابدأ بكتابة أفكارك هنا... لا أحد سيقرأ هذا سواك"
-              placeholderTextColor={Colors.textMuted + "80"}
+              placeholderTextColor={T.muted + "80"}
               multiline
               textAlign="right"
               maxLength={MAX_CHARS}
@@ -190,7 +193,7 @@ export default function JournalScreen() {
         {/* Footer */}
         <View style={[styles.writeFooter, { paddingBottom: insets.bottom + 12 }]}>
           <View style={styles.footerLeft}>
-            <Feather name="lock" size={12} color={Colors.textMuted} />
+            <Feather name="lock" size={12} color={T.muted} />
             <Text style={styles.footerPrivate}>خاص تماماً</Text>
           </View>
           <View style={styles.footerRight}>
@@ -205,7 +208,7 @@ export default function JournalScreen() {
 
         {showSaved && (
           <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.savedToast}>
-            <Feather name="check-circle" size={16} color={Colors.primary} />
+            <Feather name="check-circle" size={16} color={T.primary} />
             <Text style={styles.savedToastText}>تم حفظ تدوينتك ✓</Text>
           </Animated.View>
         )}
@@ -214,7 +217,7 @@ export default function JournalScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -222,7 +225,7 @@ export default function JournalScreen() {
           <Text style={styles.headerSub}>مساحتك الخاصة — لا أحد يقرأها سواك</Text>
         </View>
         <TouchableOpacity onPress={() => setView("write")} style={styles.newEntryBtn}>
-          <Feather name="edit-3" size={16} color={Colors.background} />
+          <Feather name="edit-3" size={16} color={T.surface} />
           <Text style={styles.newEntryBtnText}>تدوينة</Text>
         </TouchableOpacity>
       </View>
@@ -248,13 +251,13 @@ export default function JournalScreen() {
         {/* Today prompt if no entry */}
         <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.todayPromptCard}>
           <View style={styles.todayPromptTop}>
-            <Feather name="sun" size={16} color={Colors.primary} />
+            <Feather name="sun" size={16} color={T.primary} />
             <Text style={styles.todayPromptLabel}>سؤال اليوم</Text>
           </View>
-          <Text style={styles.todayPromptText} dir="rtl">{PROMPTS[0]}</Text>
+          <Text style={styles.todayPromptText}>{PROMPTS[0]}</Text>
           <TouchableOpacity onPress={() => setView("write")} style={styles.writeNowBtn}>
             <Text style={styles.writeNowBtnText}>اكتب الآن</Text>
-            <Feather name="arrow-left" size={14} color={Colors.primary} />
+            <Feather name="arrow-left" size={14} color={T.primary} />
           </TouchableOpacity>
         </Animated.View>
 
@@ -273,12 +276,12 @@ export default function JournalScreen() {
                   <Text style={styles.entryMoodLabel}>{entry.mood.label}</Text>
                 </View>
               </View>
-              <Text style={styles.entryPreview} dir="rtl" numberOfLines={2}>{entry.preview}</Text>
+              <Text style={styles.entryPreview} numberOfLines={2}>{entry.preview}</Text>
               <View style={styles.entryFooter}>
                 <Text style={styles.entryWordCount}>{entry.wordCount} كلمة</Text>
                 {entry.hasReflection && (
                   <View style={styles.reflectionBadge}>
-                    <Feather name="message-circle" size={11} color={Colors.primary} />
+                    <Feather name="message-circle" size={11} color={T.primary} />
                     <Text style={styles.reflectionBadgeText}>رد المرافق</Text>
                   </View>
                 )}
@@ -289,18 +292,18 @@ export default function JournalScreen() {
 
         {/* Privacy notice */}
         <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.privacyNotice}>
-          <Feather name="shield" size={14} color={Colors.textMuted} />
+          <Feather name="shield" size={14} color={T.muted} />
           <Text style={styles.privacyNoticeText}>تدويناتك مشفّرة ولا يمكن لأحد من فريق أُنْس قراءتها</Text>
         </Animated.View>
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: "row-reverse",
@@ -313,13 +316,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 24,
-    color: Colors.text,
+    color: T.onSurface,
     textAlign: "right",
   },
   headerSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.textMuted,
+    color: T.muted,
     textAlign: "right",
     marginTop: 2,
   },
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: Colors.primary,
+    backgroundColor: T.primary,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
@@ -335,7 +338,7 @@ const styles = StyleSheet.create({
   newEntryBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.background,
+    color: T.surface,
   },
   statsRow: {
     flexDirection: "row-reverse",
@@ -344,7 +347,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     padding: 14,
     alignItems: "center",
@@ -352,21 +355,21 @@ const styles = StyleSheet.create({
   statValue: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 22,
-    color: Colors.primary,
+    color: T.primary,
   },
   statLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.textMuted,
+    color: T.muted,
     marginTop: 2,
   },
   todayPromptCard: {
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 20,
     padding: 18,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: Colors.primary + "30",
+    borderColor: T.primary + "30",
   },
   todayPromptTop: {
     flexDirection: "row-reverse",
@@ -377,12 +380,12 @@ const styles = StyleSheet.create({
   todayPromptLabel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 12,
-    color: Colors.primary,
+    color: T.primary,
   },
   todayPromptText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: Colors.text,
+    color: T.onSurface,
     lineHeight: 24,
     textAlign: "right",
     marginBottom: 14,
@@ -396,17 +399,17 @@ const styles = StyleSheet.create({
   writeNowBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.primary,
+    color: T.primary,
   },
   sectionHeading: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 16,
-    color: Colors.text,
+    color: T.onSurface,
     textAlign: "right",
     marginBottom: 12,
   },
   entryCard: {
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 18,
     padding: 16,
     marginBottom: 10,
@@ -423,18 +426,18 @@ const styles = StyleSheet.create({
   entryDate: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 12,
-    color: Colors.text,
+    color: T.onSurface,
   },
   entryTime: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.textMuted,
+    color: T.muted,
   },
   entryMoodPill: {
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 4,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
@@ -445,12 +448,12 @@ const styles = StyleSheet.create({
   entryMoodLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.primary,
+    color: T.primary,
   },
   entryPreview: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: Colors.textMuted,
+    color: T.muted,
     lineHeight: 20,
     marginBottom: 10,
   },
@@ -462,13 +465,13 @@ const styles = StyleSheet.create({
   entryWordCount: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.textMuted,
+    color: T.muted,
   },
   reflectionBadge: {
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 4,
-    backgroundColor: Colors.primaryContainer + "80",
+    backgroundColor: T.primaryContainer + "80",
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,
@@ -476,7 +479,7 @@ const styles = StyleSheet.create({
   reflectionBadgeText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.primary,
+    color: T.primary,
   },
   privacyNotice: {
     flexDirection: "row-reverse",
@@ -484,13 +487,13 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: 12,
     padding: 14,
-    backgroundColor: Colors.card + "80",
+    backgroundColor: T.surfaceContainer + "80",
     borderRadius: 14,
   },
   privacyNoticeText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.textMuted,
+    color: T.muted,
     textAlign: "right",
     flex: 1,
   },
@@ -502,7 +505,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: Colors.background,
+    backgroundColor: T.surface,
     borderBottomWidth: 0,
   },
   backBtn: {
@@ -511,26 +514,26 @@ const styles = StyleSheet.create({
   writeTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 16,
-    color: Colors.text,
+    color: T.onSurface,
   },
   saveBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: T.primary,
     paddingHorizontal: 16,
     paddingVertical: 7,
     borderRadius: 20,
   },
   saveBtnDisabled: {
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
   },
   saveBtnText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.background,
+    color: T.surface,
   },
   sectionLabel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.textMuted,
+    color: T.muted,
     textAlign: "right",
     marginBottom: 10,
   },
@@ -538,7 +541,7 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 5,
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 20,
@@ -552,15 +555,15 @@ const styles = StyleSheet.create({
   moodLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.textMuted,
+    color: T.muted,
   },
   promptBox: {
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     padding: 14,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: Colors.primary + "20",
+    borderColor: T.primary + "20",
   },
   promptRow: {
     flexDirection: "row",
@@ -572,7 +575,7 @@ const styles = StyleSheet.create({
   promptLabel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 11,
-    color: Colors.primary,
+    color: T.primary,
   },
   promptRefreshBtn: {
     padding: 4,
@@ -580,14 +583,14 @@ const styles = StyleSheet.create({
   promptText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.text,
+    color: T.onSurface,
     lineHeight: 22,
     textAlign: "right",
   },
   journalInput: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: Colors.text,
+    color: T.onSurface,
     lineHeight: 26,
     textAlign: "right",
     minHeight: 200,
@@ -599,9 +602,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 10,
-    backgroundColor: Colors.background,
+    backgroundColor: T.surface,
     borderTopWidth: 1,
-    borderTopColor: Colors.card,
+    borderTopColor: T.surfaceContainer,
   },
   footerLeft: {
     flexDirection: "row",
@@ -611,7 +614,7 @@ const styles = StyleSheet.create({
   footerPrivate: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.textMuted,
+    color: T.muted,
   },
   footerRight: {
     flexDirection: "row",
@@ -621,7 +624,7 @@ const styles = StyleSheet.create({
   wordCountText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.textMuted,
+    color: T.muted,
   },
   charCountText: {
     fontFamily: "Tajawal_400Regular",
@@ -635,7 +638,7 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 8,
-    backgroundColor: Colors.card,
+    backgroundColor: T.surfaceContainer,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -647,6 +650,7 @@ const styles = StyleSheet.create({
   savedToastText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.primary,
+    color: T.primary,
   },
-});
+  });
+}

@@ -16,7 +16,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 import { ERRORS, LIMITS, formatError } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -86,6 +86,8 @@ function getResetTimeLabel(): string {
 // ─── Sub-components ────────────────────────────────────────────────────────
 
 function TimestampPill({ date }: { date: Date }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const label = date.toLocaleDateString("ar-SA", {
     weekday: "long",
     day: "numeric",
@@ -101,6 +103,8 @@ function TimestampPill({ date }: { date: Date }) {
 }
 
 function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: string }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const isUser = message.role === "user";
   return (
     <Animated.View
@@ -125,7 +129,7 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: 
         </Text>
         {message.crisisDetected && (
           <View style={styles.crisisBox}>
-            <Feather name="phone" size={11} color={Colors.error} />
+            <Feather name="phone" size={11} color={T.error} />
             <Text style={styles.crisisText}>
               {CRISIS_RESOURCES.map(r => `${r.country}: ${r.number}`).join("  |  ")}
             </Text>
@@ -142,6 +146,8 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId, greeting, gender, lastMoodWord } = useSession();
   const { theme } = useThemeContext();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const quickReplies = getContextualSuggestions(gender, lastMoodWord, new Date().getHours());
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -413,7 +419,7 @@ export default function ChatScreen() {
   // ─── Render ───────────────────────────────────────────────────────────
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors.surface }]}>
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
       {theme.surfaceTint !== "transparent" && (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
       )}
@@ -421,13 +427,13 @@ export default function ChatScreen() {
 
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
         <Pressable onPress={() => router.push("/(tabs)/community")} style={styles.headerBtn}>
-          <Feather name="users" size={18} color={Colors.muted} />
+          <Feather name="users" size={18} color={T.muted} />
         </Pressable>
         <Text style={styles.headerTitle}>أُنْس</Text>
         <View style={styles.headerRight}>
           {dailyCount > 0 && !dailyLimitReached && (
             <View style={[styles.msgCountPill, dailyCount >= DAILY_WARN && styles.msgCountPillWarn]}>
-              <Feather name="message-circle" size={10} color={dailyCount >= DAILY_WARN ? "#F4B942" : Colors.muted} />
+              <Feather name="message-circle" size={10} color={dailyCount >= DAILY_WARN ? "#F4B942" : T.muted} />
               <Text style={[styles.msgCountText, dailyCount >= DAILY_WARN && styles.msgCountTextWarn]}>
                 {dailyRemaining}
               </Text>
@@ -488,7 +494,7 @@ export default function ChatScreen() {
                     <Text style={styles.avatarText}>أ</Text>
                   </View>
                   <View style={styles.typingBubble}>
-                    <ActivityIndicator size="small" color={Colors.accent} />
+                    <ActivityIndicator size="small" color={T.accent} />
                   </View>
                 </View>
               ) : null
@@ -527,7 +533,7 @@ export default function ChatScreen() {
                 style={[styles.inputBar, isOverCharLimit && styles.inputBarError]}
               >
                 <Pressable style={styles.attachBtn}>
-                  <Feather name="plus" size={20} color={Colors.muted} />
+                  <Feather name="plus" size={20} color={T.muted} />
                 </Pressable>
                 <TextInput
                   style={styles.input}
@@ -541,7 +547,7 @@ export default function ChatScreen() {
                       ? `انتظر ${rateLimitCountdown}ث...`
                       : "اكتب ما يدور في خاطرك..."
                   }
-                  placeholderTextColor={Colors.muted}
+                  placeholderTextColor={T.muted}
                   multiline
                   textAlign="right"
                   editable={!isSending && rateLimitCountdown === 0}
@@ -566,7 +572,7 @@ export default function ChatScreen() {
                   {rateLimitCountdown > 0 ? (
                     <Text style={styles.countdownText}>{rateLimitCountdown}</Text>
                   ) : (
-                    <Feather name="arrow-right" size={18} color={Colors.surface} />
+                    <Feather name="arrow-right" size={18} color={T.surface} />
                   )}
                 </LinearGradient>
               </Pressable>
@@ -583,13 +589,14 @@ export default function ChatScreen() {
         onAction={toast.onAction}
         onDismiss={hideToast}
       />
-    </View>
+    </LinearGradient>
   );
 }
 
 // ─── Styles ────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1 },
   flex: { flex: 1 },
   header: {
@@ -614,19 +621,19 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.accent,
+    backgroundColor: T.accent,
   },
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 22,
-    color: Colors.accent,
+    color: T.accent,
     letterSpacing: -0.5,
   },
   msgCountPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 12,
     paddingHorizontal: 9,
     paddingVertical: 4,
@@ -637,7 +644,7 @@ const styles = StyleSheet.create({
   msgCountText: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 11,
-    color: Colors.muted,
+    color: T.muted,
   },
   msgCountTextWarn: {
     color: "#F4B942",
@@ -653,7 +660,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   timestampPill: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 5,
@@ -661,7 +668,7 @@ const styles = StyleSheet.create({
   timestampText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
   },
   companionWelcome: {
     flexDirection: "row",
@@ -672,22 +679,22 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   avatarDotError: {
-    backgroundColor: Colors.error + "22",
+    backgroundColor: T.error + "22",
   },
   avatarText: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 16,
-    color: Colors.accent,
+    color: T.accent,
   },
   welcomeBubble: {
     flex: 1,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 18,
     borderBottomLeftRadius: 4,
     padding: 14,
@@ -695,7 +702,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 16,
-    color: Colors.onSurface,
+    color: T.onSurface,
     lineHeight: 26,
     textAlign: "right",
   },
@@ -724,15 +731,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   bubbleUser: {
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     borderBottomRightRadius: 4,
   },
   bubbleCompanion: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderBottomLeftRadius: 4,
   },
   bubbleError: {
-    backgroundColor: Colors.error + "18",
+    backgroundColor: T.error + "18",
   },
   bubbleText: {
     fontSize: 16,
@@ -741,11 +748,11 @@ const styles = StyleSheet.create({
   },
   bubbleTextUser: {
     fontFamily: "Tajawal_400Regular",
-    color: Colors.primary,
+    color: T.primary,
   },
   bubbleTextCompanion: {
     fontFamily: "Tajawal_400Regular",
-    color: Colors.onSurface,
+    color: T.onSurface,
   },
   crisisBox: {
     flexDirection: "row",
@@ -757,7 +764,7 @@ const styles = StyleSheet.create({
   crisisText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 10,
-    color: Colors.error,
+    color: T.error,
     flex: 1,
     textAlign: "right",
   },
@@ -769,7 +776,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   typingBubble: {
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 16,
@@ -783,7 +790,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   quickChip: {
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -794,7 +801,7 @@ const styles = StyleSheet.create({
   quickChipText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: Colors.primary,
+    color: T.primary,
   },
   inputContainer: {
     flexDirection: "row",
@@ -802,13 +809,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
     paddingTop: 10,
-    backgroundColor: Colors.surface,
+    backgroundColor: T.surface,
   },
   inputBar: {
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
-    backgroundColor: Platform.OS === "ios" ? "rgba(26,46,38,0.85)" : Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 22,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -817,7 +824,7 @@ const styles = StyleSheet.create({
   },
   inputBarError: {
     borderWidth: 1,
-    borderColor: Colors.error + "66",
+    borderColor: T.error + "66",
   },
   attachBtn: {
     width: 32,
@@ -829,7 +836,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    color: Colors.onSurface,
+    color: T.onSurface,
     fontFamily: "Tajawal_400Regular",
     minHeight: 32,
     maxHeight: 120,
@@ -847,6 +854,7 @@ const styles = StyleSheet.create({
   countdownText: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 14,
-    color: Colors.surface,
+    color: T.surface,
   },
-});
+  });
+}

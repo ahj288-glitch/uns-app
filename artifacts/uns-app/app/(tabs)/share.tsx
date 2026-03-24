@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 
 // ─── Tone Library ──────────────────────────────────────────────────────────
 const QUOTE_BANK: Record<string, string[]> = {
@@ -88,6 +88,8 @@ const PRIVACY = [
 // ─── Sub-components ────────────────────────────────────────────────────────
 
 function AuraCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string }) {
+  const T = useTokens();
+  const cardStyles = makeCardStyles(T);
   const pulse = useRef(new Animated.Value(1)).current;
   React.useEffect(() => {
     const anim = Animated.loop(
@@ -119,14 +121,16 @@ function AuraCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string 
 }
 
 function InsightCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string }) {
+  const T = useTokens();
+  const cardStyles = makeCardStyles(T);
   return (
     <LinearGradient colors={aura.bg} style={cardStyles.card}>
       <Text style={cardStyles.brand}>أُنْس</Text>
       <View style={cardStyles.insightIconWrap}>
         <Feather name="feather" size={36} color={aura.color} />
       </View>
-      <Text style={[cardStyles.bigQuote, { color: Colors.onSurface }]}>"</Text>
-      <Text style={[cardStyles.insightQuote, { color: Colors.onSurface }]}>{quote}</Text>
+      <Text style={[cardStyles.bigQuote, { color: T.onSurface }]}>"</Text>
+      <Text style={[cardStyles.insightQuote, { color: T.onSurface }]}>{quote}</Text>
       <View style={[cardStyles.quoteBar, { backgroundColor: aura.color }]} />
       <Text style={[cardStyles.auraLabel, { color: aura.color }]}>{aura.label}</Text>
       <View style={cardStyles.cardFooter}>
@@ -137,6 +141,8 @@ function InsightCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: stri
 }
 
 function StreakCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string }) {
+  const T = useTokens();
+  const cardStyles = makeCardStyles(T);
   const streak = 7;
   return (
     <LinearGradient colors={aura.bg} style={cardStyles.card}>
@@ -152,12 +158,12 @@ function StreakCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: strin
             key={i}
             style={[
               cardStyles.dot,
-              { backgroundColor: i < streak ? aura.color : Colors.surfaceContainerHigh },
+              { backgroundColor: i < streak ? aura.color : "rgba(255,255,255,0.6)" },
             ]}
           />
         ))}
       </View>
-      <Text style={[cardStyles.smallQuote, { color: Colors.muted }]}>{quote}</Text>
+      <Text style={[cardStyles.smallQuote, { color: T.muted }]}>{quote}</Text>
       <View style={cardStyles.cardFooter}>
         <Text style={cardStyles.footerCue}>سلسلتي على أُنْس</Text>
       </View>
@@ -166,6 +172,8 @@ function StreakCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: strin
 }
 
 function SummaryCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string }) {
+  const T = useTokens();
+  const cardStyles = makeCardStyles(T);
   return (
     <LinearGradient colors={aura.bg} style={cardStyles.card}>
       <Text style={cardStyles.brand}>أُنْس</Text>
@@ -183,7 +191,7 @@ function SummaryCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: stri
           </View>
         ))}
       </View>
-      <Text style={[cardStyles.smallQuote, { color: Colors.muted }]}>{quote}</Text>
+      <Text style={[cardStyles.smallQuote, { color: T.muted }]}>{quote}</Text>
       <View style={cardStyles.cardFooter}>
         <Text style={cardStyles.footerCue}>بصمتي اليومية على أُنْس</Text>
       </View>
@@ -192,12 +200,14 @@ function SummaryCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: stri
 }
 
 function NightCard({ aura, quote }: { aura: typeof AURA_STATES[0]; quote: string }) {
+  const T = useTokens();
+  const cardStyles = makeCardStyles(T);
   return (
     <LinearGradient colors={["#020d08", "#041710"]} style={cardStyles.card}>
       <Text style={cardStyles.brand}>أُنْس</Text>
       <Text style={cardStyles.moonEmoji}>🌙</Text>
       <Text style={[cardStyles.nightTitle, { color: aura.color }]}>لحظة هدوء ليلية</Text>
-      <Text style={[cardStyles.insightQuote, { color: Colors.onSurface }]}>{quote}</Text>
+      <Text style={[cardStyles.insightQuote, { color: T.onSurface }]}>{quote}</Text>
       <View style={[cardStyles.nightBar, { backgroundColor: aura.color + "30" }]}>
         <View style={[cardStyles.nightFill, { backgroundColor: aura.color, width: "72%" }]} />
       </View>
@@ -220,6 +230,8 @@ const CARD_COMPONENTS = {
 // ─── Main Screen ───────────────────────────────────────────────────────────
 export default function ShareScreen() {
   const insets = useSafeAreaInsets();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -251,8 +263,9 @@ export default function ShareScreen() {
   const CardComponent = CARD_COMPONENTS[cardType];
 
   return (
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.surface }]}
+      style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
@@ -261,8 +274,8 @@ export default function ShareScreen() {
         <Text style={styles.logo}>أُنْس</Text>
         <Text style={styles.headerTitle}>شارك حالتك</Text>
         <View style={styles.headerRight}>
-          <View style={[styles.privacyBadge, { borderColor: Colors.accent + "40" }]}>
-            <Feather name={PRIVACY.find(p => p.key === privacy)?.icon || "globe"} size={12} color={Colors.accent} />
+          <View style={[styles.privacyBadge, { borderColor: T.accent + "40" }]}>
+            <Feather name={PRIVACY.find(p => p.key === privacy)?.icon || "globe"} size={12} color={T.accent} />
             <Text style={styles.privacyBadgeText}>{PRIVACY.find(p => p.key === privacy)?.label}</Text>
           </View>
         </View>
@@ -275,7 +288,7 @@ export default function ShareScreen() {
 
       {/* Regenerate */}
       <Pressable style={styles.regenBtn} onPress={regenerate}>
-        <Feather name="refresh-cw" size={14} color={Colors.accent} />
+        <Feather name="refresh-cw" size={14} color={T.accent} />
         <Text style={styles.regenText}>توليد عبارة جديدة</Text>
       </Pressable>
 
@@ -321,7 +334,7 @@ export default function ShareScreen() {
               <Feather
                 name={c.icon}
                 size={14}
-                color={cardType === c.key ? Colors.surface : Colors.muted}
+                color={cardType === c.key ? T.surface : T.muted}
               />
               <Text style={[styles.cardTypePillText, cardType === c.key && styles.cardTypePillTextActive]}>
                 {c.label}
@@ -357,7 +370,7 @@ export default function ShareScreen() {
               style={[styles.privacyOption, privacy === p.key && styles.privacyOptionActive]}
               onPress={() => { setPrivacy(p.key); if (Platform.OS !== "web") Haptics.selectionAsync(); }}
             >
-              <Feather name={p.icon} size={16} color={privacy === p.key ? Colors.accent : Colors.muted} />
+              <Feather name={p.icon} size={16} color={privacy === p.key ? T.accent : T.muted} />
               <Text style={[styles.privacyText, privacy === p.key && styles.privacyTextActive]}>{p.label}</Text>
             </Pressable>
           ))}
@@ -372,17 +385,17 @@ export default function ShareScreen() {
       {/* Action Buttons */}
       <View style={styles.actionsRow}>
         <Pressable style={styles.saveBtn} onPress={regenerate}>
-          <Feather name="download" size={18} color={Colors.accent} />
+          <Feather name="download" size={18} color={T.accent} />
           <Text style={styles.saveBtnText}>حفظ</Text>
         </Pressable>
         <Pressable style={styles.shareBtn} onPress={handleShare}>
           <LinearGradient
-            colors={["#74C69D", "#1B4332"]}
+            colors={[T.accent, T.onSurface]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.shareBtnInner}
           >
-            <Feather name="share-2" size={18} color={Colors.surface} />
+            <Feather name="share-2" size={18} color={T.surface} />
             <Text style={styles.shareBtnText}>شارك بصمتك</Text>
           </LinearGradient>
         </Pressable>
@@ -392,11 +405,13 @@ export default function ShareScreen() {
         لا تُكشف أي بيانات عاطفية خاصة عند المشاركة. تتحكم أنت دائماً فيما يُشارك.
       </Text>
     </ScrollView>
+    </LinearGradient>
   );
 }
 
 // ─── Card Sub-styles ───────────────────────────────────────────────────────
-const cardStyles = StyleSheet.create({
+function makeCardStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   card: {
     width: "100%",
     aspectRatio: 9 / 16,
@@ -406,15 +421,15 @@ const cardStyles = StyleSheet.create({
     justifyContent: "space-between",
     overflow: "hidden",
   },
-  brand: { fontFamily: "Tajawal_700Bold", fontSize: 24, color: "#74C69D", textAlign: "right" },
-  brandSub: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: "#4a7a5e", letterSpacing: 2, textTransform: "uppercase", textAlign: "right" },
+  brand: { fontFamily: "Tajawal_700Bold", fontSize: 24, color: T.accent, textAlign: "right" },
+  brandSub: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", textAlign: "right" },
   orbWrap: { flex: 1, alignItems: "center", justifyContent: "center", width: "100%" },
   orbGlow: { position: "absolute", width: 150, height: 150, borderRadius: 75, opacity: 0.15 },
   orbCore: { width: 120, height: 120, borderRadius: 60, borderWidth: 1, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(27,67,50,0.6)" },
   orbEmoji: { fontFamily: "Tajawal_700Bold", fontSize: 20 },
   quote: { fontFamily: "Tajawal_400Regular", fontSize: 15, textAlign: "right", lineHeight: 26, opacity: 0.9 },
   cardFooter: { alignItems: "flex-end" },
-  footerCue: { fontFamily: "BeVietnamPro_500Medium", fontSize: 9, color: "#4a7a5e", letterSpacing: 1.5, textTransform: "uppercase" },
+  footerCue: { fontFamily: "BeVietnamPro_500Medium", fontSize: 9, color: T.muted, letterSpacing: 1.5, textTransform: "uppercase" },
   insightIconWrap: { alignItems: "center", width: "100%", marginVertical: 16 },
   bigQuote: { fontFamily: "BeVietnamPro_500Medium", fontSize: 48, opacity: 0.3, alignSelf: "flex-end", lineHeight: 40 },
   insightQuote: { fontFamily: "Tajawal_400Regular", fontSize: 18, textAlign: "right", lineHeight: 30, opacity: 0.95 },
@@ -422,8 +437,8 @@ const cardStyles = StyleSheet.create({
   auraLabel: { fontFamily: "Tajawal_700Bold", fontSize: 13, textAlign: "right", marginTop: 6 },
   streakHeader: { alignItems: "flex-end", width: "100%" },
   streakCount: { fontFamily: "Tajawal_700Bold", fontSize: 72, lineHeight: 80 },
-  streakUnit: { fontFamily: "Tajawal_700Bold", fontSize: 22, color: "#e8f5ee", marginTop: -12 },
-  streakLabel: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: "#4a7a5e", marginTop: 2 },
+  streakUnit: { fontFamily: "Tajawal_700Bold", fontSize: 22, color: T.primaryContainer, marginTop: -12 },
+  streakLabel: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted, marginTop: 2 },
   dotsRow: { flexDirection: "row", gap: 8, justifyContent: "flex-end", marginVertical: 16 },
   dot: { width: 10, height: 10, borderRadius: 5 },
   smallQuote: { fontFamily: "Tajawal_400Regular", fontSize: 13, textAlign: "right", lineHeight: 22, opacity: 0.7 },
@@ -431,16 +446,18 @@ const cardStyles = StyleSheet.create({
   statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "flex-end", width: "100%" },
   statBox: { backgroundColor: "rgba(116,198,157,0.06)", borderRadius: 12, borderWidth: 1, padding: 10, minWidth: "44%", alignItems: "flex-end" },
   statValue: { fontFamily: "Tajawal_700Bold", fontSize: 16 },
-  statLabel: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: "#4a7a5e", marginTop: 2 },
+  statLabel: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.muted, marginTop: 2 },
   moonEmoji: { fontSize: 40, textAlign: "right", alignSelf: "flex-end" },
   nightTitle: { fontFamily: "Tajawal_700Bold", fontSize: 18, textAlign: "right" },
   nightBar: { width: "100%", height: 6, borderRadius: 3, marginVertical: 12 },
   nightFill: { height: "100%", borderRadius: 3 },
   nightLabel: { fontFamily: "BeVietnamPro_500Medium", fontSize: 11, textAlign: "right" },
-});
+  });
+}
 
 // ─── Screen Styles ─────────────────────────────────────────────────────────
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1 },
   header: {
     flexDirection: "row",
@@ -449,8 +466,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
   },
-  logo: { fontFamily: "Tajawal_700Bold", fontSize: 20, color: Colors.accent },
-  headerTitle: { fontFamily: "Tajawal_700Bold", fontSize: 18, color: Colors.onSurface },
+  logo: { fontFamily: "Tajawal_700Bold", fontSize: 20, color: T.accent },
+  headerTitle: { fontFamily: "Tajawal_700Bold", fontSize: 18, color: T.onSurface },
   headerRight: {},
   privacyBadge: {
     flexDirection: "row",
@@ -461,7 +478,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  privacyBadgeText: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: Colors.accent },
+  privacyBadgeText: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.accent },
   cardPreviewWrap: { paddingHorizontal: 20, marginBottom: 12 },
   regenBtn: {
     flexDirection: "row",
@@ -472,15 +489,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginBottom: 20,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 999,
   },
-  regenText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: Colors.accent },
+  regenText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.accent },
   section: { paddingHorizontal: 20, marginBottom: 20 },
   sectionLabel: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 14,
-    color: Colors.primary,
+    color: T.onSurface,
     marginBottom: 12,
     textAlign: "right",
   },
@@ -493,11 +510,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: Colors.surfaceContainerHigh,
-    backgroundColor: Colors.surfaceContainer,
+    borderColor: "rgba(255,255,255,0.6)",
+    backgroundColor: T.surfaceContainer,
   },
   auraColorDot: { width: 8, height: 8, borderRadius: 4 },
-  pillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: Colors.muted },
+  pillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
   cardTypePill: {
     flexDirection: "row",
     alignItems: "center",
@@ -505,11 +522,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
   },
-  cardTypePillActive: { backgroundColor: Colors.accent },
-  cardTypePillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: Colors.muted },
-  cardTypePillTextActive: { color: Colors.surface, fontFamily: "Tajawal_700Bold" },
+  cardTypePillActive: { backgroundColor: T.accent },
+  cardTypePillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
+  cardTypePillTextActive: { color: T.surface, fontFamily: "Tajawal_700Bold" },
   toneGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -520,11 +537,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
   },
-  tonePillActive: { backgroundColor: Colors.primaryContainer },
-  toneText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: Colors.muted },
-  toneTextActive: { color: Colors.accent },
+  tonePillActive: { backgroundColor: T.primaryContainer },
+  toneText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
+  toneTextActive: { color: T.accent },
   privacyRow: {
     flexDirection: "row",
     gap: 8,
@@ -538,15 +555,15 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
   },
-  privacyOptionActive: { backgroundColor: Colors.primaryContainer },
-  privacyText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: Colors.muted },
-  privacyTextActive: { color: Colors.accent, fontFamily: "Tajawal_700Bold" },
+  privacyOptionActive: { backgroundColor: T.primaryContainer },
+  privacyText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
+  privacyTextActive: { color: T.accent, fontFamily: "Tajawal_700Bold" },
   privacyNote: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "right",
     marginTop: 8,
     lineHeight: 18,
@@ -565,9 +582,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 999,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainer,
   },
-  saveBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: Colors.accent },
+  saveBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: T.accent },
   shareBtn: { flex: 2, borderRadius: 999, overflow: "hidden" },
   shareBtnInner: {
     flexDirection: "row",
@@ -576,14 +593,15 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
   },
-  shareBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: Colors.surface },
+  shareBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: T.surface },
   footerNote: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
     paddingHorizontal: 24,
     lineHeight: 18,
     marginBottom: 8,
   },
-});
+  });
+}

@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 
@@ -61,9 +61,11 @@ interface InsightsData {
 }
 
 function MiniBar({ value, day, moodAr, hasEntry }: { value: number; day: string; moodAr: string; hasEntry: boolean }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const maxH = 88;
   const fillH = Math.max(value * maxH, hasEntry ? 8 : 4);
-  const color = hasEntry ? Colors.accent : Colors.surfaceContainerHigh;
+  const color = hasEntry ? T.accent : T.surfaceContainerHigh;
 
   return (
     <View style={styles.barItem}>
@@ -77,6 +79,8 @@ function MiniBar({ value, day, moodAr, hasEntry }: { value: number; day: string;
 }
 
 function XpBar({ progress, color }: { progress: number; color: string }) {
+  const T = useTokens();
+  const styles = makeStyles(T);
   const pct = Math.min(Math.max(progress, 0), 1);
   return (
     <View style={styles.xpTrack}>
@@ -89,6 +93,8 @@ export default function InsightsScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId } = useSession();
   const { theme } = useThemeContext();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<InsightsData | null>(null);
   const webTop = Platform.OS === "web" ? 67 : insets.top;
@@ -115,7 +121,7 @@ export default function InsightsScreen() {
   const streak = data?.streakDays ?? 0;
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors.surface }]}>
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
       {theme.surfaceTint !== "transparent" && (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
       )}
@@ -131,7 +137,7 @@ export default function InsightsScreen() {
 
       {loading ? (
         <View style={styles.loadingBox}>
-          <ActivityIndicator color={Colors.primary} size="large" />
+          <ActivityIndicator color={T.primary} size="large" />
           <Text style={styles.loadingText}>جاري تحليل مشاعرك...</Text>
         </View>
       ) : (
@@ -139,7 +145,7 @@ export default function InsightsScreen() {
           {g && (
             <Animated.View entering={FadeInDown.duration(500).delay(60)} style={styles.gamifCard}>
               <LinearGradient
-                colors={[Colors.primaryContainer, Colors.surfaceContainer]}
+                colors={[T.primaryContainer, T.surfaceContainer]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.gamifGrad}
@@ -149,7 +155,7 @@ export default function InsightsScreen() {
                     <View style={[styles.levelBadge, { backgroundColor: g.level.color + "33", borderColor: g.level.color + "55" }]}>
                       <Text style={[styles.levelText, { color: g.level.color }]}>{g.level.labelAr}</Text>
                     </View>
-                    <Text style={styles.gamifXp}>{g.xp} <Text style={styles.gamifXpUnit}>XP</Text></Text>
+                    <Text style={styles.gamifXp}>{g.xp} <Text style={styles.gamifXpUnit}>نقاط</Text></Text>
                     <XpBar progress={g.level.xpProgress} color={g.level.color} />
                     <Text style={styles.gamifNextLevel}>
                       المرحلة التالية: {g.nextLevel.labelAr}
@@ -197,7 +203,7 @@ export default function InsightsScreen() {
               ))}
             </View>
             <View style={styles.chartLegend}>
-              <View style={[styles.legendDot, { backgroundColor: Colors.accent }]} />
+              <View style={[styles.legendDot, { backgroundColor: T.accent }]} />
               <Text style={styles.legendText}>مستوى الطمأنينة</Text>
             </View>
           </Animated.View>
@@ -254,11 +260,12 @@ export default function InsightsScreen() {
         </>
       )}
     </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: { flex: 1 },
   header: {
@@ -269,14 +276,14 @@ const styles = StyleSheet.create({
   screenTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 32,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
     letterSpacing: -0.5,
   },
   screenSubtitle: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
     marginTop: 4,
     textAlign: "right",
   },
@@ -288,7 +295,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
   },
   gamifCard: {
@@ -324,7 +331,7 @@ const styles = StyleSheet.create({
   gamifXp: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 32,
-    color: Colors.onSurface,
+    color: T.onSurface,
     letterSpacing: -1,
     lineHeight: 38,
     textAlign: "right",
@@ -332,12 +339,12 @@ const styles = StyleSheet.create({
   gamifXpUnit: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 14,
-    color: Colors.muted,
+    color: T.muted,
   },
   xpTrack: {
     width: "100%",
     height: 6,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 3,
     overflow: "hidden",
   },
@@ -348,7 +355,7 @@ const styles = StyleSheet.create({
   gamifNextLevel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "right",
   },
   gamifStats: {
@@ -364,13 +371,13 @@ const styles = StyleSheet.create({
   statValue: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 20,
-    color: Colors.onSurface,
+    color: T.onSurface,
     lineHeight: 26,
   },
   statLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 9,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
   },
   winsRow: {
@@ -383,7 +390,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -391,17 +398,17 @@ const styles = StyleSheet.create({
   winText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 11,
-    color: Colors.onSurface,
+    color: T.onSurface,
   },
   winPts: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 10,
-    color: Colors.accent,
+    color: T.accent,
   },
   chartCard: {
     marginHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
     borderRadius: 20,
     padding: 20,
     gap: 16,
@@ -409,7 +416,7 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 15,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
   },
   barChart: {
@@ -426,12 +433,12 @@ const styles = StyleSheet.create({
   barMoodLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 8,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
   },
   barTrack: {
     width: "100%",
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 6,
     justifyContent: "flex-end",
   },
@@ -442,7 +449,7 @@ const styles = StyleSheet.create({
   barDayLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 9,
-    color: Colors.muted,
+    color: T.muted,
     textAlign: "center",
   },
   chartLegend: {
@@ -459,7 +466,7 @@ const styles = StyleSheet.create({
   legendText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.muted,
+    color: T.muted,
   },
   section: {
     marginHorizontal: 16,
@@ -469,7 +476,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: Colors.onSurface,
+    color: T.onSurface,
     textAlign: "right",
     marginBottom: 4,
   },
@@ -478,8 +485,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 16,
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 20,
     padding: 16,
     justifyContent: "flex-end",
   },
@@ -487,14 +494,14 @@ const styles = StyleSheet.create({
   insightText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.primary,
+    color: T.primary,
     flex: 1,
     textAlign: "right",
     lineHeight: 22,
   },
   moodPatternCard: {
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: 16,
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 20,
     padding: 16,
     gap: 14,
   },
@@ -507,7 +514,7 @@ const styles = StyleSheet.create({
   moodBarTrack: {
     flex: 1,
     height: 6,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: T.surfaceContainerHigh,
     borderRadius: 3,
     overflow: "hidden",
   },
@@ -518,7 +525,7 @@ const styles = StyleSheet.create({
   moodPatternLabel: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: Colors.primary,
+    color: T.primary,
     width: 55,
     textAlign: "right",
   },
@@ -531,7 +538,7 @@ const styles = StyleSheet.create({
   quoteCard: {
     marginHorizontal: 16,
     marginBottom: 12,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: T.primaryContainer,
     borderRadius: 20,
     padding: 20,
     alignItems: "flex-end",
@@ -539,13 +546,14 @@ const styles = StyleSheet.create({
   },
   quoteIcon: {
     fontSize: 18,
-    color: Colors.accent,
+    color: T.accent,
   },
   quoteText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 15,
-    color: Colors.primary,
+    color: T.primary,
     textAlign: "right",
     lineHeight: 26,
   },
-});
+  });
+}

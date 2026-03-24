@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import * as Haptics from "expo-haptics";
 
@@ -25,8 +25,8 @@ const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
 
 const MOOD_THEME_COLORS: Record<string, string> = {
   anxiety: "#6B7FD7",
-  gratitude: Colors.accent,
-  reflection: Colors.secondary,
+  gratitude: "#74C69D",
+  reflection: "#A8C5B2",
   support: "#D97757",
 };
 
@@ -59,6 +59,8 @@ interface Post {
 const AVATAR_COLORS = ["#9BD4C0", "#A8C8E8", "#F4B8A0", "#C4A8D8", "#E8C4A0"];
 
 function GroupAvatars() {
+  const T = useTokens();
+  const liveCardStyles = makeLiveCardStyles(T);
   return (
     <View style={liveCardStyles.avatarStack}>
       {AVATAR_COLORS.map((color, i) => (
@@ -81,10 +83,12 @@ function GroupAvatars() {
 }
 
 function LiveSessionCard({ session, onEnter }: { session: Session; onEnter: () => void }) {
+  const T = useTokens();
+  const liveCardStyles = makeLiveCardStyles(T);
   return (
-    <Pressable style={liveCardStyles.card} onPress={onEnter}>
+    <Pressable style={[liveCardStyles.card, { backgroundColor: T.surfaceContainer }]} onPress={onEnter}>
       <GroupAvatars />
-      <Text style={liveCardStyles.title} numberOfLines={2}>{session.titleAr}</Text>
+      <Text style={[liveCardStyles.title, { color: T.onSurface }]} numberOfLines={2}>{session.titleAr}</Text>
       <View style={liveCardStyles.hostRow}>
         <Feather name="mic" size={12} color="#6B7FD7" />
         <Text style={liveCardStyles.hostText}>{session.participantCount} مشارك</Text>
@@ -103,11 +107,12 @@ function LiveSessionCard({ session, onEnter }: { session: Session; onEnter: () =
   );
 }
 
-const liveCardStyles = StyleSheet.create({
+function makeLiveCardStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   card: {
     width: 160,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 20,
     padding: 14,
     marginLeft: 12,
     gap: 8,
@@ -134,7 +139,7 @@ const liveCardStyles = StyleSheet.create({
   title: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: "#2D2D2D",
+    color: T.onSurface,
     textAlign: "right",
     lineHeight: 20,
   },
@@ -159,7 +164,8 @@ const liveCardStyles = StyleSheet.create({
     fontSize: 13,
     color: "#FFFFFF",
   },
-});
+  });
+}
 
 const MOOD_AUTHOR_LABELS: Record<string, string> = {
   anxiety: "في دائرة القلق",
@@ -170,6 +176,8 @@ const MOOD_AUTHOR_LABELS: Record<string, string> = {
 
 function ReflectionPostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
   const [hearted, setHearted] = useState(false);
+  const T = useTokens();
+  const reflStyles = makeReflStyles(T);
   const initial = post.anonymousName?.charAt(0) ?? "أ";
   const bgColors = ["#9BD4C0", "#A8C8E8", "#F4B8A0", "#C4A8D8", "#E8C4A0"];
   const bgColor = bgColors[post.anonymousName?.charCodeAt(0) % bgColors.length] ?? "#9BD4C0";
@@ -178,12 +186,12 @@ function ReflectionPostCard({ post, onHeart }: { post: Post; onHeart: () => void
     : post.anonymousName;
 
   return (
-    <Animated.View entering={FadeInDown.duration(400)} style={reflStyles.card}>
+    <Animated.View entering={FadeInDown.duration(400)} style={[reflStyles.card, { backgroundColor: T.surfaceContainer }]}>
       <View style={reflStyles.row}>
         <View style={reflStyles.textCol}>
-          <Text style={reflStyles.title} numberOfLines={1}>{post.anonymousName}</Text>
+          <Text style={[reflStyles.title, { color: T.onSurface }]} numberOfLines={1}>{post.anonymousName}</Text>
           <Text style={reflStyles.author}>{authorLabel}</Text>
-          <Text style={reflStyles.preview} numberOfLines={2}>{post.contentAr}</Text>
+          <Text style={[reflStyles.preview, { color: T.muted }]} numberOfLines={2}>{post.contentAr}</Text>
           <View style={reflStyles.footerRow}>
             <Pressable
               style={reflStyles.actionBtn}
@@ -214,10 +222,11 @@ function ReflectionPostCard({ post, onHeart }: { post: Post; onHeart: () => void
   );
 }
 
-const reflStyles = StyleSheet.create({
+function makeReflStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 20,
     padding: 14,
     marginBottom: 10,
     shadowColor: "#000",
@@ -251,7 +260,7 @@ const reflStyles = StyleSheet.create({
   title: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 14,
-    color: "#2D2D2D",
+    color: T.onSurface,
     textAlign: "right",
   },
   author: {
@@ -264,7 +273,7 @@ const reflStyles = StyleSheet.create({
   preview: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: "#555555",
+    color: T.muted,
     textAlign: "right",
     lineHeight: 20,
     marginTop: 4,
@@ -285,19 +294,22 @@ const reflStyles = StyleSheet.create({
     fontSize: 12,
     color: "#AAAAAA",
   },
-});
+  });
+}
 
 function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
   const [hearted, setHearted] = useState(false);
+  const T = useTokens();
+  const inSessionStyles = makeInSessionStyles(T);
   return (
-    <Animated.View entering={FadeInDown.duration(400)} style={inSessionStyles.postCard}>
+    <Animated.View entering={FadeInDown.duration(400)} style={[inSessionStyles.postCard, { backgroundColor: T.surfaceContainer }]}>
       <View style={inSessionStyles.postHeader}>
-        <Text style={inSessionStyles.postName}>{post.anonymousName}</Text>
+        <Text style={[inSessionStyles.postName, { color: T.accent }]}>{post.anonymousName}</Text>
         <Text style={inSessionStyles.postTime}>
           {new Date(post.createdAt).toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
         </Text>
       </View>
-      <Text style={inSessionStyles.postContent}>{post.contentAr}</Text>
+      <Text style={[inSessionStyles.postContent, { color: T.onSurface }]}>{post.contentAr}</Text>
       <Pressable
         style={inSessionStyles.heartBtn}
         onPress={() => {
@@ -308,7 +320,7 @@ function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
           }
         }}
       >
-        <Feather name="heart" size={16} color={hearted ? "#E94D6D" : Colors.muted} />
+        <Feather name="heart" size={16} color={hearted ? "#E94D6D" : "#7A9A8A"} />
         <Text style={[inSessionStyles.heartCount, hearted && { color: "#E94D6D" }]}>
           {hearted ? post.hearts + 1 : post.hearts}
         </Text>
@@ -317,10 +329,11 @@ function PostCard({ post, onHeart }: { post: Post; onHeart: () => void }) {
   );
 }
 
-const inSessionStyles = StyleSheet.create({
+function makeInSessionStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   postCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 20,
     padding: 14,
     gap: 8,
     marginBottom: 10,
@@ -334,7 +347,7 @@ const inSessionStyles = StyleSheet.create({
   postName: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 13,
-    color: Colors.accent,
+    color: T.accent,
   },
   postTime: {
     fontFamily: "Tajawal_400Regular",
@@ -344,7 +357,7 @@ const inSessionStyles = StyleSheet.create({
   postContent: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "#2D2D2D",
+    color: T.onSurface,
     lineHeight: 22,
     textAlign: "right",
   },
@@ -359,10 +372,13 @@ const inSessionStyles = StyleSheet.create({
     fontSize: 13,
     color: "#888888",
   },
-});
+  });
+}
 
 export default function CommunityScreen() {
   const insets = useSafeAreaInsets();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const { sessionId } = useSession();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -435,7 +451,7 @@ export default function CommunityScreen() {
         </View>
 
         <View style={styles.safetyBanner}>
-          <Feather name="shield" size={13} color={Colors.accent} />
+          <Feather name="shield" size={13} color={"#74C69D"} />
           <Text style={styles.safetyText}>مساحة آمنة · بدون هوية حقيقية · جميع المشاركات مراجَعة</Text>
         </View>
 
@@ -445,7 +461,7 @@ export default function CommunityScreen() {
           showsVerticalScrollIndicator={false}
         >
           {postsLoading ? (
-            <ActivityIndicator color={Colors.accent} style={{ marginTop: 40 }} />
+            <ActivityIndicator color={"#74C69D"} style={{ marginTop: 40 }} />
           ) : posts.map(p => (
             <PostCard
               key={p.id}
@@ -497,8 +513,9 @@ export default function CommunityScreen() {
   }));
 
   return (
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
     <ScrollView
-      style={styles.container}
+      style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
@@ -513,7 +530,7 @@ export default function CommunityScreen() {
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionSeeAll}>See All</Text>
+        <Text style={styles.sectionSeeAll}>عرض الكل</Text>
         <Text style={styles.sectionTitle}>حلقات مباشرة</Text>
       </View>
 
@@ -524,7 +541,7 @@ export default function CommunityScreen() {
         style={styles.liveScroll}
       >
         {loading ? (
-          <ActivityIndicator color={Colors.accent} style={{ marginLeft: 16, marginTop: 40 }} />
+          <ActivityIndicator color={"#74C69D"} style={{ marginLeft: 16, marginTop: 40 }} />
         ) : sessions.map(session => (
           <LiveSessionCard key={session.id} session={session} onEnter={() => enterSession(session)} />
         ))}
@@ -533,7 +550,7 @@ export default function CommunityScreen() {
       {sessionReflections.length > 0 && (
         <>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTrending}>Trending</Text>
+            <Text style={styles.sectionTrending}>الأبرز</Text>
             <Text style={styles.sectionTitle}>تأملات يومية</Text>
           </View>
 
@@ -549,17 +566,17 @@ export default function CommunityScreen() {
         </>
       )}
     </ScrollView>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F0E8",
   },
   containerActive: {
     flex: 1,
-    backgroundColor: "#F5F0E8",
   },
   headerBar: {
     flexDirection: "row",
@@ -572,19 +589,19 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: T.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: T.cardShadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 1,
     shadowRadius: 4,
     elevation: 2,
   },
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: "#2D2D2D",
+    color: T.onSurface,
     textAlign: "center",
   },
   sectionHeader: {
@@ -598,18 +615,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: "#2D2D2D",
+    color: T.onSurface,
     textAlign: "right",
   },
   sectionSeeAll: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 12,
-    color: "#3AAFA9",
+    color: T.accent,
   },
   sectionTrending: {
     fontFamily: "BeVietnamPro_500Medium",
     fontSize: 12,
-    color: "#888888",
+    color: T.muted,
   },
   liveScroll: {
     marginBottom: 4,
@@ -626,25 +643,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     gap: 12,
-    backgroundColor: "#F5F0E8",
+    backgroundColor: T.surface,
   },
   backBtn: { padding: 8 },
   sessionHeaderTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 18,
-    color: "#2D2D2D",
+    color: T.onSurface,
   },
   sessionHeaderSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: "#888888",
+    color: T.muted,
     marginTop: 2,
   },
   safetyBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#E8F5EE",
+    backgroundColor: T.primaryContainer,
     paddingHorizontal: 16,
     paddingVertical: 8,
     justifyContent: "flex-end",
@@ -652,26 +669,26 @@ const styles = StyleSheet.create({
   safetyText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 12,
-    color: Colors.accent,
+    color: T.accent,
   },
   postInputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 10,
     padding: 12,
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
+    backgroundColor: T.surfaceContainer,
+    shadowColor: T.cardShadow,
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 4,
   },
   postInput: {
     flex: 1,
-    backgroundColor: "#F5F0E8",
-    borderRadius: 16,
+    backgroundColor: T.surface,
+    borderRadius: 20,
     padding: 12,
-    color: "#2D2D2D",
+    color: T.onSurface,
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
     minHeight: 44,
@@ -683,11 +700,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.accent,
+    backgroundColor: T.accent,
     alignItems: "center",
     justifyContent: "center",
   },
   sendBtnDisabled: {
     opacity: 0.4,
   },
-});
+  });
+}

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import Colors from "@/constants/colors";
+import Colors, { useTokens } from "@/constants/colors";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -21,9 +21,9 @@ const CATEGORY_CONFIG: Record<string, { ar: string; color: string }> = {
   anxiety: { ar: "القلق", color: "#6B7FD7" },
   grief: { ar: "الحزن", color: "#8E7BB5" },
   sleep: { ar: "النوم", color: "#4A9EDD" },
-  ramadan: { ar: "رمضان", color: Colors.accent },
-  general: { ar: "عام", color: Colors.secondary },
-  spiritual: { ar: "روحاني", color: Colors.primary },
+  ramadan: { ar: "رمضان", color: "#74C69D" },
+  general: { ar: "عام", color: "#A8C5B2" },
+  spiritual: { ar: "روحاني", color: "#1B4332" },
 };
 
 const CARD_GRADIENTS: Record<string, [string, string]> = {
@@ -58,10 +58,11 @@ interface Program {
 }
 
 function HeroBanner() {
+  const T = useTokens();
   return (
     <Animated.View entering={FadeInDown.duration(500)} style={heroStyles.container}>
       <LinearGradient
-        colors={["#E8D5B7", "#F0E2C8"]}
+        colors={T.bg}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={heroStyles.gradient}
@@ -71,8 +72,8 @@ function HeroBanner() {
           <Text style={heroStyles.illustrationSmall}>✨</Text>
         </View>
         <View style={heroStyles.textArea}>
-          <Text style={heroStyles.heroTitle}>{"رحلتك نحو\nالصحة النفسية\nتبدأ هنا"}</Text>
-          <Text style={heroStyles.heroSub}>اختر برنامجاً يناسبك</Text>
+          <Text style={[heroStyles.heroTitle, { color: T.onSurface }]}>{"رحلتك نحو\nالصحة النفسية\nتبدأ هنا"}</Text>
+          <Text style={[heroStyles.heroSub, { color: T.muted }]}>اختر برنامجاً يناسبك</Text>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -121,21 +122,19 @@ const heroStyles = StyleSheet.create({
   heroTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 20,
-    color: "#3D2B1A",
     textAlign: "right",
     lineHeight: 32,
   },
   heroSub: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 13,
-    color: "#7A5C3A",
     textAlign: "right",
     marginTop: 4,
   },
 });
 
 function ProgramCard({ program, index }: { program: Program; index: number }) {
-  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: Colors.accent };
+  const cat = CATEGORY_CONFIG[program.category] ?? { ar: program.category, color: "#74C69D" };
   const gradientColors = CARD_GRADIENTS[program.category] ?? ["#3AAFA9", "#2C7873"] as [string, string];
   const illustration = CARD_ILLUSTRATIONS[program.category] ?? "💫";
   const completion = Math.round(program.completionRate * 100);
@@ -272,6 +271,8 @@ const cardStyles = StyleSheet.create({
 
 export default function ProgramsScreen() {
   const insets = useSafeAreaInsets();
+  const T = useTokens();
+  const styles = makeStyles(T);
   const [programs, setPrograms] = React.useState<Program[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -294,8 +295,9 @@ export default function ProgramsScreen() {
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
   return (
+    <LinearGradient colors={T.bg} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.container}>
     <ScrollView
-      style={styles.container}
+      style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
@@ -313,30 +315,31 @@ export default function ProgramsScreen() {
 
       {isLoading ? (
         <View style={styles.loadingState}>
-          <ActivityIndicator color={Colors.accent} />
+          <ActivityIndicator color={T.accent} />
           <Text style={styles.loadingText}>جاري التحميل...</Text>
         </View>
       ) : error ? (
         <Pressable style={styles.errorState} onPress={loadPrograms}>
-          <Feather name="refresh-cw" size={24} color={Colors.muted} />
+          <Feather name="refresh-cw" size={24} color={T.muted} />
           <Text style={styles.errorText}>{error}</Text>
         </Pressable>
       ) : programs.length === 0 ? (
         <View style={styles.emptyState}>
-          <Feather name="book-open" size={40} color={Colors.muted} />
+          <Feather name="book-open" size={40} color={T.muted} />
           <Text style={styles.emptyText}>لا توجد برامج بعد</Text>
         </View>
       ) : (
         programs.map((p, i) => <ProgramCard key={p.id} program={p} index={i} />)
       )}
     </ScrollView>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(T: import("@/constants/colors").ColorTokens) {
+  return StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F3EC",
   },
   headerBar: {
     flexDirection: "row",
@@ -349,7 +352,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: T.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "Tajawal_700Bold",
     fontSize: 20,
-    color: "#2D2D2D",
+    color: T.onSurface,
     textAlign: "center",
   },
   loadingState: {
@@ -372,7 +375,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: "#888888",
+    color: T.muted,
   },
   errorState: {
     alignItems: "center",
@@ -382,7 +385,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 14,
-    color: Colors.error,
+    color: T.error,
   },
   emptyState: {
     alignItems: "center",
@@ -392,6 +395,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontFamily: "Tajawal_400Regular",
     fontSize: 18,
-    color: Colors.muted,
+    color: T.muted,
   },
-});
+  });
+}
