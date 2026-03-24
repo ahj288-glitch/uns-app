@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
 import BreathingSession from "@/components/BreathingSession";
 import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
 
@@ -40,7 +41,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 
 // ─── IridescentOrb ────────────────────────────────────────────────────────
-function IridescentOrb() {
+function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
   const pulse = useRef(new Animated.Value(1)).current;
   const glow = useRef(new Animated.Value(0.3)).current;
   const rotate = useRef(new Animated.Value(0)).current;
@@ -116,17 +117,17 @@ function IridescentOrb() {
         if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       }}
     >
-      <Animated.View style={[orbStyles.outerRing, { opacity: glow, transform: [{ rotate: spin }] }]} />
-      <Animated.View style={[orbStyles.greenLayer, { opacity: Animated.multiply(glow, 0.5) }]} />
+      <Animated.View style={[orbStyles.outerRing, { opacity: glow, transform: [{ rotate: spin }], borderColor: orbColors[0] }]} />
+      <Animated.View style={[orbStyles.greenLayer, { opacity: Animated.multiply(glow, 0.5), backgroundColor: orbColors[0] }]} />
       <Animated.View
         style={[
           orbStyles.goldLayer,
-          { opacity: Animated.multiply(glow, 0.4), transform: [{ rotate: spinReverse }] },
+          { opacity: Animated.multiply(glow, 0.4), transform: [{ rotate: spinReverse }], backgroundColor: orbColors[1] },
         ]}
       />
       <Animated.View style={[orbStyles.orbMid, { transform: [{ scale: pulse }] }]}>
         <LinearGradient
-          colors={["#74C69D", "#D4B896", "#9ECBFF"]}
+          colors={orbColors}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={orbStyles.orbGradient}
@@ -158,7 +159,6 @@ const orbStyles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: "#74C69D",
     borderStyle: "dashed",
   },
   greenLayer: {
@@ -166,14 +166,12 @@ const orbStyles = StyleSheet.create({
     width: 184,
     height: 184,
     borderRadius: 92,
-    backgroundColor: "#74C69D",
   },
   goldLayer: {
     position: "absolute",
     width: 170,
     height: 170,
     borderRadius: 85,
-    backgroundColor: "#D4B896",
   },
   orbMid: {
     width: 152,
@@ -208,6 +206,7 @@ const orbStyles = StyleSheet.create({
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { greeting, gender, setLastMoodWord } = useSession();
+  const { theme } = useThemeContext();
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -241,140 +240,168 @@ export default function HomeScreen() {
   const recipeEmoji = CATEGORY_EMOJI[recipe?.category ?? ""] ?? "🌅";
 
   return (
-    <LinearGradient
-      colors={["#7DB89A", "#A8C4A0", "#C8B99A", "#D4C4A0"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0.4, y: 1 }}
-      style={styles.gradientBg}
-    >
-      <BreathingSession
-        visible={breathingOpen}
-        onClose={(completed) => {
-          setBreathingOpen(false);
-          if (completed) router.push("/(tabs)/insights");
-        }}
-      />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={{ paddingBottom: webBottom + 90 }}
-        showsVerticalScrollIndicator={false}
+    <View style={styles.flex}>
+      <LinearGradient
+        colors={theme.homeGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+        style={styles.gradientBg}
       >
-        <View style={[styles.header, { paddingTop: webTop + 12 }]}>
-          <Pressable onPress={() => router.push("/(tabs)/profile")} style={styles.avatarBtn}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
-              style={styles.avatarCircle}
-            >
-              <Text style={styles.avatarText}>س</Text>
-            </LinearGradient>
-          </Pressable>
-          <Text style={styles.headerLogo}>أُنْس</Text>
-          <Pressable onPress={handleShare} style={styles.shareHeaderBtn}>
-            <Feather name="share-2" size={18} color="rgba(255,255,255,0.8)" />
-          </Pressable>
-        </View>
-
-        <View style={styles.greetingSection}>
-          <Text style={styles.greetingTitle}>
-            {greeting || "أهلاً بك في مساحتك الخاصة"}
-          </Text>
-        </View>
-
-        <IridescentOrb />
-
-        <View style={styles.breatheSubRow}>
-          <Pressable
-            style={styles.playBtn}
-            onPress={() => {
-              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setBreathingOpen(true);
-            }}
-          >
-            <Feather name="play" size={14} color="rgba(255,255,255,0.9)" />
-          </Pressable>
-          <Text style={styles.breatheLabel}>تنفس بعمق... شهيق، زفير</Text>
-        </View>
-
-        {Platform.OS !== "web" ? (
-          <BlurView intensity={40} tint="light" style={styles.moodCard}>
-            <Text style={styles.moodQuestion}>{moodQuestion}</Text>
-            <View style={styles.moodChipsRow}>
-              {MOODS.map((m, i) => (
-                <Pressable
-                  key={m.word}
-                  style={[
-                    styles.moodChip,
-                    selectedMood === i && { backgroundColor: m.color + "33" },
-                  ]}
-                  onPress={() => handleMoodSelect(i)}
-                >
-                  <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
-                    <Text style={styles.moodEmoji}>{m.emoji}</Text>
-                  </View>
-                  <Text style={[styles.moodWord, selectedMood === i && { color: m.color, fontFamily: "Tajawal_700Bold" }]}>
-                    {m.word}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </BlurView>
-        ) : (
-          <View style={[styles.moodCard, styles.moodCardWeb]}>
-            <Text style={styles.moodQuestion}>{moodQuestion}</Text>
-            <View style={styles.moodChipsRow}>
-              {MOODS.map((m, i) => (
-                <Pressable
-                  key={m.word}
-                  style={[
-                    styles.moodChip,
-                    selectedMood === i && { backgroundColor: m.color + "33" },
-                  ]}
-                  onPress={() => handleMoodSelect(i)}
-                >
-                  <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
-                    <Text style={styles.moodEmoji}>{m.emoji}</Text>
-                  </View>
-                  <Text style={[styles.moodWord, selectedMood === i && { color: m.color, fontFamily: "Tajawal_700Bold" }]}>
-                    {m.word}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+        <BreathingSession
+          visible={breathingOpen}
+          onClose={(completed) => {
+            setBreathingOpen(false);
+            if (completed) router.push("/(tabs)/insights");
+          }}
+        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={{ paddingBottom: webBottom + 90 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={[styles.header, { paddingTop: webTop + 12 }]}>
+            <Pressable onPress={() => router.push("/(tabs)/profile")} style={styles.avatarBtn}>
+              <LinearGradient
+                colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
+                style={styles.avatarCircle}
+              >
+                <Text style={styles.avatarText}>س</Text>
+              </LinearGradient>
+            </Pressable>
+            <Text style={styles.headerLogo}>أُنْس</Text>
+            <Pressable onPress={handleShare} style={styles.shareHeaderBtn}>
+              <Feather name="share-2" size={18} color="rgba(255,255,255,0.8)" />
+            </Pressable>
           </View>
-        )}
 
-        <View style={styles.dailyFlashCard}>
-          <LinearGradient
-            colors={["#C8A882", "#D4B896"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.dailyThumbnail}
-          >
-            <Text style={styles.dailyThumbnailEmoji}>{recipeEmoji}</Text>
-          </LinearGradient>
-          <View style={styles.dailyContent}>
-            <Text style={styles.dailyTitle}>{recipe?.title ?? "الومضة اليومية"}</Text>
-            <Text style={styles.dailyQuote} numberOfLines={3}>
-              "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
+          <View style={styles.greetingSection}>
+            <Text style={styles.greetingTitle}>
+              {greeting || "أهلاً بك في مساحتك الخاصة"}
             </Text>
-            <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
+          </View>
+
+          <IridescentOrb orbColors={theme.orbColors} />
+
+          <View style={styles.breatheSubRow}>
             <Pressable
-              style={styles.dailyCTA}
+              style={styles.playBtn}
               onPress={() => {
-                if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setBreathingOpen(true);
               }}
             >
-              <Text style={styles.dailyCTAText}>تأمل لمدة ٥ دقائق</Text>
+              <Feather name="play" size={14} color="rgba(255,255,255,0.9)" />
             </Pressable>
+            <Text style={styles.breatheLabel}>تنفس بعمق... شهيق، زفير</Text>
           </View>
-        </View>
-      </ScrollView>
-    </LinearGradient>
+
+          {Platform.OS !== "web" ? (
+            <BlurView intensity={theme.blurIntensity} tint="light" style={styles.moodCard}>
+              <Text style={styles.moodQuestion}>{moodQuestion}</Text>
+              <View style={styles.moodChipsRow}>
+                {MOODS.map((m, i) => (
+                  <Pressable
+                    key={m.word}
+                    style={[
+                      styles.moodChip,
+                      selectedMood === i && { backgroundColor: m.color + "33" },
+                    ]}
+                    onPress={() => handleMoodSelect(i)}
+                  >
+                    <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
+                      <Text style={styles.moodEmoji}>{m.emoji}</Text>
+                    </View>
+                    <Text style={[styles.moodWord, selectedMood === i && { color: m.color, fontFamily: "Tajawal_700Bold" }]}>
+                      {m.word}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </BlurView>
+          ) : (
+            <View style={[styles.moodCard, styles.moodCardWeb]}>
+              <Text style={styles.moodQuestion}>{moodQuestion}</Text>
+              <View style={styles.moodChipsRow}>
+                {MOODS.map((m, i) => (
+                  <Pressable
+                    key={m.word}
+                    style={[
+                      styles.moodChip,
+                      selectedMood === i && { backgroundColor: m.color + "33" },
+                    ]}
+                    onPress={() => handleMoodSelect(i)}
+                  >
+                    <View style={[styles.moodIconBox, { backgroundColor: m.color + "40" }]}>
+                      <Text style={styles.moodEmoji}>{m.emoji}</Text>
+                    </View>
+                    <Text style={[styles.moodWord, selectedMood === i && { color: m.color, fontFamily: "Tajawal_700Bold" }]}>
+                      {m.word}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <View style={styles.dailyFlashCard}>
+            <LinearGradient
+              colors={["#C8A882", "#D4B896"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.dailyThumbnail}
+            >
+              <Text style={styles.dailyThumbnailEmoji}>{recipeEmoji}</Text>
+            </LinearGradient>
+            <View style={styles.dailyContent}>
+              <Text style={styles.dailyTitle}>{recipe?.title ?? "الومضة اليومية"}</Text>
+              <Text style={styles.dailyQuote} numberOfLines={3}>
+                "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
+              </Text>
+              <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
+              <Pressable
+                style={styles.dailyCTA}
+                onPress={() => {
+                  if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setBreathingOpen(true);
+                }}
+              >
+                <Text style={styles.dailyCTAText}>تأمل لمدة ٥ دقائق</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Community Entry Card */}
+          <Pressable
+            style={styles.communityCard}
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/(tabs)/community");
+            }}
+          >
+            <LinearGradient
+              colors={["rgba(116,198,157,0.18)", "rgba(133,215,173,0.12)"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.communityCardInner}
+            >
+              <View style={styles.communityLeft}>
+                <Text style={styles.communityEmoji}>🌿</Text>
+              </View>
+              <View style={styles.communityTextCol}>
+                <Text style={styles.communityTitle}>واحة المجتمع</Text>
+                <Text style={styles.communitySub}>شارك في جلسات دعم جماعية آمنة</Text>
+              </View>
+              <Feather name="arrow-left" size={18} color="rgba(255,255,255,0.6)" />
+            </LinearGradient>
+          </Pressable>
+        </ScrollView>
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   gradientBg: {
     flex: 1,
   },
@@ -552,5 +579,45 @@ const styles = StyleSheet.create({
     fontFamily: "Tajawal_700Bold",
     fontSize: 12,
     color: "#FFFFFF",
+  },
+  communityCard: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 20,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(116,198,157,0.25)",
+  },
+  communityCardInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    gap: 12,
+  },
+  communityLeft: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  communityEmoji: { fontSize: 22 },
+  communityTextCol: {
+    flex: 1,
+    alignItems: "flex-end",
+    gap: 3,
+  },
+  communityTitle: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 17,
+    color: "#FFFFFF",
+    textAlign: "right",
+  },
+  communitySub: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 12,
+    color: "rgba(255,255,255,0.75)",
+    textAlign: "right",
   },
 });

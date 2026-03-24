@@ -14,6 +14,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -87,6 +88,7 @@ function XpBar({ progress, color }: { progress: number; color: string }) {
 export default function InsightsScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId } = useSession();
+  const { theme } = useThemeContext();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<InsightsData | null>(null);
   const webTop = Platform.OS === "web" ? 67 : insets.top;
@@ -113,8 +115,12 @@ export default function InsightsScreen() {
   const streak = data?.streakDays ?? 0;
 
   return (
+    <View style={[styles.container, { backgroundColor: Colors.surface }]}>
+      {theme.surfaceTint !== "transparent" && (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
+      )}
     <ScrollView
-      style={[styles.container, { backgroundColor: Colors.surface }]}
+      style={[styles.scrollContainer]}
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
@@ -248,11 +254,13 @@ export default function InsightsScreen() {
         </>
       )}
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  scrollContainer: { flex: 1 },
   header: {
     paddingHorizontal: 24,
     paddingBottom: 16,

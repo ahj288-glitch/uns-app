@@ -19,6 +19,7 @@ import { router } from "expo-router";
 import Colors from "@/constants/colors";
 import { ERRORS, LIMITS, formatError } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
 import { getContextualSuggestions } from "@/lib/gender";
 import * as Haptics from "expo-haptics";
 import ErrorToast from "@/components/ui/ErrorToast";
@@ -99,7 +100,7 @@ function TimestampPill({ date }: { date: Date }) {
   );
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: string }) {
   const isUser = message.role === "user";
   return (
     <Animated.View
@@ -111,7 +112,14 @@ function MessageBubble({ message }: { message: Message }) {
           <Text style={styles.avatarText}>أ</Text>
         </View>
       )}
-      <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleCompanion, message.isError && styles.bubbleError]}>
+      <View style={[
+        styles.bubble,
+        isUser ? styles.bubbleUser : styles.bubbleCompanion,
+        message.isError && styles.bubbleError,
+      ]}>
+        {!isUser && bubbleTint !== "transparent" && (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: bubbleTint, borderRadius: 18, borderBottomLeftRadius: 4 }]} />
+        )}
         <Text style={[styles.bubbleText, isUser ? styles.bubbleTextUser : styles.bubbleTextCompanion]}>
           {message.content}
         </Text>
@@ -133,6 +141,7 @@ function MessageBubble({ message }: { message: Message }) {
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId, greeting, gender, lastMoodWord } = useSession();
+  const { theme } = useThemeContext();
   const quickReplies = getContextualSuggestions(gender, lastMoodWord, new Date().getHours());
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -405,6 +414,9 @@ export default function ChatScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
+      {theme.surfaceTint !== "transparent" && (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
+      )}
       <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />
 
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
@@ -459,7 +471,7 @@ export default function ChatScreen() {
                 olderMsg && !isSameDay(new Date(item.createdAt), new Date(olderMsg.createdAt));
               return (
                 <>
-                  <MessageBubble message={item} />
+                  <MessageBubble message={item} bubbleTint={theme.bubbleTint} />
                   {showSep && <TimestampPill date={new Date(olderMsg.createdAt)} />}
                 </>
               );

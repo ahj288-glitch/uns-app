@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
+  Pressable,
   type DimensionValue,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,6 +17,9 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
@@ -200,6 +204,31 @@ export default function JourneyScreen() {
           <Text style={styles.metricLabel}>جلسات التنفس</Text>
         </View>
       </Animated.View>
+
+      <Animated.View entering={FadeInDown.duration(500).delay(700)} style={styles.pathsCardWrapper}>
+        <Pressable
+          onPress={() => {
+            if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/(tabs)/programs");
+          }}
+        >
+          <LinearGradient
+            colors={["#3AAFA9", "#2C6B9E"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.pathsCard}
+          >
+            <View style={styles.pathsIllustration}>
+              <Text style={styles.pathsEmoji}>🌿</Text>
+            </View>
+            <View style={styles.pathsTextCol}>
+              <Text style={styles.pathsTitle}>مسارات أُنْس</Text>
+              <Text style={styles.pathsSub}>برامج موجّهة لرحلة التعافي والنمو</Text>
+            </View>
+            <Feather name="arrow-left" size={20} color="rgba(255,255,255,0.7)" />
+          </LinearGradient>
+        </Pressable>
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -381,5 +410,49 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: Colors.accent,
     borderRadius: 3,
+  },
+  pathsCardWrapper: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  pathsCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 18,
+    gap: 14,
+  },
+  pathsIllustration: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  pathsEmoji: { fontSize: 26 },
+  pathsTextCol: {
+    flex: 1,
+    alignItems: "flex-end",
+    gap: 4,
+  },
+  pathsTitle: {
+    fontFamily: "Tajawal_700Bold",
+    fontSize: 20,
+    color: "#FFFFFF",
+    textAlign: "right",
+  },
+  pathsSub: {
+    fontFamily: "Tajawal_400Regular",
+    fontSize: 13,
+    color: "rgba(255,255,255,0.8)",
+    textAlign: "right",
   },
 });
