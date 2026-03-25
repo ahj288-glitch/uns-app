@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
@@ -75,6 +76,12 @@ export default function RegisterScreen() {
         }
         return;
       }
+
+      await Promise.all([
+        AsyncStorage.setItem("@uns_pending_userId", data.userId),
+        AsyncStorage.setItem("@uns_pending_email", data.email),
+        AsyncStorage.setItem("@uns_pending_gender", gender),
+      ]);
 
       router.push({
         pathname: "/onboarding/verify",

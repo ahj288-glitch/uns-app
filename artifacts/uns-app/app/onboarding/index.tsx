@@ -41,7 +41,7 @@ export default function OnboardingScreen() {
       await AsyncStorage.setItem("@uns_onboarding_complete", "1");
       await AsyncStorage.setItem("@uns_dialect", "auto");
       await AsyncStorage.setItem("@uns_intention", intention || "explore");
-      router.replace("/(tabs)");
+      router.push("/onboarding/register");
     }
   };
 

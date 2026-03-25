@@ -78,6 +78,9 @@ export default function TourScreen() {
     router.replace("/(tabs)");
   }
 
+  // Safety: if we somehow land here without a token, the tabs guard
+  // will redirect to / which will redirect to /onboarding/register.
+
   return (
     <LinearGradient
       colors={[Colors.surface, "#FAF3EB"]}

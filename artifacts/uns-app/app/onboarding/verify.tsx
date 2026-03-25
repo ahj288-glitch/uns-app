@@ -83,8 +83,12 @@ export default function VerifyScreen() {
         AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
         AsyncStorage.setItem("@uns_onboarding_complete", "1"),
         AsyncStorage.setItem("@uns_gender", gender ?? "female"),
+        AsyncStorage.removeItem("@uns_pending_userId"),
+        AsyncStorage.removeItem("@uns_pending_email"),
+        AsyncStorage.removeItem("@uns_pending_gender"),
       ]);
 
+      console.log("[verify] success — onboarding complete, token stored, navigating to tour");
       router.replace("/onboarding/tour");
     } catch {
       setError("تعذّر الاتصال بالخادم");

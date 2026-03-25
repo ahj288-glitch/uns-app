@@ -1,0 +1,171 @@
+Act as a senior mobile engineer and UX flow architect.
+
+There is a critical onboarding/navigation bug in my app "أُنس".
+
+Problem:
+After opening the app, the onboarding screens keep repeating in a loop.
+I cannot enter the actual app.
+The user gets stuck between the onboarding slides instead of progressing normally.
+
+You must diagnose and FIX the onboarding flow logic, not just the UI.
+
+==================================================
+1) PROBLEM TO FIX
+==================================================
+
+Current issue:
+- The onboarding screens repeat continuously
+- The user cannot enter the app
+- Buttons like "التالي" and "ابدأ رحلتك مع أُنس" are not leading to the proper next state
+- The app appears stuck in onboarding instead of moving forward
+
+This is a navigation/state-management bug.
+
+==================================================
+2) REQUIRED ROOT-CAUSE ANALYSIS
+==================================================
+
+Before changing anything, inspect the logic for:
+
+- first app launch flag
+- onboarding completion flag
+- authentication state
+- email verification state
+- route guards
+- local storage / persistent storage
+- state restoration on app restart
+- page index updates
+- button handlers for next / back / finish
+- logic after registration and after verification
+
+Check whether the app is correctly saving and reading values such as:
+
+- hasCompletedOnboarding
+- isLoggedIn
+- isEmailVerified
+- hasFinishedIntro
+- firstLaunch
+- currentStep
+
+==================================================
+3) REQUIRED FIX
+==================================================
+
+Implement a clean and reliable navigation decision tree.
+
+The flow must be:
+
+A) First-time user:
+1. Open app
+2. See onboarding
+3. Complete onboarding
+4. Go to registration/login
+5. Verify email
+6. Enter app
+
+B) Returning user who already completed onboarding:
+- must NEVER see onboarding again unless explicitly reset
+
+C) Logged-in and verified user:
+- must go directly into the app
+
+D) Logged-in but not verified:
+- must go to verification screen
+
+==================================================
+4) STATE RULES
+==================================================
+
+Create a robust persistent state system.
+
+Required flags:
+- hasCompletedOnboarding: boolean
+- isAuthenticated: boolean
+- isEmailVerified: boolean
+
+Optional:
+- hasSeenWelcomeTour
+- onboardingVersion
+
+When user taps the final onboarding CTA:
+"ابدأ رحلتك مع أُنس"
+
+You MUST:
+- set hasCompletedOnboarding = true
+- persist it properly
+- navigate to the correct next screen
+
+This state must survive app restarts.
+
+==================================================
+5) PREVENT LOOPING
+==================================================
+
+Add guards so onboarding cannot loop.
+
+Examples:
+- if hasCompletedOnboarding == true, onboarding route must not reopen
+- if user is already authenticated and verified, skip onboarding entirely
+- prevent accidental reset of onboarding state on rebuild/re-render
+- avoid resetting onboarding index on every screen rebuild
+
+==================================================
+6) BUTTON LOGIC
+==================================================
+
+Fix all button actions:
+
+- "التالي" → moves to the next onboarding slide correctly
+- "رجوع" → goes to the previous slide only
+- "ابدأ رحلتك مع أُنس" → completes onboarding and exits onboarding permanently
+- "لدي حساب بالفعل" → navigates directly to login without re-entering onboarding loop
+
+==================================================
+7) DEBUGGING REQUIREMENT
+==================================================
+
+Add temporary debug logs for:
+- onboarding state value
+- authentication state
+- email verification state
+- current route decision
+
+So we can see exactly why the user is getting stuck.
+
+==================================================
+8) UX REQUIREMENT
+==================================================
+
+Do not change the visual beauty of the onboarding screens unless needed.
+Focus on fixing the logic first.
+
+The onboarding should feel smooth and intentional:
+- slide 1
+- slide 2
+- finish
+- continue to app flow
+
+No repeated screens.
+No loop.
+No dead-end.
+
+==================================================
+9) OPTIONAL IMPROVEMENT
+==================================================
+
+Add a safe fallback:
+If the app detects corrupted onboarding state,
+show a recovery action or reinitialize the flow cleanly instead of trapping the user.
+
+==================================================
+10) OUTPUT REQUIRED
+==================================================
+
+Before implementing, provide:
+1. the root cause of the loop
+2. the exact flags being used
+3. the corrected flow logic
+4. the route decision tree
+5. the fix implementation plan
+
+Then implement the fix.
