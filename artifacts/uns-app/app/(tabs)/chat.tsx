@@ -23,6 +23,8 @@ import { Spacing, Radius } from "@/constants/layout";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { getContextualSuggestions } from "@/lib/gender";
+import { CRISIS_RESOURCES } from "@/lib/crisis";
+import { API_BASE } from "@/lib/api";
 import * as Haptics from "expo-haptics";
 import ErrorToast from "@/components/ui/ErrorToast";
 import NetworkBanner from "@/components/ui/NetworkBanner";
@@ -49,12 +51,6 @@ type ToastState = {
 };
 
 // ─── Constants ─────────────────────────────────────────────────────────────
-
-const CRISIS_RESOURCES = [
-  { country: "السعودية", number: "920033360" },
-  { country: "الإمارات", number: "800-4673" },
-  { country: "مصر", number: "08008880700" },
-];
 
 
 // Daily limit loaded from shared config (admin-configurable)
@@ -175,7 +171,6 @@ export default function ChatScreen() {
   const lastSentAt = useRef<number>(0);
   const offlineCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -220,7 +215,7 @@ export default function ChatScreen() {
     if (Platform.OS === "web") return;
     offlineCheckRef.current = setInterval(async () => {
       try {
-        await fetch(`${BASE}/api/health`, { method: "HEAD" });
+        await fetch(`${API_BASE}/health`, { method: "HEAD" });
         if (isOffline) {
           setIsReconnecting(true);
           setIsOffline(false);
@@ -318,7 +313,7 @@ export default function ChatScreen() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-        const res = await authFetch(`${BASE}/api/companion/chat`, {
+        const res = await authFetch(`${API_BASE}/companion/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId, message: msg }),

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { randomInt } from "crypto";
 import { db } from "@workspace/db";
 import {
   companionSessionsTable,
@@ -14,6 +15,7 @@ import {
 } from "../lib/jwt.js";
 import nodemailer from "nodemailer";
 import pino from "pino";
+import { DIALECT_GREETINGS } from "../lib/constants.js";
 
 const router = Router();
 const logger = pino({ name: "auth" });
@@ -24,16 +26,8 @@ const logger = pino({ name: "auth" });
 const IS_VERIFICATION_ENABLED = process.env["VERIFICATION_ENABLED"] === "true";
 logger.info({ IS_VERIFICATION_ENABLED }, "[auth] verification feature flag");
 
-const DIALECT_GREETINGS: Record<string, string> = {
-  gulf: "هلا وغلا! أنا رفيقك اليوم. كيف حالك؟",
-  levant: "مرحبا كتير! أنا رفيقك اليوم. كيفك؟",
-  egyptian: "أهلاً! أنا رفيقك النهارده. إيه أخبارك؟",
-  maghrebi: "مرحبا بيك! أنا رفيقك اليوم. كيداير؟",
-  msa: "مرحباً بك! أنا رفيقك اليوم. كيف حالك؟",
-};
-
 function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 1000000).toString();
 }
 
 function maskEmail(email: string): string {

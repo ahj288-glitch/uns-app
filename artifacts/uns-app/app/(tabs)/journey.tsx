@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -25,10 +25,7 @@ import { useSession } from "@/contexts/SessionContext";
 import EmptyState from "@/components/EmptyState";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius, Shadow } from "@/constants/layout";
-
-const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
-  ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
-  : "/api";
+import { API_BASE } from "@/lib/api";
 
 const LEVELS = [
   {
@@ -98,7 +95,7 @@ export default function JourneyScreen() {
   const insets = useSafeAreaInsets();
   const { sessionId } = useSession();
   const T = useTokens();
-  const styles = makeStyles(T);
+  const styles = useMemo(() => makeStyles(T), [T]);
   const [data, setData] = useState<GamificationProgress | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +104,7 @@ export default function JourneyScreen() {
 
   useEffect(() => {
     if (!sessionId) return;
-    fetch(`${BASE_URL}/gamification/progress?sessionId=${sessionId}`)
+    fetch(`${API_BASE}/gamification/progress?sessionId=${sessionId}`)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => setData(d))
       .catch(() => setData(null))

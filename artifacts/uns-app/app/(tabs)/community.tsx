@@ -22,9 +22,9 @@ import EmptyState from "@/components/EmptyState";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius, Shadow } from "@/constants/layout";
 
-const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
-  ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
-  : "/api";
+import { API_BASE } from "@/lib/api";
+
+const BASE_URL = API_BASE;
 
 const MOOD_THEME_COLORS: Record<string, string> = {
   anxiety: "#6B7FD7",

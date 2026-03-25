@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -19,8 +19,7 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import EmptyState from "@/components/EmptyState";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius, Shadow } from "@/constants/layout";
-
-const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+import { API_BASE } from "@/lib/api";
 
 interface WeeklyDay {
   day: string;
@@ -66,7 +65,7 @@ interface InsightsData {
 
 function MiniBar({ value, day, moodAr, hasEntry }: { value: number; day: string; moodAr: string; hasEntry: boolean }) {
   const T = useTokens();
-  const styles = makeStyles(T);
+  const styles = useMemo(() => makeStyles(T), [T]);
   const maxH = 88;
   const fillH = Math.max(value * maxH, hasEntry ? 8 : 4);
   const color = hasEntry ? T.accent : T.surfaceContainerHigh;
@@ -84,7 +83,7 @@ function MiniBar({ value, day, moodAr, hasEntry }: { value: number; day: string;
 
 function XpBar({ progress, color }: { progress: number; color: string }) {
   const T = useTokens();
-  const styles = makeStyles(T);
+  const styles = useMemo(() => makeStyles(T), [T]);
   const pct = Math.min(Math.max(progress, 0), 1);
   return (
     <View style={styles.xpTrack}>
@@ -98,7 +97,7 @@ export default function InsightsScreen() {
   const { sessionId, authFetch } = useSession();
   const { theme } = useThemeContext();
   const T = useTokens();
-  const styles = makeStyles(T);
+  const styles = useMemo(() => makeStyles(T), [T]);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<InsightsData | null>(null);
   const webTop = Platform.OS === "web" ? 67 : insets.top;
@@ -108,7 +107,7 @@ export default function InsightsScreen() {
     if (!sessionId) return;
     setLoading(true);
     try {
-      const r = await authFetch(`${BASE}/api/insights?sessionId=${encodeURIComponent(sessionId)}`);
+      const r = await authFetch(`${API_BASE}/insights?sessionId=${encodeURIComponent(sessionId)}`);
       if (!r.ok) throw new Error("fetch failed");
       const d = await r.json();
       setData(d);

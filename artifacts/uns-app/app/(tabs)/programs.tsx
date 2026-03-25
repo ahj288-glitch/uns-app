@@ -18,8 +18,9 @@ import EmptyState from "@/components/EmptyState";
 import { useSession } from "@/contexts/SessionContext";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius, Shadow } from "@/constants/layout";
+import { API_BASE } from "@/lib/api";
 
-const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+const BASE = API_BASE;
 
 const CATEGORY_CONFIG: Record<string, { ar: string; color: string }> = {
   anxiety: { ar: "القلق", color: "#6B7FD7" },
@@ -273,7 +274,7 @@ export default function ProgramsScreen() {
 
   async function loadPrograms() {
     try {
-      const res = await authFetch(`${BASE}/api/admin/programs`);
+      const res = await authFetch(`${BASE}/admin/programs`);
       const data = await res.json();
       setPrograms(data.programs ?? []);
     } catch {

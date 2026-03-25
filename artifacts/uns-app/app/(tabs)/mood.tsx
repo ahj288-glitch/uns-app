@@ -27,6 +27,7 @@ import ErrorToast from "@/components/ui/ErrorToast";
 import CharCounter from "@/components/ui/CharCounter";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius } from "@/constants/layout";
+import { API_BASE } from "@/lib/api";
 
 const MOODS = [
   { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
@@ -165,7 +166,6 @@ export default function MoodScreen() {
     setToast({ visible: true, message, severity });
   }
 
-  const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -185,7 +185,7 @@ export default function MoodScreen() {
 
     setIsSaving(true);
     try {
-      const res = await authFetch(`${BASE}/api/moods/checkin`, {
+      const res = await authFetch(`${API_BASE}/moods/checkin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -198,7 +198,7 @@ export default function MoodScreen() {
       });
       if (!res.ok && res.status !== 201) throw new Error("checkin_failed");
 
-      const progressRes = await authFetch(`${BASE}/api/gamification/checkin-complete`, {
+      const progressRes = await authFetch(`${API_BASE}/gamification/checkin-complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, moodWord: selectedMood.en }),

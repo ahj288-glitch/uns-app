@@ -17,7 +17,9 @@ import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "@/constants/colors";
 
-const BASE = `https://${process.env["EXPO_PUBLIC_DOMAIN"]}`;
+import { API_BASE } from "@/lib/api";
+
+const BASE = API_BASE;
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 60;
 
@@ -56,7 +58,7 @@ export default function VerifyScreen() {
 
     const otp = otpDigits.join("");
     try {
-      const res = await fetch(`${BASE}/api/auth/verify-email`, {
+      const res = await fetch(`${BASE}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, otp }),
@@ -149,7 +151,7 @@ export default function VerifyScreen() {
     setResending(true);
     setError("");
     try {
-      await fetch(`${BASE}/api/auth/resend-verification`, {
+      await fetch(`${BASE}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),

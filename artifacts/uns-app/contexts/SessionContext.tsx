@@ -2,7 +2,9 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Gender } from "@/lib/gender";
 
-const BASE = `https://${process.env["EXPO_PUBLIC_DOMAIN"]}`;
+import { API_BASE } from "@/lib/api";
+
+const BASE = API_BASE;
 
 interface SessionContextType {
   sessionId: string | null;
@@ -70,7 +72,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     try {
       const storedRefresh = await AsyncStorage.getItem("uns_refresh_token");
       if (!storedRefresh) return null;
-      const res = await fetch(`${BASE}/api/auth/refresh`, {
+      const res = await fetch(`${BASE}/auth/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken: storedRefresh }),

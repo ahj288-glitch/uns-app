@@ -1,11 +1,11 @@
 import { BlurView } from "expo-blur";
 import { Tabs, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "@/constants/colors";
+import { useSession } from "@/contexts/SessionContext";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
@@ -20,23 +20,15 @@ function TabIcon({ name, color, focused }: { name: FeatherIconName; color: strin
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
-  const [checking, setChecking] = useState(true);
+  const { authToken, isReady } = useSession();
 
   useEffect(() => {
-    AsyncStorage.getItem("uns_access_token")
-      .then(token => {
-        if (!token) {
-          router.replace("/");
-        } else {
-          setChecking(false);
-        }
-      })
-      .catch(() => {
-        router.replace("/");
-      });
-  }, []);
+    if (isReady && !authToken) {
+      router.replace("/");
+    }
+  }, [isReady, authToken]);
 
-  if (checking) {
+  if (!isReady) {
     return (
       <View style={{ flex: 1, backgroundColor: Colors.surface, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator color={Colors.accent} size="large" />
@@ -78,7 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="journey"
         options={{
-          title: "Journey",
+          title: "رحلتي",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="map" color={color} focused={focused} />
           ),
@@ -87,7 +79,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="insights"
         options={{
-          title: "Insights",
+          title: "رؤى",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="trending-up" color={color} focused={focused} />
           ),
@@ -96,7 +88,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: "Chat",
+          title: "محادثة",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="message-circle" color={color} focused={focused} />
           ),
@@ -105,7 +97,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "الرئيسية",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="feather" color={color} focused={focused} />
           ),
@@ -114,7 +106,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="share"
         options={{
-          title: "Share",
+          title: "مشاركة",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="share-2" color={color} focused={focused} />
           ),
@@ -124,7 +116,6 @@ export default function TabLayout() {
       <Tabs.Screen name="community" options={{ href: null }} />
       <Tabs.Screen name="programs" options={{ href: null }} />
       <Tabs.Screen name="profile" options={{ href: null }} />
-      <Tabs.Screen name="journal" options={{ href: null }} />
     </Tabs>
   );
 }

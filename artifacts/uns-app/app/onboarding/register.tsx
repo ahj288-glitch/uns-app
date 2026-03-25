@@ -18,7 +18,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/colors";
 
-const BASE = `https://${process.env["EXPO_PUBLIC_DOMAIN"]}`;
+import { API_BASE } from "@/lib/api";
+
+const BASE = API_BASE;
 
 // ── Feature flag ──────────────────────────────────────────────────────────────
 const IS_VERIFICATION_ENABLED = false;
@@ -224,7 +226,7 @@ export default function RegisterScreen() {
     const dobString = `${dobYear}-${monthStr}-${dayStr}`;
 
     try {
-      const res = await fetch(`${BASE}/api/auth/register`, {
+      const res = await fetch(`${BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

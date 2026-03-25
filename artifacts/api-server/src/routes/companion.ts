@@ -7,22 +7,9 @@ import {
   SendCompanionMessageBody,
   GetCompanionHistoryQueryParams,
 } from "@workspace/api-zod";
+import { DIALECT_GREETINGS, CRISIS_RESOURCES } from "../lib/constants.js";
 
 const router = Router();
-
-const DIALECT_GREETINGS: Record<string, string> = {
-  gulf: "هلا وغلا! أنا رفيقك اليوم. كيف حالك؟",
-  levant: "مرحبا كتير! أنا رفيقك اليوم. كيفك؟",
-  egyptian: "أهلاً! أنا رفيقك النهارده. إيه أخبارك؟",
-  maghrebi: "مرحبا بيك! أنا رفيقك اليوم. كيداير؟",
-  msa: "مرحباً بك! أنا رفيقك اليوم. كيف حالك؟",
-};
-
-const CRISIS_RESOURCES = [
-  { country: "KSA", name: "إتصال", number: "920033360" },
-  { country: "UAE", name: "800HOPE", number: "800-4673" },
-  { country: "Egypt", name: "خط دعم الصحة النفسية", number: "08008880700" },
-];
 
 const CRISIS_KEYWORDS = ["اقتل نفسي", "انهيت", "مابغا أعيش", "أموت", "عايز أموت", "نفسي أموت", "يأس", "ميت"];
 
