@@ -1,0 +1,72 @@
+Act as a senior software engineer responsible for version control and repository management.
+
+I want you to push ALL recent changes of the project to GitHub.
+
+==================================================
+OBJECTIVE
+==================================================
+
+- Push the FULL project to GitHub
+- Include ALL files without exception
+- Ensure nothing is missing
+- Prepare the repository for review
+
+==================================================
+REQUIREMENTS
+==================================================
+
+1. Stage ALL files:
+   - source code
+   - UI components
+   - assets (images, icons, fonts)
+   - configuration files
+   - environment-safe files (exclude secrets if needed)
+
+2. Ensure NOTHING is skipped:
+   - no partial commits
+   - no ignored important files
+   - review .gitignore carefully
+
+3. Create a clean commit:
+
+Commit message:
+"feat: complete UI/UX updates + auth flow fixes + design system improvements"
+
+4. Push to GitHub:
+   - push to main branch (or current working branch)
+   - ensure remote is properly connected
+
+==================================================
+VALIDATION BEFORE PUSH
+==================================================
+
+- Run project (if possible) to ensure no breaking errors
+- Check file structure completeness
+- Confirm all recent updates are included:
+  - UI fixes
+  - Arabic font fixes
+  - auth flow changes
+  - registration improvements
+
+==================================================
+POST-PUSH OUTPUT
+==================================================
+
+After pushing, provide:
+
+1. GitHub repository link
+2. Branch name
+3. Last commit hash
+4. Summary of files changed
+5. Confirmation:
+   "All files have been pushed successfully"
+
+==================================================
+IMPORTANT
+==================================================
+
+- Do NOT skip any files unless they contain sensitive secrets
+- If secrets exist, keep structure but exclude only the secret values
+- The goal is to have a FULL working version on GitHub for review
+
+Proceed carefully and completely.
