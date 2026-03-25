@@ -19,6 +19,8 @@ import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import * as Haptics from "expo-haptics";
 import EmptyState from "@/components/EmptyState";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius, Shadow } from "@/constants/layout";
 
 const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
   ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
@@ -113,19 +115,15 @@ function makeLiveCardStyles(T: import("@/constants/colors").ColorTokens) {
   card: {
     width: 160,
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     padding: 14,
-    marginLeft: 12,
-    gap: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    marginLeft: Spacing.md,
+    gap: Spacing.sm,
+    ...Shadow.subtle,
   },
   avatarStack: {
     flexDirection: "row",
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   avatarCircle: {
     width: 32,
@@ -138,31 +136,29 @@ function makeLiveCardStyles(T: import("@/constants/colors").ColorTokens) {
   },
   avatarEmoji: { fontSize: 14 },
   title: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
     color: T.onSurface,
     textAlign: "right",
-    lineHeight: 20,
   },
   hostRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
     justifyContent: "flex-end",
   },
   hostText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: "#6B7FD7",
   },
   joinBtn: {
-    borderRadius: 10,
-    paddingVertical: 8,
+    borderRadius: Radius.sm - 2,
+    paddingVertical: Spacing.sm,
     alignItems: "center",
   },
   joinBtnText: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
     color: "#FFFFFF",
   },
   });
@@ -227,19 +223,15 @@ function makeReflStyles(T: import("@/constants/colors").ColorTokens) {
   return StyleSheet.create({
   card: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     padding: 14,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 3,
+    marginBottom: Spacing.md,
+    ...Shadow.subtle,
   },
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 10,
+    gap: Spacing.md,
   },
   textCol: {
     flex: 1,
@@ -254,45 +246,40 @@ function makeReflStyles(T: import("@/constants/colors").ColorTokens) {
     flexShrink: 0,
   },
   avatarInitial: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: "#FFFFFF",
   },
   title: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 14,
     color: T.onSurface,
     textAlign: "right",
   },
   author: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: "#888888",
     textAlign: "right",
     marginTop: 1,
   },
   preview: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: T.muted,
     textAlign: "right",
-    lineHeight: 20,
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
   footerRow: {
     flexDirection: "row",
     gap: 14,
-    marginTop: 8,
+    marginTop: Spacing.sm,
     justifyContent: "flex-end",
   },
   actionBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
   },
   actionCount: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: "#AAAAAA",
   },
   });
@@ -334,32 +321,25 @@ function makeInSessionStyles(T: import("@/constants/colors").ColorTokens) {
   return StyleSheet.create({
   postCard: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     padding: 14,
-    gap: 8,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+    ...Shadow.subtle,
   },
   postHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   postName: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
     color: T.accent,
   },
   postTime: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: "#888888",
   },
   postContent: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.onSurface,
-    lineHeight: 22,
     textAlign: "right",
   },
   heartBtn: {
@@ -369,8 +349,7 @@ function makeInSessionStyles(T: import("@/constants/colors").ColorTokens) {
     alignSelf: "flex-start",
   },
   heartCount: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: "#888888",
   },
   });
@@ -458,7 +437,7 @@ export default function CommunityScreen() {
 
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 120 }}
+          contentContainerStyle={{ padding: Spacing.lg, gap: Spacing.md, paddingBottom: 120 }}
           showsVerticalScrollIndicator={false}
         >
           {postsLoading ? (
@@ -478,7 +457,7 @@ export default function CommunityScreen() {
           ))}
         </ScrollView>
 
-        <View style={[styles.postInputContainer, { paddingBottom: webBottom + 8 }]}>
+        <View style={[styles.postInputContainer, { paddingBottom: webBottom + Spacing.sm }]}>
           <TextInput
             style={styles.postInput}
             value={newPost}
@@ -520,7 +499,7 @@ export default function CommunityScreen() {
       contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={[styles.headerBar, { paddingTop: webTop + 8 }]}>
+      <View style={[styles.headerBar, { paddingTop: webTop + Spacing.sm }]}>
         <Pressable style={styles.headerBtn}>
           <Feather name="chevron-right" size={20} color="#555555" />
         </Pressable>
@@ -536,7 +515,7 @@ export default function CommunityScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color={"#74C69D"} style={{ marginLeft: 16, marginTop: 40, marginBottom: 20 }} />
+        <ActivityIndicator color={"#74C69D"} style={{ marginLeft: Spacing.lg, marginTop: 40, marginBottom: Spacing.xl }} />
       ) : sessions.length === 0 ? (
         <EmptyState
           icon="users"
@@ -591,8 +570,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
   headerBtn: {
     width: 36,
@@ -601,15 +580,10 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: T.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: T.cardShadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.subtle,
   },
   headerTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: T.onSurface,
     textAlign: "center",
   },
@@ -617,89 +591,78 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 10,
+    paddingHorizontal: Spacing.lg,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   sectionTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: T.onSurface,
     textAlign: "right",
   },
   sectionSeeAll: {
-    fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 12,
+    ...Typography.label,
     color: T.accent,
   },
   sectionTrending: {
-    fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 12,
+    ...Typography.label,
     color: T.muted,
   },
   liveScroll: {
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   liveScrollContent: {
-    paddingRight: 16,
-    paddingLeft: 4,
+    paddingRight: Spacing.lg,
+    paddingLeft: Spacing.xs,
   },
   reflectionsList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.lg,
   },
   sessionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    gap: 12,
+    padding: Spacing.lg,
+    gap: Spacing.md,
     backgroundColor: T.surface,
   },
-  backBtn: { padding: 8 },
+  backBtn: { padding: Spacing.sm },
   sessionHeaderTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: T.onSurface,
   },
   sessionHeaderSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: T.muted,
     marginTop: 2,
   },
   safetyBanner: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: Spacing.sm,
     backgroundColor: T.primaryContainer,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     justifyContent: "flex-end",
   },
   safetyText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: T.accent,
   },
   postInputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
-    padding: 12,
+    gap: Spacing.md,
+    padding: Spacing.md,
     backgroundColor: T.surfaceContainer,
-    shadowColor: T.cardShadow,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...Shadow.card,
   },
   postInput: {
     flex: 1,
     backgroundColor: T.surface,
-    borderRadius: 20,
-    padding: 12,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
     color: T.onSurface,
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     minHeight: 44,
     maxHeight: 100,
     textAlignVertical: "top",

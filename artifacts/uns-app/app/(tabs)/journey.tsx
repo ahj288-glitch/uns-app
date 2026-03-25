@@ -23,6 +23,8 @@ import * as Haptics from "expo-haptics";
 import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import EmptyState from "@/components/EmptyState";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius, Shadow } from "@/constants/layout";
 
 const BASE_URL = process.env.EXPO_PUBLIC_DOMAIN
   ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`
@@ -265,40 +267,38 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       flex: 1,
     },
     header: {
-      paddingHorizontal: 24,
-      paddingTop: 20,
-      paddingBottom: 16,
+      paddingHorizontal: Spacing.xxl,
+      paddingTop: Spacing.xl,
+      paddingBottom: Spacing.lg,
       alignItems: "flex-end",
-      gap: 12,
+      gap: Spacing.md,
     },
     screenTitle: {
-      fontFamily: "Tajawal_700Bold",
-      fontSize: 36,
+      ...Typography.display,
       color: T.onSurface,
       textAlign: "right",
       letterSpacing: -0.5,
     },
     streakBadge: {
       backgroundColor: T.primaryContainer,
-      borderRadius: 999,
+      borderRadius: Radius.pill,
       paddingHorizontal: 14,
       paddingVertical: 6,
     },
     streakBadgeText: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 13,
+      ...Typography.bodySmall,
       color: T.accent,
     },
     stagesContainer: {
-      paddingHorizontal: 16,
-      gap: 12,
-      marginBottom: 16,
+      paddingHorizontal: Spacing.lg,
+      gap: Spacing.md,
+      marginBottom: Spacing.lg,
     },
     stageCard: {
       flexDirection: "row",
-      gap: 16,
+      gap: Spacing.lg,
       backgroundColor: T.surfaceContainer,
-      borderRadius: 20,
+      borderRadius: Radius.lg,
       padding: 18,
       alignItems: "flex-start",
     },
@@ -326,33 +326,29 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     stageRight: {
       flex: 1,
       alignItems: "flex-end",
-      gap: 4,
+      gap: Spacing.xs,
     },
     stageMeta: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 11,
+      ...Typography.caption,
       color: T.muted,
       textAlign: "right",
       letterSpacing: 0.5,
     },
     stageName: {
-      fontFamily: "Tajawal_700Bold",
-      fontSize: 22,
+      ...Typography.h1,
       color: T.onSurface,
       textAlign: "right",
     },
     stageDesc: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 13,
+      ...Typography.bodySmall,
       color: T.primary,
       textAlign: "right",
-      lineHeight: 20,
       marginTop: 2,
     },
     stageProgress: {
       width: "100%",
       gap: 6,
-      marginTop: 10,
+      marginTop: Spacing.md,
       alignItems: "flex-end",
     },
     progressBarBg: {
@@ -368,8 +364,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       borderRadius: 2,
     },
     progressLabel: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 11,
+      ...Typography.caption,
       color: T.accent,
     },
     textDimmed: {
@@ -380,62 +375,53 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       opacity: 0.6,
     },
     quoteCard: {
-      marginHorizontal: 16,
+      marginHorizontal: Spacing.lg,
       backgroundColor: T.surfaceContainer,
-      borderRadius: 20,
-      padding: 20,
+      borderRadius: Radius.lg,
+      padding: Spacing.xl,
       alignItems: "flex-end",
-      gap: 10,
-      marginBottom: 16,
+      gap: Spacing.md,
+      marginBottom: Spacing.lg,
     },
     quotePrefix: {
-      fontFamily: "Tajawal_700Bold",
-      fontSize: 12,
+      ...Typography.label,
       color: T.accent,
       letterSpacing: 0.5,
     },
     quoteText: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 15,
+      ...Typography.body,
       color: T.primary,
       textAlign: "right",
-      lineHeight: 28,
     },
     metricsRow: {
       flexDirection: "row",
-      gap: 12,
-      marginHorizontal: 16,
-      marginBottom: 12,
+      gap: Spacing.md,
+      marginHorizontal: Spacing.lg,
+      marginBottom: Spacing.md,
     },
     metricCard: {
       flex: 1,
       backgroundColor: T.surfaceContainerHigh,
-      borderRadius: 20,
-      padding: 20,
+      borderRadius: Radius.lg,
+      padding: Spacing.xl,
       alignItems: "flex-end",
-      gap: 4,
+      gap: Spacing.xs,
     },
     metricValue: {
-      fontFamily: "Tajawal_700Bold",
-      fontSize: 32,
+      ...Typography.display,
       color: T.onSurface,
     },
     metricLabel: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 12,
+      ...Typography.label,
       color: T.muted,
       textAlign: "right",
     },
     pathsCardWrapper: {
-      marginHorizontal: 16,
-      marginBottom: 16,
-      borderRadius: 20,
+      marginHorizontal: Spacing.lg,
+      marginBottom: Spacing.lg,
+      borderRadius: Radius.lg,
       overflow: "hidden",
-      shadowColor: T.cardShadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 12,
-      elevation: 6,
+      ...Shadow.card,
     },
     pathsCard: {
       flexDirection: "row",
@@ -456,20 +442,17 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     pathsTextCol: {
       flex: 1,
       alignItems: "flex-end",
-      gap: 4,
+      gap: Spacing.xs,
     },
     pathsTitle: {
-      fontFamily: "Tajawal_700Bold",
-      fontSize: 20,
+      ...Typography.h2,
       color: "#FFFFFF",
       textAlign: "right",
     },
     pathsSub: {
-      fontFamily: "Tajawal_400Regular",
-      fontSize: 13,
+      ...Typography.bodySmall,
       color: "rgba(255,255,255,0.8)",
       textAlign: "right",
     },
   });
 }
-

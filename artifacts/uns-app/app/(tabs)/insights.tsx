@@ -17,6 +17,8 @@ import Colors, { useTokens } from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import EmptyState from "@/components/EmptyState";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius, Shadow } from "@/constants/layout";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -132,7 +134,7 @@ export default function InsightsScreen() {
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View entering={FadeInDown.duration(500)} style={[styles.header, { paddingTop: webTop + 16 }]}>
+      <Animated.View entering={FadeInDown.duration(500)} style={[styles.header, { paddingTop: webTop + Spacing.lg }]}>
         <Text style={styles.screenTitle}>رؤاك الأسبوعية</Text>
         <Text style={styles.screenSubtitle}>تحليل مشاعرك وأنماطك</Text>
       </Animated.View>
@@ -279,40 +281,38 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   container: { flex: 1 },
   scrollContainer: { flex: 1 },
   header: {
-    paddingHorizontal: 24,
-    paddingBottom: 16,
+    paddingHorizontal: Spacing.xxl,
+    paddingBottom: Spacing.lg,
     alignItems: "flex-end",
   },
   screenTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 32,
+    ...Typography.display,
     color: T.onSurface,
     textAlign: "right",
     letterSpacing: -0.5,
   },
   screenSubtitle: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
-    marginTop: 4,
+    marginTop: Spacing.xs,
     textAlign: "right",
   },
   loadingBox: {
     alignItems: "center",
     paddingTop: 60,
-    gap: 16,
+    gap: Spacing.lg,
   },
   loadingText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
     textAlign: "center",
   },
   gamifCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 24,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: Radius.xl,
     overflow: "hidden",
+    ...Shadow.card,
   },
   gamifGrad: {
     padding: 18,
@@ -320,35 +320,32 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   },
   gamifRow: {
     flexDirection: "row",
-    gap: 16,
+    gap: Spacing.lg,
     alignItems: "flex-start",
   },
   gamifLeft: {
     flex: 1,
-    gap: 8,
+    gap: Spacing.sm,
     alignItems: "flex-end",
   },
   levelBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Spacing.xl,
     borderWidth: 1,
   },
   levelText: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
   },
   gamifXp: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 32,
+    ...Typography.display,
     color: T.onSurface,
     letterSpacing: -1,
-    lineHeight: 38,
     textAlign: "right",
   },
   gamifXpUnit: {
-    fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 14,
+    ...Typography.label,
     color: T.muted,
   },
   xpTrack: {
@@ -363,14 +360,13 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderRadius: 3,
   },
   gamifNextLevel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: T.muted,
     textAlign: "right",
   },
   gamifStats: {
     flexDirection: "row",
-    gap: 8,
+    gap: Spacing.sm,
   },
   statItem: {
     alignItems: "center",
@@ -379,13 +375,11 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   },
   statIcon: { fontSize: 16 },
   statValue: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     color: T.onSurface,
-    lineHeight: 26,
   },
   statLabel: {
-    fontFamily: "Tajawal_400Regular",
+    ...Typography.caption,
     fontSize: 9,
     color: T.muted,
     textAlign: "center",
@@ -399,33 +393,31 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   winChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
     backgroundColor: T.surfaceContainerHigh,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: Spacing.xl,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
   },
   winText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: T.onSurface,
   },
   winPts: {
-    fontFamily: "BeVietnamPro_500Medium",
+    ...Typography.label,
     fontSize: 10,
     color: T.accent,
   },
   chartCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
-    padding: 20,
-    gap: 16,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    gap: Spacing.lg,
   },
   chartTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 15,
+    ...Typography.h3,
     color: T.onSurface,
     textAlign: "right",
   },
@@ -438,10 +430,10 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   barItem: {
     flex: 1,
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
   },
   barMoodLabel: {
-    fontFamily: "Tajawal_400Regular",
+    ...Typography.caption,
     fontSize: 8,
     color: T.muted,
     textAlign: "center",
@@ -457,7 +449,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     minHeight: 4,
   },
   barDayLabel: {
-    fontFamily: "Tajawal_400Regular",
+    ...Typography.caption,
     fontSize: 9,
     color: T.muted,
     textAlign: "center",
@@ -474,51 +466,47 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderRadius: 4,
   },
   legendText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: T.muted,
   },
   section: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    gap: 10,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    gap: Spacing.md,
   },
   sectionTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: T.onSurface,
     textAlign: "right",
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
-  insightsList: { gap: 8 },
+  insightsList: { gap: Spacing.sm },
   insightCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: Radius.lg,
+    padding: Spacing.cardPad,
     justifyContent: "flex-end",
   },
   insightIcon: { fontSize: 22 },
   insightText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.primary,
     flex: 1,
     textAlign: "right",
-    lineHeight: 22,
   },
   moodPatternCard: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: Radius.lg,
+    padding: Spacing.cardPad,
     gap: 14,
   },
   moodPatternRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: Spacing.md,
     justifyContent: "flex-end",
   },
   moodBarTrack: {
@@ -533,37 +521,34 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderRadius: 3,
   },
   moodPatternLabel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: T.primary,
     width: 55,
     textAlign: "right",
   },
   moodPatternPct: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
     width: 36,
     textAlign: "right",
   },
   quoteCard: {
-    marginHorizontal: 16,
-    marginBottom: 12,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
     backgroundColor: T.primaryContainer,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
     alignItems: "flex-end",
-    gap: 10,
+    gap: Spacing.md,
   },
   quoteIcon: {
     fontSize: 18,
     color: T.accent,
   },
   quoteText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 15,
+    ...Typography.body,
     color: T.primary,
     textAlign: "right",
-    lineHeight: 26,
   },
   });
 }

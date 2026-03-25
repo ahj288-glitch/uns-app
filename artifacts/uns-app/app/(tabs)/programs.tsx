@@ -16,6 +16,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import Colors, { useTokens } from "@/constants/colors";
 import EmptyState from "@/components/EmptyState";
 import { useSession } from "@/contexts/SessionContext";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius, Shadow } from "@/constants/layout";
 
 const BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
@@ -84,20 +86,16 @@ function HeroBanner() {
 
 const heroStyles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 20,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: Radius.lg,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    ...Shadow.subtle,
   },
   gradient: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
+    padding: Spacing.xl,
     minHeight: 130,
   },
   illustrationArea: {
@@ -119,19 +117,16 @@ const heroStyles = StyleSheet.create({
   textArea: {
     flex: 1,
     alignItems: "flex-end",
-    paddingRight: 12,
+    paddingRight: Spacing.md,
   },
   heroTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     textAlign: "right",
-    lineHeight: 32,
   },
   heroSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     textAlign: "right",
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
 });
 
@@ -188,15 +183,11 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
 
 const cardStyles = StyleSheet.create({
   wrapper: {
-    marginHorizontal: 16,
+    marginHorizontal: Spacing.lg,
     marginBottom: 14,
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    ...Shadow.card,
   },
   card: {
     flexDirection: "row",
@@ -217,17 +208,16 @@ const cardStyles = StyleSheet.create({
   contentArea: {
     flex: 1,
     alignItems: "flex-end",
-    gap: 8,
+    gap: Spacing.sm,
   },
   title: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     color: "#FFFFFF",
     textAlign: "right",
   },
   progressSection: {
     width: "100%",
-    gap: 4,
+    gap: Spacing.xs,
     alignItems: "flex-end",
   },
   progressBarBg: {
@@ -243,7 +233,7 @@ const cardStyles = StyleSheet.create({
     borderRadius: 2,
   },
   progressLabel: {
-    fontFamily: "BeVietnamPro_500Medium",
+    ...Typography.label,
     fontSize: 11,
     color: "rgba(255,255,255,0.8)",
   },
@@ -254,19 +244,18 @@ const cardStyles = StyleSheet.create({
     width: "100%",
   },
   durationLabel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: "rgba(255,255,255,0.75)",
   },
   ctaBtn: {
     backgroundColor: "rgba(255,255,255,0.25)",
     paddingHorizontal: 14,
     paddingVertical: 7,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
   },
   ctaBtnText: {
+    ...Typography.bodySmall,
     fontFamily: "Tajawal_700Bold",
-    fontSize: 13,
     color: "#FFFFFF",
   },
 });
@@ -304,7 +293,7 @@ export default function ProgramsScreen() {
       contentContainerStyle={{ paddingBottom: webBottom + 80 }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={[styles.headerBar, { paddingTop: webTop + 8 }]}>
+      <View style={[styles.headerBar, { paddingTop: webTop + Spacing.sm }]}>
         <Pressable style={styles.headerBtn}>
           <Feather name="settings" size={18} color="#555555" />
         </Pressable>
@@ -349,8 +338,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
   },
   headerBtn: {
     width: 36,
@@ -359,36 +348,29 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: T.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.subtle,
   },
   headerTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     color: T.onSurface,
     textAlign: "center",
   },
   loadingState: {
     alignItems: "center",
     paddingVertical: 60,
-    gap: 12,
+    gap: Spacing.md,
   },
   loadingText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
   },
   errorState: {
     alignItems: "center",
     paddingVertical: 60,
-    gap: 12,
+    gap: Spacing.md,
   },
   errorText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.error,
   },
   });

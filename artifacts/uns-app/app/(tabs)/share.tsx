@@ -14,6 +14,8 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import Colors, { useTokens } from "@/constants/colors";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius } from "@/constants/layout";
 
 // ─── Tone Library ──────────────────────────────────────────────────────────
 const QUOTE_BANK: Record<string, string[]> = {
@@ -269,8 +271,7 @@ export default function ShareScreen() {
       contentContainerStyle={{ paddingBottom: webBottom + 100 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: webTop + 12 }]}>
+      <View style={[styles.header, { paddingTop: webTop + Spacing.md }]}>
         <Text style={styles.logo}>أُنْس</Text>
         <Text style={styles.headerTitle}>شارك حالتك</Text>
         <View style={styles.headerRight}>
@@ -281,18 +282,15 @@ export default function ShareScreen() {
         </View>
       </View>
 
-      {/* Card Preview */}
       <View style={styles.cardPreviewWrap}>
         <CardComponent aura={aura} quote={quote} />
       </View>
 
-      {/* Regenerate */}
       <Pressable style={styles.regenBtn} onPress={regenerate}>
         <Feather name="refresh-cw" size={14} color={T.accent} />
         <Text style={styles.regenText}>توليد عبارة جديدة</Text>
       </Pressable>
 
-      {/* Aura State */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>الحالة العاطفية</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
@@ -315,7 +313,6 @@ export default function ShareScreen() {
         </ScrollView>
       </View>
 
-      {/* Card Type */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>نوع البطاقة</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
@@ -344,7 +341,6 @@ export default function ShareScreen() {
         </ScrollView>
       </View>
 
-      {/* Tone */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>نبرة العبارة</Text>
         <View style={styles.toneGrid}>
@@ -360,7 +356,6 @@ export default function ShareScreen() {
         </View>
       </View>
 
-      {/* Privacy */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>مستوى الخصوصية</Text>
         <View style={styles.privacyRow}>
@@ -382,7 +377,6 @@ export default function ShareScreen() {
         </Text>
       </View>
 
-      {/* Action Buttons */}
       <View style={styles.actionsRow}>
         <Pressable style={styles.saveBtn} onPress={regenerate}>
           <Feather name="download" size={18} color={T.accent} />
@@ -415,43 +409,43 @@ function makeCardStyles(T: import("@/constants/colors").ColorTokens) {
   card: {
     width: "100%",
     aspectRatio: 9 / 16,
-    borderRadius: 24,
+    borderRadius: Radius.xl,
     padding: 28,
     alignItems: "flex-end",
     justifyContent: "space-between",
     overflow: "hidden",
   },
-  brand: { fontFamily: "Tajawal_700Bold", fontSize: 24, color: T.accent, textAlign: "right" },
-  brandSub: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.muted, letterSpacing: 2, textTransform: "uppercase", textAlign: "right" },
+  brand: { ...Typography.h2, color: T.accent, textAlign: "right" },
+  brandSub: { ...Typography.caption, color: T.muted, letterSpacing: 2, textTransform: "uppercase", textAlign: "right" },
   orbWrap: { flex: 1, alignItems: "center", justifyContent: "center", width: "100%" },
   orbGlow: { position: "absolute", width: 150, height: 150, borderRadius: 75, opacity: 0.15 },
   orbCore: { width: 120, height: 120, borderRadius: 60, borderWidth: 1, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(27,67,50,0.6)" },
-  orbEmoji: { fontFamily: "Tajawal_700Bold", fontSize: 20 },
-  quote: { fontFamily: "Tajawal_400Regular", fontSize: 15, textAlign: "right", lineHeight: 26, opacity: 0.9 },
+  orbEmoji: { ...Typography.h2, fontFamily: "Tajawal_700Bold" },
+  quote: { ...Typography.body, textAlign: "right", opacity: 0.9 },
   cardFooter: { alignItems: "flex-end" },
-  footerCue: { fontFamily: "BeVietnamPro_500Medium", fontSize: 9, color: T.muted, letterSpacing: 1.5, textTransform: "uppercase" },
+  footerCue: { ...Typography.label, fontSize: 9, color: T.muted, letterSpacing: 1.5, textTransform: "uppercase" },
   insightIconWrap: { alignItems: "center", width: "100%", marginVertical: 16 },
-  bigQuote: { fontFamily: "BeVietnamPro_500Medium", fontSize: 48, opacity: 0.3, alignSelf: "flex-end", lineHeight: 40 },
-  insightQuote: { fontFamily: "Tajawal_400Regular", fontSize: 18, textAlign: "right", lineHeight: 30, opacity: 0.95 },
+  bigQuote: { ...Typography.label, fontSize: 48, opacity: 0.3, alignSelf: "flex-end", lineHeight: 40 },
+  insightQuote: { ...Typography.h2, textAlign: "right", opacity: 0.95 },
   quoteBar: { width: 40, height: 2, borderRadius: 1, marginTop: 12, alignSelf: "flex-end" },
-  auraLabel: { fontFamily: "Tajawal_700Bold", fontSize: 13, textAlign: "right", marginTop: 6 },
+  auraLabel: { ...Typography.bodySmall, fontFamily: "Tajawal_700Bold", textAlign: "right", marginTop: 6 },
   streakHeader: { alignItems: "flex-end", width: "100%" },
-  streakCount: { fontFamily: "Tajawal_700Bold", fontSize: 72, lineHeight: 80 },
-  streakUnit: { fontFamily: "Tajawal_700Bold", fontSize: 22, color: T.primaryContainer, marginTop: -12 },
-  streakLabel: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted, marginTop: 2 },
-  dotsRow: { flexDirection: "row", gap: 8, justifyContent: "flex-end", marginVertical: 16 },
+  streakCount: { ...Typography.display, fontSize: 72, lineHeight: 80, fontFamily: "Tajawal_700Bold" },
+  streakUnit: { ...Typography.h1, color: T.primaryContainer, marginTop: -12 },
+  streakLabel: { ...Typography.bodySmall, color: T.muted, marginTop: 2 },
+  dotsRow: { flexDirection: "row", gap: Spacing.sm, justifyContent: "flex-end", marginVertical: 16 },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  smallQuote: { fontFamily: "Tajawal_400Regular", fontSize: 13, textAlign: "right", lineHeight: 22, opacity: 0.7 },
-  summaryTitle: { fontFamily: "Tajawal_700Bold", fontSize: 16, textAlign: "right", marginBottom: 12 },
-  statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "flex-end", width: "100%" },
-  statBox: { backgroundColor: "rgba(116,198,157,0.06)", borderRadius: 12, borderWidth: 1, padding: 10, minWidth: "44%", alignItems: "flex-end" },
-  statValue: { fontFamily: "Tajawal_700Bold", fontSize: 16 },
-  statLabel: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.muted, marginTop: 2 },
+  smallQuote: { ...Typography.bodySmall, textAlign: "right", opacity: 0.7 },
+  summaryTitle: { ...Typography.h3, textAlign: "right", marginBottom: 12 },
+  statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm, justifyContent: "flex-end", width: "100%" },
+  statBox: { backgroundColor: "rgba(116,198,157,0.06)", borderRadius: Radius.sm, borderWidth: 1, padding: Spacing.md, minWidth: "44%", alignItems: "flex-end" },
+  statValue: { ...Typography.h3, fontFamily: "Tajawal_700Bold" },
+  statLabel: { ...Typography.caption, color: T.muted, marginTop: 2 },
   moonEmoji: { fontSize: 40, textAlign: "right", alignSelf: "flex-end" },
-  nightTitle: { fontFamily: "Tajawal_700Bold", fontSize: 18, textAlign: "right" },
+  nightTitle: { ...Typography.h3, textAlign: "right" },
   nightBar: { width: "100%", height: 6, borderRadius: 3, marginVertical: 12 },
   nightFill: { height: "100%", borderRadius: 3 },
-  nightLabel: { fontFamily: "BeVietnamPro_500Medium", fontSize: 11, textAlign: "right" },
+  nightLabel: { ...Typography.label, textAlign: "right" },
   });
 }
 
@@ -463,89 +457,91 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.screenH,
+    paddingBottom: Spacing.md,
   },
-  logo: { fontFamily: "Tajawal_700Bold", fontSize: 20, color: T.accent },
-  headerTitle: { fontFamily: "Tajawal_700Bold", fontSize: 18, color: T.onSurface },
+  logo: { ...Typography.h2, color: T.accent },
+  headerTitle: { ...Typography.h2, color: T.onSurface },
   headerRight: {},
   privacyBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
     borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 8,
+    borderRadius: Radius.pill,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: 3,
   },
-  privacyBadgeText: { fontFamily: "Tajawal_400Regular", fontSize: 10, color: T.accent },
-  cardPreviewWrap: { paddingHorizontal: 20, marginBottom: 12 },
+  privacyBadgeText: { ...Typography.caption, color: T.accent },
+  cardPreviewWrap: { paddingHorizontal: Spacing.xl, marginBottom: Spacing.md },
   regenBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
     alignSelf: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginBottom: 20,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.xl,
     backgroundColor: T.surfaceContainer,
-    borderRadius: 999,
+    borderRadius: Radius.pill,
   },
-  regenText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.accent },
-  section: { paddingHorizontal: 20, marginBottom: 20 },
+  regenText: { ...Typography.bodySmall, color: T.accent },
+  section: { paddingHorizontal: Spacing.xl, marginBottom: Spacing.xl },
   sectionLabel: {
-    fontFamily: "Tajawal_700Bold",
+    ...Typography.label,
     fontSize: 14,
     color: T.onSurface,
-    marginBottom: 12,
+    marginBottom: Spacing.md,
     textAlign: "right",
   },
-  pillsRow: { gap: 8, paddingVertical: 2 },
+  pillsRow: { gap: Spacing.sm, paddingVertical: 2 },
   auraPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.pill,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.6)",
     backgroundColor: T.surfaceContainer,
   },
   auraColorDot: { width: 8, height: 8, borderRadius: 4 },
-  pillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
+  pillText: { ...Typography.bodySmall, color: T.muted },
   cardTypePill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.pill,
     backgroundColor: T.surfaceContainer,
   },
-  cardTypePillActive: { backgroundColor: T.accent },
-  cardTypePillText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
-  cardTypePillTextActive: { color: T.surface, fontFamily: "Tajawal_700Bold" },
+  cardTypePillActive: {
+    backgroundColor: T.accent,
+  },
+  cardTypePillText: { ...Typography.bodySmall, color: T.muted },
+  cardTypePillTextActive: { color: T.surface },
   toneGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: Spacing.sm,
     justifyContent: "flex-end",
   },
   tonePill: {
     paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 999,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.pill,
     backgroundColor: T.surfaceContainer,
   },
   tonePillActive: { backgroundColor: T.primaryContainer },
-  toneText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
+  toneText: { ...Typography.bodySmall, color: T.muted },
   toneTextActive: { color: T.accent },
   privacyRow: {
     flexDirection: "row",
-    gap: 8,
-    justifyContent: "flex-end",
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   privacyOption: {
     flex: 1,
@@ -553,55 +549,58 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.md,
     backgroundColor: T.surfaceContainer,
   },
   privacyOptionActive: { backgroundColor: T.primaryContainer },
-  privacyText: { fontFamily: "Tajawal_400Regular", fontSize: 13, color: T.muted },
-  privacyTextActive: { color: T.accent, fontFamily: "Tajawal_700Bold" },
+  privacyText: { ...Typography.bodySmall, color: T.muted },
+  privacyTextActive: { color: T.accent },
   privacyNote: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: T.muted,
     textAlign: "right",
-    marginTop: 8,
-    lineHeight: 18,
+    marginTop: Spacing.xs,
   },
   actionsRow: {
     flexDirection: "row",
-    gap: 12,
-    paddingHorizontal: 20,
-    marginBottom: 12,
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.md,
   },
   saveBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    flex: 1,
+    gap: 6,
     paddingVertical: 14,
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     backgroundColor: T.surfaceContainer,
+    borderWidth: 1,
+    borderColor: T.accent + "40",
   },
-  saveBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: T.accent },
-  shareBtn: { flex: 2, borderRadius: 999, overflow: "hidden" },
+  saveBtnText: { ...Typography.h3, color: T.accent },
+  shareBtn: {
+    flex: 2,
+    borderRadius: Radius.pill,
+    overflow: "hidden",
+  },
   shareBtnInner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: Spacing.sm,
     paddingVertical: 14,
+    borderRadius: Radius.pill,
   },
-  shareBtnText: { fontFamily: "Tajawal_700Bold", fontSize: 15, color: T.surface },
+  shareBtnText: { ...Typography.h3, color: T.surface },
   footerNote: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: T.muted,
     textAlign: "center",
-    paddingHorizontal: 24,
-    lineHeight: 18,
-    marginBottom: 8,
+    paddingHorizontal: Spacing.xxl,
+    marginBottom: Spacing.lg,
   },
   });
 }

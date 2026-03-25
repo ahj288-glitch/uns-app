@@ -21,6 +21,8 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import BreathingSession from "@/components/BreathingSession";
 import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
 import { useGetDailyRecipe, useRecordMoodCheckin } from "@workspace/api-client-react";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius, Shadow } from "@/constants/layout";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   "هدوء": "🌅",
@@ -37,9 +39,6 @@ function IridescentOrb({ orbColors }: { orbColors: [string, string, string] }) {
   const rotate = useRef(new Animated.Value(0)).current;
   const layer2Rotate = useRef(new Animated.Value(0)).current;
 
-  // Derived animated values computed once at mount — not inside render.
-  // Calling Animated.multiply() inside render creates new nodes every cycle
-  // which defeats useNativeDriver and accumulates memory.
   const glowHalf = useRef(Animated.multiply(glow, 0.5)).current;
   const glowFour = useRef(Animated.multiply(glow, 0.4)).current;
   const glowThreeFive = useRef(Animated.multiply(glow, 0.35)).current;
@@ -151,7 +150,7 @@ const orbStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 220,
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
   outerRing: {
     position: "absolute",
@@ -195,14 +194,12 @@ const orbStyles = StyleSheet.create({
     borderRadius: 76,
   },
   orbLabel: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     color: "rgba(255,255,255,0.97)",
     textAlign: "center",
   },
   orbSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 10,
+    ...Typography.caption,
     color: "rgba(255,255,255,0.75)",
     textAlign: "center",
     letterSpacing: 0.5,
@@ -267,7 +264,7 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingBottom: webBottom + 90 }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.header, { paddingTop: webTop + 12 }]}>
+          <View style={[styles.header, { paddingTop: webTop + Spacing.md }]}>
             <Pressable onPress={() => router.push("/(tabs)/profile")} style={styles.avatarBtn}>
               <LinearGradient
                 colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
@@ -376,7 +373,6 @@ export default function HomeScreen() {
               <Text style={styles.dailyQuote} numberOfLines={3}>
                 "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
               </Text>
-              {/* Only show static attribution when no recipe is loaded */}
               {!recipe && (
                 <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
               )}
@@ -407,7 +403,6 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Community Entry Card */}
           <Pressable
             style={styles.communityCard}
             onPress={() => {
@@ -449,8 +444,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 8,
+    paddingHorizontal: Spacing.screenH,
+    paddingBottom: Spacing.sm,
   },
   avatarBtn: {},
   avatarCircle: {
@@ -463,29 +458,25 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.4)",
   },
   avatarText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: "#FFFFFF",
   },
   headerLogo: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 22,
+    ...Typography.h1,
     color: "#FFFFFF",
     letterSpacing: -0.5,
   },
   shareHeaderBtn: { padding: 6 },
   greetingSection: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 4,
+    paddingHorizontal: Spacing.xxl,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
     alignItems: "flex-end",
   },
   greetingTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 26,
+    ...Typography.h1,
     color: "#FFFFFF",
     textAlign: "right",
-    lineHeight: 42,
     letterSpacing: -0.3,
     textShadowColor: "rgba(0,0,0,0.1)",
     textShadowOffset: { width: 0, height: 1 },
@@ -495,19 +486,18 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
-    marginBottom: 20,
+    gap: Spacing.md,
+    marginBottom: Spacing.xl,
     marginTop: 6,
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xxl,
   },
   breatheLabel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: "rgba(255,255,255,0.85)",
     textAlign: "center",
   },
   startNowBtn: {
-    borderRadius: 24,
+    borderRadius: Radius.xl,
     overflow: "hidden",
     width: "100%",
     borderWidth: 1,
@@ -517,18 +507,17 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 24,
+    borderRadius: Radius.xl,
   },
   startNowText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 18,
+    ...Typography.h2,
     color: "#FFFFFF",
     letterSpacing: 0.5,
   },
   moodCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 24,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: Radius.xl,
     padding: 18,
     overflow: "hidden",
   },
@@ -536,8 +525,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.22)",
   },
   moodQuestion: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 16,
+    ...Typography.h3,
     color: "#FFFFFF",
     textAlign: "right",
     marginBottom: 14,
@@ -545,14 +533,14 @@ const styles = StyleSheet.create({
   moodChipsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 4,
+    gap: Spacing.xs,
   },
   moodChip: {
     flex: 1,
     alignItems: "center",
     gap: 6,
-    borderRadius: 14,
-    paddingVertical: 8,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.sm,
     paddingHorizontal: 2,
   },
   moodIconBox: {
@@ -564,32 +552,25 @@ const styles = StyleSheet.create({
   },
   moodEmoji: { fontSize: 18 },
   moodWord: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 10,
+    ...Typography.caption,
     color: "rgba(255,255,255,0.85)",
     textAlign: "center",
   },
   dailyFlashCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 20,
-    // Translucent surface — fits Midnight Garden/light gradient instead of stark white
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: Spacing.xl,
     backgroundColor: "rgba(255,255,255,0.82)",
-    padding: 16,
+    padding: Spacing.cardPad,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 14,
-    // Soft green-tinted shadow aligned with the design system palette
-    shadowColor: "rgba(27,67,50,0.15)",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 3,
+    ...Shadow.subtle,
   },
   dailyThumbnail: {
     width: 72,
     height: 90,
-    borderRadius: 14,
+    borderRadius: Radius.sm,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
@@ -601,41 +582,35 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dailyTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 16,
+    ...Typography.h3,
     color: "#2D2D2D",
     textAlign: "right",
   },
   dailyQuote: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: "#555555",
     textAlign: "right",
-    lineHeight: 22,
   },
   dailyAttrib: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 11,
+    ...Typography.caption,
     color: "#AAAAAA",
     textAlign: "right",
   },
   dailyCTA: {
-    // Midnight Garden mint — replaces the off-palette teal #3AAFA9
     backgroundColor: Colors.accent,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginTop: 4,
+    borderRadius: Spacing.xl,
+    paddingHorizontal: Spacing.cardPad,
+    paddingVertical: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   dailyCTAText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 12,
+    ...Typography.label,
     color: "#FFFFFF",
   },
   communityCard: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 20,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: Spacing.xl,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(116,198,157,0.25)",
@@ -643,8 +618,8 @@ const styles = StyleSheet.create({
   communityCardInner: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    gap: 12,
+    padding: Spacing.cardPad,
+    gap: Spacing.md,
   },
   communityLeft: {
     width: 44,
@@ -661,14 +636,12 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   communityTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 17,
+    ...Typography.h3,
     color: "#FFFFFF",
     textAlign: "right",
   },
   communitySub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.bodySmall,
     color: "rgba(255,255,255,0.75)",
     textAlign: "right",
   },

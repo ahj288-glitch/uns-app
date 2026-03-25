@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTokens } from "@/constants/colors";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius } from "@/constants/layout";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
@@ -44,8 +46,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 64,
-    paddingHorizontal: 32,
-    gap: 16,
+    paddingHorizontal: Spacing.xxxl,
+    gap: Spacing.lg,
   },
   iconCircle: {
     width: 80,
@@ -53,30 +55,25 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   title: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     textAlign: "center",
-    lineHeight: 30,
   },
   subtitle: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     textAlign: "center",
-    lineHeight: 24,
     maxWidth: 280,
   },
   ctaBtn: {
-    borderRadius: 24,
+    borderRadius: Radius.xl,
     paddingHorizontal: 28,
-    paddingVertical: 12,
-    marginTop: 8,
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.sm,
   },
   ctaBtnText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 15,
+    ...Typography.h3,
     color: "#FFFFFF",
     textAlign: "center",
   },

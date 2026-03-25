@@ -25,6 +25,8 @@ import { ERRORS, LIMITS } from "@/constants/errors";
 import { useSession } from "@/contexts/SessionContext";
 import ErrorToast from "@/components/ui/ErrorToast";
 import CharCounter from "@/components/ui/CharCounter";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius } from "@/constants/layout";
 
 const MOODS = [
   { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
@@ -234,7 +236,7 @@ export default function MoodScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.header, { paddingTop: webTop + 16 }]}>
+        <View style={[styles.header, { paddingTop: webTop + Spacing.lg }]}>
           <Text style={styles.headerTitle}>كيف تحس اليوم؟</Text>
           <Text style={styles.headerSub}>سجّل مشاعرك — كل مشاعر لها قيمة</Text>
         </View>
@@ -311,7 +313,7 @@ export default function MoodScreen() {
             {selectedMood && (
               <Animated.View entering={FadeInDown.duration(600)} style={styles.saveSection}>
                 <Pressable
-                  style={{ borderRadius: 999, overflow: "hidden", opacity: isSaving ? 0.7 : 1 }}
+                  style={{ borderRadius: Radius.pill, overflow: "hidden", opacity: isSaving ? 0.7 : 1 }}
                   onPress={saveCheckin}
                   disabled={isSaving}
                 >
@@ -356,87 +358,79 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   return StyleSheet.create({
   container: { flex: 1 },
   header: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
+    paddingHorizontal: Spacing.xxl,
+    paddingBottom: Spacing.xl,
     alignItems: "flex-end",
   },
   headerTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 28,
+    ...Typography.h1,
     color: T.onSurface,
     textAlign: "right",
     letterSpacing: -0.3,
   },
   headerSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
-    marginTop: 4,
+    marginTop: Spacing.xs,
     textAlign: "right",
   },
   savedCard: {
-    margin: 24,
+    margin: Spacing.xxl,
     backgroundColor: T.primaryContainer,
-    borderRadius: 20,
-    padding: 32,
+    borderRadius: Radius.lg,
+    padding: Spacing.xxxl,
     alignItems: "center",
-    gap: 8,
+    gap: Spacing.sm,
   },
   savedIcon: { fontSize: 40, color: T.accent },
   savedText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 22,
+    ...Typography.h1,
     color: T.onSurface,
   },
   savedSub: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
   },
   moodGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
-    padding: 20,
+    gap: Spacing.md,
+    padding: Spacing.xl,
     justifyContent: "flex-end",
   },
   moodChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.cardPad,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.xl,
   },
   moodDot: { width: 8, height: 8, borderRadius: 4 },
   moodWord: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 15,
+    ...Typography.body,
   },
-  intensitySection: { paddingHorizontal: 24, marginBottom: 16 },
+  intensitySection: { paddingHorizontal: Spacing.xxl, marginBottom: Spacing.lg },
   sectionLabel: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 15,
+    ...Typography.h3,
     color: T.onSurface,
     textAlign: "right",
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
-  intensityRow: { flexDirection: "row", gap: 12, justifyContent: "flex-end" },
+  intensityRow: { flexDirection: "row", gap: Spacing.md, justifyContent: "flex-end" },
   intensityDot: { width: 32, height: 32, borderRadius: 16 },
-  intensityLabels: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
+  intensityLabels: { flexDirection: "row", justifyContent: "space-between", marginTop: Spacing.sm },
   intensityLabel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: T.muted,
   },
-  notesSection: { paddingHorizontal: 24, marginBottom: 16 },
+  notesSection: { paddingHorizontal: Spacing.xxl, marginBottom: Spacing.lg },
   notesInput: {
     backgroundColor: T.surfaceContainerHigh,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: Radius.md,
+    padding: Spacing.cardPad,
     color: T.onSurface,
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 15,
+    ...Typography.body,
     minHeight: 100,
     textAlignVertical: "top",
   },
@@ -444,28 +438,25 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderWidth: 1,
     borderColor: T.error + "66",
   },
-  saveSection: { paddingHorizontal: 24, marginBottom: 16 },
+  saveSection: { paddingHorizontal: Spacing.xxl, marginBottom: Spacing.lg },
   saveBtn: {
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     paddingVertical: 18,
     alignItems: "center",
   },
   saveBtnText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 17,
+    ...Typography.h3,
     color: T.surface,
   },
-  historySection: { paddingHorizontal: 24, marginTop: 8 },
+  historySection: { paddingHorizontal: Spacing.xxl, marginTop: Spacing.sm },
   infoCard: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: Radius.md,
+    padding: Spacing.cardPad,
   },
   infoText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
-    lineHeight: 22,
     textAlign: "right",
   },
   modalOverlay: {
@@ -473,7 +464,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: "rgba(4,23,16,0.85)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: Spacing.xxl,
   },
   winModal: {
     backgroundColor: T.surfaceContainer,
@@ -482,65 +473,57 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     alignItems: "center",
     width: "100%",
     maxWidth: 340,
-    gap: 12,
+    gap: Spacing.md,
   },
   winEmoji: { fontSize: 52 },
   winTitle: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 24,
+    ...Typography.h1,
     color: T.onSurface,
   },
   winLevel: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 20,
+    ...Typography.h2,
     color: T.accent,
   },
   streakBadge: {
     backgroundColor: T.primaryContainer,
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },
   streakBadgeText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: T.accent,
   },
   winRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    paddingHorizontal: 4,
+    paddingHorizontal: Spacing.xs,
   },
   winRowLabel: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.primary,
     flex: 1,
     textAlign: "right",
   },
   winRowPoints: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 14,
+    ...Typography.h3,
     color: T.accent,
   },
   winEncouragement: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 14,
+    ...Typography.body,
     color: T.muted,
     textAlign: "center",
-    lineHeight: 22,
   },
   winCloseBtn: {
     backgroundColor: T.accent,
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     paddingHorizontal: 28,
-    paddingVertical: 12,
-    marginTop: 4,
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.xs,
   },
   winCloseBtnText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 15,
+    ...Typography.h3,
     color: T.surface,
   },
   });

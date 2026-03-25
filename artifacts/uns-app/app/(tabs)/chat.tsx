@@ -18,6 +18,8 @@ import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import Colors, { useTokens } from "@/constants/colors";
 import { ERRORS, LIMITS, formatError } from "@/constants/errors";
+import { Typography } from "@/constants/typography";
+import { Spacing, Radius } from "@/constants/layout";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { getContextualSuggestions } from "@/lib/gender";
@@ -603,8 +605,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.screenH,
+    paddingBottom: Spacing.md,
   },
   headerBtn: {
     width: 36,
@@ -615,7 +617,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: Spacing.sm,
   },
   headerOnlineDot: {
     width: 8,
@@ -624,7 +626,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: T.accent,
   },
   headerTitle: {
-    fontFamily: "Tajawal_700Bold",
+    ...Typography.h1,
     fontSize: 22,
     color: T.accent,
     letterSpacing: -0.5,
@@ -632,9 +634,9 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   msgCountPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: Spacing.xs,
     backgroundColor: T.surfaceContainer,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
     paddingHorizontal: 9,
     paddingVertical: 4,
   },
@@ -642,8 +644,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: "#F4B94222",
   },
   msgCountText: {
-    fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 11,
+    ...Typography.caption,
     color: T.muted,
   },
   msgCountTextWarn: {
@@ -651,29 +652,28 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   },
   welcomeContainer: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    gap: 16,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    gap: Spacing.lg,
   },
   timestampPillWrap: {
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: Spacing.md,
   },
   timestampPill: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
     paddingHorizontal: 14,
     paddingVertical: 5,
   },
   timestampText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 12,
+    ...Typography.label,
     color: T.muted,
   },
   companionWelcome: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
+    gap: Spacing.md,
   },
   avatarDot: {
     width: 34,
@@ -688,8 +688,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: T.error + "22",
   },
   avatarText: {
-    fontFamily: "Tajawal_700Bold",
-    fontSize: 16,
+    ...Typography.h3,
     color: T.accent,
   },
   welcomeBubble: {
@@ -700,21 +699,19 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     padding: 14,
   },
   welcomeText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 16,
+    ...Typography.body,
     color: T.onSurface,
-    lineHeight: 26,
     textAlign: "right",
   },
   messageList: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
   },
   bubbleWrapper: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 14,
-    gap: 8,
+    gap: Spacing.sm,
   },
   bubbleWrapperUser: {
     justifyContent: "flex-end",
@@ -726,8 +723,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   bubble: {
     maxWidth: "76%",
     borderRadius: 18,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     gap: 6,
   },
   bubbleUser: {
@@ -742,16 +739,13 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     backgroundColor: T.error + "18",
   },
   bubbleText: {
-    fontSize: 16,
-    lineHeight: 26,
+    ...Typography.body,
     textAlign: "right",
   },
   bubbleTextUser: {
-    fontFamily: "Tajawal_400Regular",
     color: T.primary,
   },
   bubbleTextCompanion: {
-    fontFamily: "Tajawal_400Regular",
     color: T.onSurface,
   },
   crisisBox: {
@@ -759,10 +753,10 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     alignItems: "center",
     gap: 5,
     marginTop: 6,
-    paddingTop: 8,
+    paddingTop: Spacing.sm,
   },
   crisisText: {
-    fontFamily: "Tajawal_400Regular",
+    ...Typography.caption,
     fontSize: 10,
     color: T.error,
     flex: 1,
@@ -771,44 +765,43 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   typingRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
-    paddingHorizontal: 16,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
   typingBubble: {
     backgroundColor: T.surfaceContainer,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    borderRadius: Radius.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderBottomLeftRadius: 4,
   },
   quickRepliesRow: {
     flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
     justifyContent: "flex-end",
   },
   quickChip: {
     backgroundColor: T.surfaceContainerHigh,
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
   quickChipDisabled: {
     opacity: 0.4,
   },
   quickChipText: {
-    fontFamily: "Tajawal_400Regular",
-    fontSize: 13,
+    ...Typography.bodySmall,
     color: T.primary,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
     backgroundColor: T.surface,
   },
   inputBar: {
@@ -817,7 +810,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     alignItems: "flex-end",
     backgroundColor: T.surfaceContainerHigh,
     borderRadius: 22,
-    paddingHorizontal: 10,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 6,
     gap: 6,
     overflow: "hidden",
@@ -835,13 +828,12 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   },
   input: {
     flex: 1,
-    fontSize: 15,
+    ...Typography.body,
     color: T.onSurface,
-    fontFamily: "Tajawal_400Regular",
     minHeight: 32,
     maxHeight: 120,
     textAlign: "right",
-    paddingHorizontal: 8,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
   },
   sendBtn: {
@@ -852,7 +844,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderRadius: 21,
   },
   countdownText: {
-    fontFamily: "BeVietnamPro_500Medium",
+    ...Typography.label,
     fontSize: 14,
     color: T.surface,
   },
