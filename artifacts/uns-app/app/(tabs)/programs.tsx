@@ -31,7 +31,7 @@ const CATEGORY_CONFIG: Record<string, { ar: string; color: string }> = {
 };
 
 const CARD_GRADIENTS: Record<string, [string, string]> = {
-  anxiety: ["#3AAFA9", "#2C6B9E"],
+  anxiety: ["#74C69D", "#2C6B9E"],
   grief: ["#7B68B5", "#4A3A8A"],
   sleep: ["#2D5A6B", "#3D5A7A"],
   ramadan: ["#D4776A", "#E8936A"],

@@ -108,17 +108,9 @@ export default function JourneyScreen() {
   useEffect(() => {
     if (!sessionId) return;
     fetch(`${BASE_URL}/gamification/progress?sessionId=${sessionId}`)
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => setData(d))
-      .catch(() => setData({
-        xp: 350,
-        streakDays: 5,
-        longestStreak: 12,
-        totalCheckins: 24,
-        totalLoopsCompleted: 10,
-        currentLevel: { key: "balance", labelAr: "توازن", progressPercent: 60 },
-        recentWins: [],
-      }))
+      .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, [sessionId]);
 

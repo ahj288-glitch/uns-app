@@ -373,9 +373,11 @@ export default function HomeScreen() {
               <Text style={styles.dailyQuote} numberOfLines={3}>
                 "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
               </Text>
-              {!recipe && (
+              {recipe?.source ? (
+                <Text style={styles.dailyAttrib}>- {recipe.source}</Text>
+              ) : !recipe ? (
                 <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
-              )}
+              ) : null}
               <Pressable
                 style={styles.dailyCTA}
                 onPress={() => {
@@ -560,11 +562,13 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.lg,
     marginBottom: Spacing.lg,
     borderRadius: Spacing.xl,
-    backgroundColor: "rgba(255,255,255,0.82)",
+    backgroundColor: "#10231c",
     padding: Spacing.cardPad,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 14,
+    borderWidth: 1,
+    borderColor: "rgba(116,198,157,0.18)",
     ...Shadow.subtle,
   },
   dailyThumbnail: {
@@ -583,17 +587,17 @@ const styles = StyleSheet.create({
   },
   dailyTitle: {
     ...Typography.h3,
-    color: "#2D2D2D",
+    color: "#e8f5ee",
     textAlign: "right",
   },
   dailyQuote: {
     ...Typography.bodySmall,
-    color: "#555555",
+    color: "#a5d0b9",
     textAlign: "right",
   },
   dailyAttrib: {
     ...Typography.caption,
-    color: "#AAAAAA",
+    color: "#4a7a5e",
     textAlign: "right",
   },
   dailyCTA: {

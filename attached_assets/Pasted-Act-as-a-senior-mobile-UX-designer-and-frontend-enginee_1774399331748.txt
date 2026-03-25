@@ -1,0 +1,185 @@
+Act as a senior mobile UX designer and frontend engineer specialized in Arabic RTL applications.
+
+We need to redesign and FIX the registration screen in the app "أُنس".
+
+==================================================
+1) CRITICAL BUG – ARABIC TEXT CUTTING / RENDERING ISSUE
+==================================================
+
+There is a serious issue where Arabic text is not rendering correctly:
+
+Examples:
+- "أنثى" is displayed incorrectly as "انتى"
+- "أنشئ حسابك" is visually broken (character clipping)
+- some letters like "ش" are cut from top
+
+You MUST:
+
+1. Fix Arabic font rendering completely
+2. Ensure proper RTL layout
+3. Ensure no clipping occurs in:
+   - headers
+   - buttons
+   - input fields
+   - labels
+
+Check and fix:
+
+- line-height (must be increased for Arabic)
+- font-family (use a high-quality Arabic font)
+- text container height
+- vertical alignment
+- overflow / clipping issues
+- padding inside buttons
+
+Recommended fonts:
+- IBM Plex Arabic
+- Cairo
+- Tajawal
+
+==================================================
+2) NAME FIELD (UX + VALIDATION)
+==================================================
+
+Improve "اسمك" field:
+
+Requirements:
+
+- Must support Arabic input properly
+- Add validation rules:
+  - Minimum: 2 characters
+  - Maximum: 30 characters
+  - Only letters (Arabic + optional English)
+  - No numbers
+  - No special symbols
+
+Show helper text below field:
+
+"الاسم يجب أن يكون بين 2 و 30 حرفًا"
+
+Add real-time validation:
+- show soft error if invalid
+- show success state if valid
+
+==================================================
+3) EMAIL FIELD
+==================================================
+
+Improve behavior:
+
+- Validate format properly
+- If email already exists:
+  Replace harsh red error with friendly message:
+
+❌ Current:
+"هذا البريد الإلكتروني مسجل مسبقاً"
+
+✅ Replace with:
+"يبدو أن لديك حساب مسبق، يمكنك تسجيل الدخول بدلاً من ذلك"
+
+Add CTA:
+→ "تسجيل الدخول"
+
+==================================================
+4) DATE OF BIRTH (CRITICAL UX FIX)
+==================================================
+
+Current input is poor.
+
+Replace with dropdown selectors:
+
+- Day: dropdown (1–31)
+- Month: dropdown (يناير – ديسمبر)
+- Year: dropdown (1900 → current year)
+
+OR use native date picker if supported.
+
+Add validation:
+- age must be ≥ 13
+
+==================================================
+5) GENDER SELECTION
+==================================================
+
+Fix UI + text:
+
+- Correct Arabic:
+  "ذكر" / "أنثى" (NOT "انتى")
+
+Improve UI:
+- make selection clearer
+- use soft highlight instead of harsh border
+- animate selection (subtle scale or color change)
+
+==================================================
+6) BUTTON (CTA)
+==================================================
+
+Improve "التالي" button:
+
+- ensure text is vertically centered
+- increase padding (top/bottom)
+- fix text clipping issue
+- add loading state
+
+==================================================
+7) VISUAL POLISH
+==================================================
+
+- Increase spacing between fields
+- Improve alignment consistency
+- Ensure all text uses same baseline grid
+- Add subtle focus states on inputs
+- Smooth transitions
+
+==================================================
+8) ERROR HANDLING STYLE
+==================================================
+
+Do NOT use aggressive red blocks.
+
+Instead:
+- soft error color
+- inline message under field
+- calm tone (matching app personality)
+
+==================================================
+9) RTL CONSISTENCY
+==================================================
+
+Ensure:
+- all fields aligned RTL
+- labels right-aligned
+- inputs right-aligned
+- cursor starts from right
+
+==================================================
+10) OUTPUT REQUIRED
+==================================================
+
+Before implementing:
+
+1. Explain root cause of Arabic text clipping
+2. Show how you fix font + layout
+3. Show improved UX structure for:
+   - name
+   - email
+   - birth date
+   - gender
+4. Confirm no text clipping remains
+
+Then implement.
+
+==================================================
+IMPORTANT
+==================================================
+
+This is a premium emotional app.
+The UI must feel:
+- calm
+- polished
+- elegant
+- human
+
+Arabic typography must be PERFECT.
+No broken letters are acceptable.

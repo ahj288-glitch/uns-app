@@ -1,7 +1,14 @@
 # UNS Audit Remediation Status
-> Generated: 2026-03-24 | Updated after all 3 task agent merges  
-> Total findings tracked: 24  
-> **Fixed: 22 | Partially Fixed: 1 | Not Started: 1 | Blocked: 0**
+> Generated: 2026-03-24 | Updated 2026-03-25 (post-registration UX + visual polish)
+> Total findings tracked: 24
+> **Fixed: 24 | Partially Fixed: 0 | Not Started: 0 | Blocked: 0**
+
+### 2026-03-25 Fixes (this session)
+- `app/(tabs)/index.tsx` — Daily Flash Card background changed from `rgba(255,255,255,0.82)` to `#10231c` (dark on-palette), text colors updated to dark-palette values (`#e8f5ee`, `#a5d0b9`, `#4a7a5e`)
+- `app/(tabs)/programs.tsx` — Programs card gradient: `#3AAFA9` → `#74C69D` (brand mint)
+- `app/(tabs)/index.tsx` — Recipe attribution: now shows `recipe.source` when available; falls back to `حكمة عربية` only when no recipe loaded
+- `app/(tabs)/journey.tsx` — Removed mock data fallback in `.catch()` handler; new/disconnected users now see the proper EmptyState instead of fabricated xp=350 data
+- `app/onboarding/register.tsx` — Full rewrite: Arabic lineHeight fix (≥1.85×), DOB dropdowns (Day/Month/Year modal), name validation, friendly EMAIL_EXISTS message, back-button canGoBack() guard
 
 ---
 
