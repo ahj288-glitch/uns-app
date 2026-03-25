@@ -1,0 +1,104 @@
+Act as a senior software architect and code reviewer (CTO level).
+
+I want a full technical audit of the current project after the latest updates.
+
+Do NOT give generic answers. I need a precise and actionable analysis.
+
+==================================================
+1) FILE CHANGES ANALYSIS
+==================================================
+
+- List all files that were modified recently
+- Categorize them:
+  (UI / Logic / State / API / Config / Assets)
+- Highlight any risky or critical changes
+
+==================================================
+2) DUPLICATION CHECK
+==================================================
+
+- Detect any duplicated:
+  - components
+  - functions
+  - styles
+  - logic blocks
+
+- For each duplication:
+  - show where it exists
+  - explain why it’s a problem
+  - suggest how to refactor it (shared component / hook / utility)
+
+==================================================
+3) UNUSED CODE DETECTION
+==================================================
+
+- Identify:
+  - unused files
+  - unused components
+  - dead functions
+  - unused imports
+
+- For each:
+  - show file path
+  - confirm it's safe to delete
+  - estimate impact
+
+==================================================
+4) PROJECT STRUCTURE EVALUATION
+==================================================
+
+- Analyze current folder structure
+
+Answer clearly:
+- Is the structure scalable?
+- Is it clean or messy?
+- Are responsibilities well separated?
+
+If issues exist:
+- show what's wrong
+- propose improved structure (with folder tree)
+
+==================================================
+5) CODE QUALITY & ARCHITECTURE
+==================================================
+
+Evaluate:
+
+- readability
+- consistency
+- naming conventions
+- separation of concerns
+- reusability
+
+Highlight:
+- anti-patterns
+- bad practices
+- quick wins
+
+==================================================
+6) PERFORMANCE & RISK
+==================================================
+
+- detect anything that may cause:
+  - performance issues
+  - UI lag
+  - unnecessary re-renders
+  - heavy components
+
+==================================================
+7) FINAL SUMMARY
+==================================================
+
+Give:
+
+- Overall rating (out of 10)
+- Top 5 issues to fix immediately
+- Top 5 improvements for scaling
+
+==================================================
+IMPORTANT
+==================================================
+
+Be direct, critical, and professional.
+Do NOT be polite at the cost of truth.
+Treat this like a production-level app.
