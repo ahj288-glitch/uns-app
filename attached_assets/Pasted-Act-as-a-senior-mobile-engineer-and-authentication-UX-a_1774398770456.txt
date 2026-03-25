@@ -1,0 +1,160 @@
+Act as a senior mobile engineer and authentication UX architect.
+
+We need to redesign and fix the email verification flow in the app "أُنس".
+
+==================================================
+0) TESTING MODE (CRITICAL)
+==================================================
+
+We are currently in TESTING / MVP mode.
+
+Email verification MUST be completely DISABLED for now.
+
+Requirements:
+- Do NOT block the user on email verification
+- Do NOT show OTP screen
+- Do NOT require entering any code
+- Do NOT require clicking a magic link
+
+After registration:
+→ user should enter the app immediately
+
+However:
+- Keep the verification logic in the codebase (feature-flagged)
+- Add a toggle like: isVerificationEnabled = false
+
+When enabled in the future:
+- system should support both magic link + OTP
+
+==================================================
+1) CURRENT PROBLEM
+==================================================
+
+- Verification email is not arriving reliably
+- User is blocked on OTP screen
+- This breaks the onboarding and entry flow
+
+==================================================
+2) REQUIRED TEMPORARY SOLUTION (MVP MODE)
+==================================================
+
+During testing:
+
+After user submits:
+- name
+- email
+- birth date
+- gender
+
+You MUST:
+
+1. mark user as:
+   isAuthenticated = true
+   isEmailVerified = true (temporarily)
+
+2. skip:
+   - OTP screen
+   - email verification screen
+
+3. route user directly to:
+   → onboarding (if not completed)
+   → or main app (if onboarding done)
+
+==================================================
+3) FUTURE VERIFICATION ARCHITECTURE (KEEP READY)
+==================================================
+
+Prepare the system (but do NOT activate it):
+
+Primary method:
+- Magic Link (deep link verification)
+
+Fallback:
+- OTP code
+
+Use feature flag:
+- isVerificationEnabled
+
+If true:
+- activate full verification flow
+
+If false:
+- bypass completely
+
+==================================================
+4) UX REQUIREMENTS
+==================================================
+
+Remove or hide:
+- OTP input screen
+- "تحقق من بريدك"
+- resend code logic (temporarily)
+
+Ensure:
+- seamless entry
+- no friction
+- no dead-end screens
+
+==================================================
+5) STATE MANAGEMENT
+==================================================
+
+Ensure correct persistent logic:
+
+Flags:
+- hasCompletedOnboarding
+- isAuthenticated
+- isEmailVerified
+
+Flow:
+
+if !hasCompletedOnboarding:
+    show onboarding
+else:
+    show main app
+
+==================================================
+6) PREVENT FUTURE ISSUES
+==================================================
+
+Add safe guards:
+
+- verification screen should never appear when isVerificationEnabled = false
+- no hidden route should redirect user back to verification
+- no loop between onboarding and auth
+
+==================================================
+7) DEBUGGING
+==================================================
+
+Add temporary logs:
+
+- isVerificationEnabled
+- isAuthenticated
+- isEmailVerified
+- current route decision
+
+==================================================
+8) OUTPUT REQUIRED
+==================================================
+
+Before implementing:
+
+1. show current auth flow
+2. explain where the blocking happens
+3. show updated flow with verification disabled
+4. confirm all routes are fixed
+
+Then implement.
+
+==================================================
+IMPORTANT
+==================================================
+
+Goal now:
+- let user enter app smoothly
+- remove all friction
+- keep verification system ready for later
+
+Do NOT redesign UI.
+Fix flow and access first.

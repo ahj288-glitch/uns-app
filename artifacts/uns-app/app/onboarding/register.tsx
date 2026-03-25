@@ -18,6 +18,12 @@ import Colors from "@/constants/colors";
 
 const BASE = `https://${process.env["EXPO_PUBLIC_DOMAIN"]}`;
 
+// ── Feature flag ──────────────────────────────────────────────────────────────
+// Mirror of server-side VERIFICATION_ENABLED.
+// false = MVP mode: registration returns tokens immediately, no OTP screen shown.
+// true  = full flow: OTP sent to email, user must verify before entering app.
+const IS_VERIFICATION_ENABLED = false;
+
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -77,6 +83,26 @@ export default function RegisterScreen() {
         return;
       }
 
+      console.log("[register] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
+
+      if (!IS_VERIFICATION_ENABLED) {
+        // Verification disabled — server returned tokens directly
+        await Promise.all([
+          AsyncStorage.setItem("uns_session_id", data.sessionId),
+          AsyncStorage.setItem("uns_access_token", data.accessToken),
+          AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
+          AsyncStorage.setItem("@uns_onboarding_complete", "1"),
+          AsyncStorage.setItem("@uns_gender", gender),
+          AsyncStorage.removeItem("@uns_pending_userId"),
+          AsyncStorage.removeItem("@uns_pending_email"),
+          AsyncStorage.removeItem("@uns_pending_gender"),
+        ]);
+        console.log("[register] isAuthenticated: true, isEmailVerified: true — routing to tour");
+        router.replace("/onboarding/tour");
+        return;
+      }
+
+      // Verification enabled — persist pending state and go to OTP screen
       await Promise.all([
         AsyncStorage.setItem("@uns_pending_userId", data.userId),
         AsyncStorage.setItem("@uns_pending_email", data.email),

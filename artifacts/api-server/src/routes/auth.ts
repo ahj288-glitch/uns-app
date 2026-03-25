@@ -18,6 +18,12 @@ import pino from "pino";
 const router = Router();
 const logger = pino({ name: "auth" });
 
+// ── Feature flag ──────────────────────────────────────────────────────────────
+// Set VERIFICATION_ENABLED=true in env to require email OTP/magic-link.
+// Default false for MVP/testing — user enters app immediately after registration.
+const IS_VERIFICATION_ENABLED = process.env["VERIFICATION_ENABLED"] === "true";
+logger.info({ IS_VERIFICATION_ENABLED }, "[auth] verification feature flag");
+
 const DIALECT_GREETINGS: Record<string, string> = {
   gulf: "هلا وغلا! أنا رفيقك اليوم. كيف حالك؟",
   levant: "مرحبا كتير! أنا رفيقك اليوم. كيفك؟",
@@ -113,10 +119,36 @@ router.post("/auth/register", async (req, res) => {
       email: email.toLowerCase(),
       dob,
       gender,
-      verified: false,
+      verified: !IS_VERIFICATION_ENABLED,
     })
     .returning();
 
+  if (!IS_VERIFICATION_ENABLED) {
+    // Verification disabled — create session immediately and return tokens
+    const [session] = await db
+      .insert(companionSessionsTable)
+      .values({ dialect: "gulf" })
+      .returning();
+
+    const accessToken = generateAccessToken(session.sessionId, "user");
+    const refreshToken = generateRefreshToken(session.sessionId);
+
+    logger.info(
+      { userId: user.id, IS_VERIFICATION_ENABLED, isAuthenticated: true, isEmailVerified: true },
+      "[auth/register] verification disabled — session created immediately"
+    );
+
+    return res.status(201).json({
+      accessToken,
+      refreshToken,
+      sessionId: session.sessionId,
+      userId: user.id,
+      email: user.email,
+      verified: true,
+    });
+  }
+
+  // Verification enabled — generate OTP and send email
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -127,6 +159,11 @@ router.post("/auth/register", async (req, res) => {
   });
 
   await sendOtpEmail(email.toLowerCase(), otp);
+
+  logger.info(
+    { userId: user.id, IS_VERIFICATION_ENABLED, maskedEmail: maskEmail(email) },
+    "[auth/register] OTP sent — awaiting verification"
+  );
 
   return res.status(201).json({
     userId: user.id,
