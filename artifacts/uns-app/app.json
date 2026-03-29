@@ -14,7 +14,12 @@
       "backgroundColor": "#0B0E18"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan"
