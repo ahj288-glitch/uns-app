@@ -60,7 +60,7 @@ Implement a real authentication and authorisation layer. The current API has zer
 - Middleware: `requireAdmin(req)` — ensures `role === 'admin'` on `/api/admin/*`
 
 **Route Protection**
-- Public (no auth): `/api/health`, `/api/waitlist`, `/api/auth/*`
+- Public (no auth): `/api/healthz`, `/api/waitlist`, `/api/auth/*`
 - Session-authenticated: all other `/api/*` routes
 - Admin-only: `/api/admin/*`
 
