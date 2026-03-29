@@ -17,6 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.uns.app",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         }
