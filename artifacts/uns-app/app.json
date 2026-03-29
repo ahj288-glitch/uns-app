@@ -21,7 +21,8 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         }
-      }
+      },
+      "buildNumber": "2"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan"
