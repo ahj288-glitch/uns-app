@@ -7,18 +7,12 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "teamId": "GFT439VJUC"
-      },
       "env": {
         "EXPO_PUBLIC_API_URL": "http://76.13.45.198:3000"
       }
     },
     "preview": {
       "distribution": "internal",
-      "ios": {
-        "teamId": "GFT439VJUC"
-      },
       "android": {
         "buildType": "apk"
       },
@@ -27,17 +21,10 @@
       }
     },
     "production": {
-      "autoIncrement": true,
-      "ios": {
-        "teamId": "GFT439VJUC"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {
-    "production": {
-      "ios": {
-        "appleTeamId": "GFT439VJUC"
-      }
-    }
+    "production": {}
   }
 }
