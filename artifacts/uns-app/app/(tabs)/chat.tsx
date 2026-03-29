@@ -22,7 +22,6 @@ import { Typography } from "@/constants/typography";
 import { Spacing, Radius } from "@/constants/layout";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
-import { getContextualSuggestions } from "@/lib/gender";
 import { CRISIS_RESOURCES } from "@/lib/crisis";
 import { API_BASE } from "@/lib/api";
 import * as Haptics from "expo-haptics";
@@ -146,7 +145,7 @@ export default function ChatScreen() {
   const { theme } = useThemeContext();
   const T = useTokens();
   const styles = makeStyles(T);
-  const quickReplies = getContextualSuggestions(gender, lastMoodWord, new Date().getHours());
+  // quickReplies intentionally removed — contextual suggestions felt artificial
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -504,20 +503,7 @@ export default function ChatScreen() {
           />
         )}
 
-        {!dailyLimitReached && quickReplies.length > 0 && (
-          <View style={styles.quickRepliesRow}>
-            {quickReplies.map(q => (
-              <Pressable
-                key={q}
-                style={[styles.quickChip, rateLimitCountdown > 0 && styles.quickChipDisabled]}
-                onPress={() => sendMessage(q)}
-                disabled={rateLimitCountdown > 0 || isSending}
-              >
-                <Text style={styles.quickChipText}>{q}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
+        {/* Quick reply chips removed — feel artificial for an emotional companion */}
 
         {!dailyLimitReached && (
           <>
@@ -624,7 +610,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     ...Typography.h1,
     fontSize: 22,
     color: T.accent,
-    letterSpacing: -0.5,
   },
   msgCountPill: {
     flexDirection: "row",

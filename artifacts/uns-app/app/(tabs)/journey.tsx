@@ -103,12 +103,19 @@ export default function JourneyScreen() {
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      // No session yet — don't spin forever, fall through to empty state
+      setLoading(false);
+      return;
+    }
+    // Safety timeout: if the request hangs for >8s, stop the spinner
+    const timeoutId = setTimeout(() => setLoading(false), 8000);
     fetch(`${API_BASE}/gamification/progress?sessionId=${sessionId}`)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => setData(d))
       .catch(() => setData(null))
-      .finally(() => setLoading(false));
+      .finally(() => { clearTimeout(timeoutId); setLoading(false); });
+    return () => clearTimeout(timeoutId);
   }, [sessionId]);
 
   if (loading) {
@@ -266,7 +273,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       ...Typography.display,
       color: T.onSurface,
       textAlign: "right",
-      letterSpacing: -0.5,
     },
     streakBadge: {
       backgroundColor: T.primaryContainer,
@@ -321,7 +327,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       ...Typography.caption,
       color: T.muted,
       textAlign: "right",
-      letterSpacing: 0.5,
     },
     stageName: {
       ...Typography.h1,
@@ -375,7 +380,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     quotePrefix: {
       ...Typography.label,
       color: T.accent,
-      letterSpacing: 0.5,
     },
     quoteText: {
       ...Typography.body,

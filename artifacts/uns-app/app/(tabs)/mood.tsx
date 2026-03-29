@@ -366,7 +366,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     ...Typography.h1,
     color: T.onSurface,
     textAlign: "right",
-    letterSpacing: -0.3,
+    
   },
   headerSub: {
     ...Typography.body,

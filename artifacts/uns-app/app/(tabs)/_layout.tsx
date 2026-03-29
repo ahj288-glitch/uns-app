@@ -2,17 +2,33 @@ import { BlurView } from "expo-blur";
 import { Tabs, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
+import { Platform, StyleSheet, View, ActivityIndicator, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
+// Regular tab icon — small pill background when focused
 function TabIcon({ name, color, focused }: { name: FeatherIconName; color: string; focused: boolean }) {
   return (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
       <Feather name={name} size={20} color={focused ? Colors.surface : color} />
+    </View>
+  );
+}
+
+// Center chat tab — larger, raised, always prominent
+function ChatTabIcon({ focused }: { focused: boolean }) {
+  return (
+    <View style={[styles.chatIconOuter, focused && styles.chatIconOuterActive]}>
+      <View style={[styles.chatIconInner, focused && styles.chatIconInnerActive]}>
+        <Feather
+          name="message-circle"
+          size={24}
+          color={focused ? Colors.surface : Colors.accent}
+        />
+      </View>
     </View>
   );
 }
@@ -49,24 +65,25 @@ export default function TabLayout() {
           elevation: 0,
           height: 64 + insets.bottom,
           paddingBottom: insets.bottom,
-          paddingTop: 8,
+          paddingTop: 6,
         },
         tabBarBackground: () =>
           Platform.OS !== "web" ? (
             <BlurView
               intensity={80}
               tint="dark"
-              style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(4,23,16,0.88)" }]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(4,23,16,0.90)" }]}
             />
           ) : null,
         tabBarLabelStyle: {
-          fontFamily: "BeVietnamPro_500Medium",
-          fontSize: 10,
-          marginTop: 2,
+          fontFamily: "Tajawal_400Regular",
+          fontSize: 11,
+          marginTop: 1,
         },
         tabBarShowLabel: true,
       }}
     >
+      {/* Tab 1 — Journey */}
       <Tabs.Screen
         name="journey"
         options={{
@@ -76,24 +93,23 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="insights"
-        options={{
-          title: "رؤى",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="trending-up" color={color} focused={focused} />
-          ),
-        }}
-      />
+
+      {/* Tab 2 — Chat (center, primary action) */}
       <Tabs.Screen
         name="chat"
         options={{
-          title: "محادثة",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="message-circle" color={color} focused={focused} />
-          ),
+          title: "أُنس",
+          tabBarLabelStyle: {
+            fontFamily: "Tajawal_700Bold",
+            fontSize: 11,
+            marginTop: 1,
+            color: Colors.accent,
+          },
+          tabBarIcon: ({ focused }) => <ChatTabIcon focused={focused} />,
         }}
       />
+
+      {/* Tab 3 — Home */}
       <Tabs.Screen
         name="index"
         options={{
@@ -103,24 +119,20 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="share"
-        options={{
-          title: "مشاركة",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="share-2" color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen name="mood" options={{ href: null }} />
-      <Tabs.Screen name="community" options={{ href: null }} />
-      <Tabs.Screen name="programs" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
+
+      {/* Hidden tabs — accessible via router.push but not shown in bar */}
+      <Tabs.Screen name="insights"   options={{ href: null }} />
+      <Tabs.Screen name="share"      options={{ href: null }} />
+      <Tabs.Screen name="mood"       options={{ href: null }} />
+      <Tabs.Screen name="community"  options={{ href: null }} />
+      <Tabs.Screen name="programs"   options={{ href: null }} />
+      <Tabs.Screen name="profile"    options={{ href: null }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
+  // Standard tab icons
   iconWrap: {
     width: 40,
     height: 28,
@@ -130,5 +142,31 @@ const styles = StyleSheet.create({
   },
   iconWrapActive: {
     backgroundColor: Colors.accent,
+  },
+  // Center chat tab
+  chatIconOuter: {
+    width: 52,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -4, // Raise above tab bar baseline
+  },
+  chatIconOuterActive: {
+    // No outer background when active — inner handles it
+  },
+  chatIconInner: {
+    width: 48,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: Colors.accent,
+    backgroundColor: "transparent",
+  },
+  chatIconInnerActive: {
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
   },
 });

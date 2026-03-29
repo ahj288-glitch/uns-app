@@ -202,7 +202,7 @@ const orbStyles = StyleSheet.create({
     ...Typography.caption,
     color: "rgba(255,255,255,0.75)",
     textAlign: "center",
-    letterSpacing: 0.5,
+    
   },
 });
 
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   headerLogo: {
     ...Typography.h1,
     color: "#FFFFFF",
-    letterSpacing: -0.5,
+    
   },
   shareHeaderBtn: { padding: 6 },
   greetingSection: {
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     ...Typography.h1,
     color: "#FFFFFF",
     textAlign: "right",
-    letterSpacing: -0.3,
+    
     textShadowColor: "rgba(0,0,0,0.1)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   startNowText: {
     ...Typography.h2,
     color: "#FFFFFF",
-    letterSpacing: 0.5,
+    
   },
   moodCard: {
     marginHorizontal: Spacing.lg,

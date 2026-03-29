@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
-  View,
-  Text,
+  Keyboard,
+  Platform,
   Pressable,
   StyleSheet,
-  Platform,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, {
-  FadeInDown,
-  FadeInUp,
+  FadeIn,
+  FadeOut,
   SlideInRight,
+  SlideOutLeft,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
@@ -20,126 +23,282 @@ import Colors from "@/constants/colors";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius } from "@/constants/layout";
 
-const INTENTIONS = [
-  { key: "cope", labelAr: "للتعامل مع الضغط والقلق", icon: "🌬️" },
-  { key: "grow", labelAr: "للنمو والوعي الذاتي", icon: "🌱" },
-  { key: "connect", labelAr: "لأشعر بأنني لست وحدي", icon: "🤝" },
-  { key: "habits", labelAr: "لبناء عادات صحية للعقل", icon: "✨" },
-  { key: "explore", labelAr: "فقط أستكشف", icon: "🔭" },
+// ─── Data ──────────────────────────────────────────────────────────────────
+
+const MOODS = [
+  { key: "exhausted",  ar: "متعب ومرهق",          emoji: "😔", response: "أنا هنا معك — لست وحدك الليلة." },
+  { key: "anxious",    ar: "قلق أو متوتر",          emoji: "😰", response: "خذ نفساً عميقاً. أنت بأمان هنا." },
+  { key: "okay",       ar: "بخير، أريد أن أتحدث",   emoji: "🙂", response: "رائع — أنا أسمعك." },
+  { key: "lonely",     ar: "أشعر بالوحدة",           emoji: "🤍", response: "شكراً لأنك قلت ذلك. أنا هنا." },
+  { key: "unknown",    ar: "لا أعرف كيف أصف شعوري", emoji: "🌫️", response: "لا بأس — سنكتشف ذلك معاً." },
 ];
+
+const INTENTIONS = [
+  { key: "cope",     ar: "للتعامل مع الضغط والقلق",    emoji: "🌬️" },
+  { key: "grow",     ar: "للنمو والوعي الذاتي",          emoji: "🌱" },
+  { key: "connect",  ar: "لأشعر بأنني لست وحدي",        emoji: "🤝" },
+  { key: "habits",   ar: "لبناء عادات صحية للعقل",       emoji: "✨" },
+  { key: "reflect",  ar: "لأفهم مشاعري أكثر",            emoji: "🔍" },
+  { key: "explore",  ar: "فقط أستكشف",                  emoji: "🔭" },
+];
+
+const TOTAL_STEPS = 3;
+
+// ─── Step indicator ─────────────────────────────────────────────────────────
+
+function StepIndicator({ current }: { current: number }) {
+  return (
+    <View style={si.row}>
+      {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+        <View
+          key={i}
+          style={[si.dot, i === current && si.dotActive, i < current && si.dotDone]}
+        />
+      ))}
+    </View>
+  );
+}
+
+const si = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.xxl,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.surfaceContainerHigh,
+  },
+  dotActive: { width: 28, backgroundColor: Colors.accent },
+  dotDone:   { backgroundColor: Colors.primaryContainer },
+});
+
+// ─── Step counter label ──────────────────────────────────────────────────────
+
+function StepLabel({ current }: { current: number }) {
+  const labels = ["١ من ٣", "٢ من ٣", "٣ من ٣"];
+  return (
+    <Text style={styles.stepLabel}>{labels[current]}</Text>
+  );
+}
+
+// ─── Primary CTA ─────────────────────────────────────────────────────────────
+
+function PrimaryBtn({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
+  return (
+    <Pressable
+      style={{ borderRadius: Radius.pill, overflow: "hidden", opacity: disabled ? 0.35 : 1 }}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <LinearGradient
+        colors={["#74C69D", "#1B4332"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.primaryBtn}
+      >
+        <Text style={styles.primaryBtnText}>{label}</Text>
+      </LinearGradient>
+    </Pressable>
+  );
+}
+
+// ─── Step 0: Mood baseline ───────────────────────────────────────────────────
+
+function MoodStep({
+  selected,
+  onSelect,
+}: {
+  selected: string;
+  onSelect: (key: string) => void;
+}) {
+  return (
+    <Animated.View entering={SlideInRight.duration(350)} exiting={SlideOutLeft.duration(250)} style={styles.stepContent}>
+      <StepLabel current={0} />
+      <Text style={styles.stepTitle}>كيف حالك{"\n"}الآن؟</Text>
+      <Text style={styles.stepSub}>لا توجد إجابة خاطئة.</Text>
+      {selected !== "" && (
+        <Animated.Text entering={FadeIn.duration(300)} style={styles.moodResponse}>
+          {MOODS.find(m => m.key === selected)?.response}
+        </Animated.Text>
+      )}
+      <View style={styles.moodList}>
+        {MOODS.map(mood => (
+          <Pressable
+            key={mood.key}
+            style={[styles.moodTile, mood.key === selected && styles.moodTileActive]}
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.selectionAsync();
+              onSelect(mood.key);
+            }}
+          >
+            <Text style={styles.moodEmoji}>{mood.emoji}</Text>
+            <Text style={[styles.moodLabel, mood.key === selected && styles.moodLabelActive]}>
+              {mood.ar}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </Animated.View>
+  );
+}
+
+// ─── Step 1: Intent multi-select ────────────────────────────────────────────
+
+function IntentStep({
+  selected,
+  onToggle,
+}: {
+  selected: string[];
+  onToggle: (key: string) => void;
+}) {
+  return (
+    <Animated.View entering={SlideInRight.duration(350)} exiting={SlideOutLeft.duration(250)} style={styles.stepContent}>
+      <StepLabel current={1} />
+      <Text style={styles.stepTitle}>ما الذي{"\n"}تبحث عنه؟</Text>
+      <Text style={styles.stepSub}>اختر كل ما ينطبق عليك.</Text>
+      <View style={styles.intentionsList}>
+        {INTENTIONS.map(intent => {
+          const active = selected.includes(intent.key);
+          return (
+            <Pressable
+              key={intent.key}
+              style={[styles.intentionCard, active && styles.intentionCardActive]}
+              onPress={() => {
+                if (Platform.OS !== "web") Haptics.selectionAsync();
+                onToggle(intent.key);
+              }}
+            >
+              <Text style={styles.intentionEmoji}>{intent.emoji}</Text>
+              <Text style={[styles.intentionLabel, active && styles.intentionLabelActive]}>
+                {intent.ar}
+              </Text>
+              {active && (
+                <View style={styles.checkDot} />
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </Animated.View>
+  );
+}
+
+// ─── Step 2: Name ────────────────────────────────────────────────────────────
+
+function NameStep({
+  name,
+  onChangeName,
+}: {
+  name: string;
+  onChangeName: (v: string) => void;
+}) {
+  const inputRef = useRef<TextInput>(null);
+  return (
+    <Animated.View entering={SlideInRight.duration(350)} exiting={SlideOutLeft.duration(250)} style={styles.stepContent}>
+      <StepLabel current={2} />
+      <Text style={styles.stepTitle}>ما اسمك؟</Text>
+      <Text style={styles.stepSub}>أُنس سيناديك به — لا حاجة لاسمك الكامل.</Text>
+      {name.trim().length > 0 && (
+        <Animated.Text entering={FadeIn.duration(300)} style={styles.nameGreeting}>
+          أهلاً {name.trim()} 👋
+        </Animated.Text>
+      )}
+      <Pressable style={styles.nameInputWrap} onPress={() => inputRef.current?.focus()}>
+        <TextInput
+          ref={inputRef}
+          style={styles.nameInput}
+          value={name}
+          onChangeText={onChangeName}
+          placeholder="اكتب اسمك أو أي اسم تحب"
+          placeholderTextColor={Colors.muted}
+          autoFocus
+          textAlign="right"
+          returnKeyType="done"
+          onSubmitEditing={Keyboard.dismiss}
+          maxLength={30}
+        />
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+// ─── Main screen ─────────────────────────────────────────────────────────────
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState(0);
-  const [intention, setIntention] = useState("");
+  const [mood, setMood] = useState("");
+  const [intentions, setIntentions] = useState<string[]>([]);
+  const [name, setName] = useState("");
 
-  const handleNext = async () => {
-    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (step < 1) {
-      setStep(step + 1);
-    } else {
-      await AsyncStorage.setItem("@uns_onboarding_complete", "1");
-      await AsyncStorage.setItem("@uns_dialect", "auto");
-      await AsyncStorage.setItem("@uns_intention", intention || "explore");
-      router.push("/onboarding/register");
-    }
-  };
+  function toggleIntention(key: string) {
+    setIntentions(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  }
 
   const canProceed =
-    step === 0 ||
-    (step === 1 && intention !== "");
+    (step === 0 && mood !== "") ||
+    (step === 1 && intentions.length > 0) ||
+    (step === 2 && name.trim().length > 0);
+
+  async function handleNext() {
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    if (step < TOTAL_STEPS - 1) {
+      setStep(s => s + 1);
+      return;
+    }
+
+    // Final step — persist and proceed to registration
+    await Promise.all([
+      AsyncStorage.setItem("@uns_onboarding_complete", "1"),
+      AsyncStorage.setItem("@uns_dialect", "auto"),
+      AsyncStorage.setItem("@uns_mood_baseline", mood),
+      AsyncStorage.setItem("@uns_intentions", JSON.stringify(intentions)),
+      AsyncStorage.setItem("@uns_intention", intentions[0] ?? "explore"),
+      AsyncStorage.setItem("@uns_display_name", name.trim()),
+    ]);
+
+    router.push("/onboarding/register");
+  }
+
+  function handleBack() {
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setStep(s => s - 1);
+  }
+
+  const ctaLabel =
+    step === 0 ? "التالي ←" :
+    step === 1 ? "التالي ←" :
+    `ابدأ مع أُنس ←`;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top + Spacing.sm, paddingBottom: insets.bottom + Spacing.xxl },
-      ]}
-    >
-      <View style={styles.progressRow}>
-        {[0, 1].map(i => (
-          <View
-            key={i}
-            style={[styles.dot, i === step && styles.dotActive, i < step && styles.dotDone]}
-          />
-        ))}
-      </View>
+    <View style={[styles.container, { paddingTop: insets.top + Spacing.md, paddingBottom: insets.bottom + Spacing.xl }]}>
+      <StepIndicator current={step} />
 
       {step === 0 && (
-        <Animated.View entering={FadeInDown.duration(700)} style={styles.stepContent}>
-          <Text style={styles.brandMark}>أُنْس</Text>
-          <Text style={styles.heroTitle}>رفيقك العاطفي{"\n"}الأول من نوعه</Text>
-          <Text style={styles.heroSub}>
-            لست وحدك. أُنْس هنا معك كل يوم —{"\n"}يستمع، يتذكر، ويكون معك.
-          </Text>
-          <View style={styles.featureRow}>
-            {[
-              { icon: "🧠", text: "يتذكر قصتك" },
-              { icon: "💬", text: "يتحدث بلهجتك" },
-              { icon: "🔒", text: "يحمي خصوصيتك" },
-            ].map(f => (
-              <View key={f.text} style={styles.featureCard}>
-                <Text style={styles.featureIcon}>{f.icon}</Text>
-                <Text style={styles.featureLabel}>{f.text}</Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
+        <MoodStep selected={mood} onSelect={setMood} />
       )}
-
       {step === 1 && (
-        <Animated.View entering={SlideInRight.duration(400)} style={styles.stepContent}>
-          <Text style={styles.stepNumLabel}>١ / ١</Text>
-          <Text style={styles.heroTitle}>لماذا أنت{"\n"}هنا اليوم؟</Text>
-          <Text style={styles.heroSub}>لا إجابة خاطئة — أريد أن أبدأ معك من حيث أنت</Text>
-          <View style={styles.intentionsList}>
-            {INTENTIONS.map(int => (
-              <Pressable
-                key={int.key}
-                style={[
-                  styles.intentionCard,
-                  intention === int.key && styles.intentionCardActive,
-                ]}
-                onPress={() => {
-                  setIntention(int.key);
-                  if (Platform.OS !== "web") Haptics.selectionAsync();
-                }}
-              >
-                <Text style={styles.intentionIcon}>{int.icon}</Text>
-                <Text
-                  style={[styles.intentionLabel, intention === int.key && { color: Colors.accent }]}
-                >
-                  {int.labelAr}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </Animated.View>
+        <IntentStep selected={intentions} onToggle={toggleIntention} />
+      )}
+      {step === 2 && (
+        <NameStep name={name} onChangeName={setName} />
       )}
 
-      <Animated.View entering={FadeInUp.duration(400)} style={styles.footer}>
-        <Pressable
-          style={{ borderRadius: Radius.pill, overflow: "hidden", opacity: canProceed ? 1 : 0.35 }}
-          onPress={handleNext}
-          disabled={!canProceed}
-        >
-          <LinearGradient
-            colors={["#74C69D", "#1B4332"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.nextBtn}
-          >
-            <Text style={styles.nextBtnText}>
-              {step === 1 ? "ابدأ رحلتك مع أُنْس ←" : "التالي ←"}
-            </Text>
-          </LinearGradient>
-        </Pressable>
-        {step > 0 && (
-          <Pressable onPress={() => setStep(step - 1)} style={styles.secondaryBtn}>
+      <Animated.View entering={FadeIn.duration(400)} style={styles.footer}>
+        <PrimaryBtn label={ctaLabel} onPress={handleNext} disabled={!canProceed} />
+
+        {step > 0 ? (
+          <Pressable onPress={handleBack} style={styles.secondaryBtn}>
             <Text style={styles.secondaryBtnText}>→ رجوع</Text>
           </Pressable>
-        )}
-        {step === 0 && (
+        ) : (
           <Pressable onPress={() => router.push("/onboarding/login")} style={styles.secondaryBtn}>
             <Text style={styles.secondaryBtnText}>لديّ حساب بالفعل</Text>
           </Pressable>
@@ -149,115 +308,131 @@ export default function OnboardingScreen() {
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.surface,
     paddingHorizontal: Spacing.xxl,
   },
-  progressRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: Spacing.sm,
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.xs,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.surfaceContainerHigh,
-  },
-  dotActive: {
-    width: 28,
-    backgroundColor: Colors.accent,
-  },
-  dotDone: {
-    backgroundColor: Colors.primaryContainer,
-  },
   stepContent: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: Spacing.lg,
-    gap: Spacing.sm,
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
+    paddingTop: Spacing.md,
+    gap: Spacing.md,
   },
-  brandMark: {
-    ...Typography.display,
-    fontSize: 80,
-    lineHeight: 100,
-    color: Colors.accent,
-    marginBottom: Spacing.sm,
-    textAlign: "center",
-  },
-  heroTitle: {
-    ...Typography.display,
-    color: Colors.onSurface,
-    textAlign: "center",
-    marginBottom: Spacing.sm,
-  },
-  heroSub: {
-    ...Typography.body,
-    color: Colors.muted,
-    textAlign: "center",
-    marginBottom: Spacing.xxl,
-    maxWidth: 310,
-  },
-  stepNumLabel: {
+  stepLabel: {
     ...Typography.label,
     color: Colors.accent,
-    marginBottom: Spacing.md,
-    letterSpacing: 2,
+    textAlign: "right",
   },
-  featureRow: {
+  stepTitle: {
+    ...Typography.display,
+    color: Colors.onSurface,
+    textAlign: "right",
+  },
+  stepSub: {
+    ...Typography.body,
+    color: Colors.muted,
+    textAlign: "right",
+    marginBottom: Spacing.sm,
+  },
+  // Mood step
+  moodResponse: {
+    ...Typography.body,
+    color: Colors.accent,
+    textAlign: "right",
+    fontFamily: "Tajawal_500Medium",
+  },
+  moodList: { width: "100%", gap: Spacing.sm },
+  moodTile: {
     flexDirection: "row",
-    gap: Spacing.md - 2,
-    marginTop: Spacing.sm,
-  },
-  featureCard: {
-    flex: 1,
+    alignItems: "center",
+    gap: Spacing.md,
     backgroundColor: Colors.surfaceContainer,
     borderRadius: Radius.md,
-    padding: 14,
-    alignItems: "center",
-    gap: Spacing.sm,
+    paddingVertical: 16,
+    paddingHorizontal: Spacing.cardPad,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
-  featureIcon: { fontSize: 24 },
-  featureLabel: {
-    ...Typography.bodySmall,
+  moodTileActive: {
+    backgroundColor: Colors.primaryContainer,
+    borderColor: Colors.accent,
+  },
+  moodEmoji: { fontSize: 22 },
+  moodLabel: {
+    ...Typography.body,
     color: Colors.primary,
-    textAlign: "center",
+    flex: 1,
+    textAlign: "right",
   },
-  intentionsList: { width: "100%", gap: Spacing.md },
+  moodLabelActive: { color: Colors.accent },
+  // Intent step
+  intentionsList: { width: "100%", gap: Spacing.sm },
   intentionCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: Spacing.md,
     backgroundColor: Colors.surfaceContainer,
     borderRadius: Radius.md,
     padding: Spacing.cardPad,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
   intentionCardActive: {
     backgroundColor: Colors.primaryContainer,
+    borderColor: Colors.accent,
   },
-  intentionIcon: { fontSize: 22 },
+  intentionEmoji: { fontSize: 20 },
   intentionLabel: {
     ...Typography.body,
     color: Colors.primary,
     flex: 1,
     textAlign: "right",
   },
+  intentionLabelActive: { color: Colors.accent },
+  checkDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.accent,
+  },
+  // Name step
+  nameGreeting: {
+    ...Typography.h2,
+    color: Colors.accent,
+    textAlign: "right",
+  },
+  nameInputWrap: {
+    width: "100%",
+    backgroundColor: Colors.surfaceContainer,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.accent,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+    marginTop: Spacing.sm,
+  },
+  nameInput: {
+    ...Typography.h2,
+    color: Colors.onSurface,
+    textAlign: "right",
+    minHeight: 44,
+  },
+  // Footer
   footer: {
     gap: Spacing.md,
-    paddingBottom: Spacing.sm,
     paddingTop: Spacing.sm,
   },
-  nextBtn: {
+  primaryBtn: {
     borderRadius: Radius.pill,
     paddingVertical: 18,
     alignItems: "center",
   },
-  nextBtnText: {
+  primaryBtnText: {
     ...Typography.h3,
     color: Colors.surface,
   },

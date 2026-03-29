@@ -273,7 +273,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     fontSize: 12,
     color: T.muted,
     textAlign: "right",
-    letterSpacing: 0.5,
+    
     textTransform: "uppercase",
   },
   dialectGrid: {

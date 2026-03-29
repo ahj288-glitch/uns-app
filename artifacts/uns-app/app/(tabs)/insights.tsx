@@ -288,7 +288,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     ...Typography.display,
     color: T.onSurface,
     textAlign: "right",
-    letterSpacing: -0.5,
+    
   },
   screenSubtitle: {
     ...Typography.body,
@@ -340,7 +340,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   gamifXp: {
     ...Typography.display,
     color: T.onSurface,
-    letterSpacing: -1,
+    
     textAlign: "right",
   },
   gamifXpUnit: {
