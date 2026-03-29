@@ -125,11 +125,25 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
+        Root: function CalendarRoot({ className, rootRef, ...props }) {
+          // react-day-picker types rootRef against an older @types/react version.
+          // Use a callback ref adapter to satisfy React 19's stricter Ref types.
+          const setRef = React.useCallback(
+            (node: HTMLDivElement | null) => {
+              if (!rootRef) return;
+              if (typeof rootRef === "function") {
+                rootRef(node);
+              } else if (Object.prototype.hasOwnProperty.call(rootRef, "current")) {
+                (rootRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+              }
+            },
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            [rootRef]
+          );
           return (
             <div
               data-slot="calendar"
-              ref={rootRef}
+              ref={setRef}
               className={cn(className)}
               {...props}
             />

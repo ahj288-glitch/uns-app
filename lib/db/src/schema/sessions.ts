@@ -4,6 +4,8 @@ import { z } from "zod/v4";
 
 export const companionSessionsTable = pgTable("companion_sessions", {
   sessionId: uuid("session_id").primaryKey().defaultRandom(),
+  // userId links a session to a registered user (nullable for anonymous sessions)
+  userId: uuid("user_id"),
   dialect: text("dialect").notNull().default("gulf"),
   emotionalProfile: jsonb("emotional_profile"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

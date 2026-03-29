@@ -1,6 +1,7 @@
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -79,6 +80,9 @@ app.use(
     },
   }),
 );
+
+// ── Cookie Parsing (used for httpOnly admin auth cookie) ──────────────────────
+app.use(cookieParser());
 
 // ── Body Parsing — bounded size to prevent payload attacks ────────────────────
 app.use(express.json({ limit: "50kb" }));

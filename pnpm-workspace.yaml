@@ -6,6 +6,14 @@ packages:
 
 autoInstallPeers: false
 
+# Force @hookform/resolvers to resolve zod from the workspace (v3) rather than from the
+# hoisted @scalar/* packages which require zod v4. Without this, TypeScript sees two
+# incompatible ZodType definitions and resolver calls fail to type-check.
+packageExtensions:
+  "@hookform/resolvers@*":
+    peerDependencies:
+      zod: ">=3"
+
 catalog:
   '@replit/vite-plugin-cartographer': ^0.5.1
   '@replit/vite-plugin-dev-banner': ^0.1.1

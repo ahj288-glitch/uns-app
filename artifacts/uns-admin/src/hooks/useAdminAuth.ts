@@ -53,7 +53,17 @@ export function useAdminAuth() {
 
   const isAuthenticated = isTokenValid(accessToken);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Tell the server to clear the httpOnly cookie.
+    // Fire-and-forget — we navigate away regardless of outcome.
+    try {
+      await fetch(`${API_BASE}/auth/admin/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // Network failure on logout is non-fatal; local state is still cleared.
+    }
     clearToken();
     setAccessToken(null);
     navigate("/login");
@@ -70,6 +80,7 @@ export function useAdminAuth() {
     const res = await fetch(`${API_BASE}/auth/admin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // allows the server to set the httpOnly admin cookie
       body: JSON.stringify({ secret }),
     });
 
@@ -77,9 +88,9 @@ export function useAdminAuth() {
       throw new Error("unauthorized");
     }
 
-    const data = await res.json() as { token: string };
-    storeToken(data.token);
-    setAccessToken(data.token);
+    const data = await res.json() as { accessToken: string };
+    storeToken(data.accessToken);
+    setAccessToken(data.accessToken);
   }, []);
 
   const getAuthHeader = useCallback((): { Authorization: string } | Record<string, never> => {

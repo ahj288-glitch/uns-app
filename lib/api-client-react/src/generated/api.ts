@@ -132,6 +132,7 @@ export interface DailyRecipe {
   summary: string;
   content: string;
   imageUrl: string | null;
+  source?: string | null;
   category: string;
 }
 

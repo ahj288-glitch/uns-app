@@ -57,6 +57,12 @@ router.get("/insights", async (req, res) => {
   }
 
   const { sessionId } = parsed.data;
+
+  // ── Ownership check — caller must own this session ─────────────────────────
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
+
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const [entries, progressRows, recentWins] = await Promise.all([
@@ -64,7 +70,7 @@ router.get("/insights", async (req, res) => {
       .select()
       .from(moodsTable)
       .where(and(
-        eq(moodsTable.sessionId, sessionId as any),
+        eq(moodsTable.sessionId, sessionId as string),
         gte(moodsTable.createdAt, sevenDaysAgo),
       ))
       .orderBy(desc(moodsTable.createdAt))

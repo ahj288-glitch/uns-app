@@ -14,6 +14,11 @@ router.post("/moods/checkin", async (req, res) => {
 
   const { sessionId, moodWord, moodWordArabic, intensity, notes } = parsed.data;
 
+  // ── Ownership check — caller must own this session ─────────────────────────
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
+
   const [entry] = await db.insert(moodsTable).values({
     sessionId,
     moodWord,
@@ -40,6 +45,12 @@ router.get("/moods/history", async (req, res) => {
   }
 
   const { sessionId, days } = parsed.data;
+
+  // ── Ownership check — caller must own this session ─────────────────────────
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
+
   const daysBack = days ?? 30;
   const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
 

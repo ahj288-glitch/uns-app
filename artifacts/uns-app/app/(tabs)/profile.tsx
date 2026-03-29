@@ -85,7 +85,7 @@ export default function ProfileScreen() {
           text: "نعم",
           style: "destructive",
           onPress: async () => {
-            await AsyncStorage.removeItem("uns_session_id");
+            await AsyncStorage.multiRemove(["uns_session_id", "uns_access_token", "uns_refresh_token"]);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
             Alert.alert("تم", "أعد تشغيل التطبيق لبدء جلسة جديدة.");
           },

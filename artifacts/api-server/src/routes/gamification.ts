@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { userProgressTable, microWinsTable, dailyLoopsTable } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
+import { requireAdmin } from "../middlewares/auth.js";
 
 const router = Router();
 
@@ -98,6 +99,9 @@ async function getOrCreateProgress(sessionId: string) {
 router.get("/progress", async (req, res) => {
   const sessionId = req.query.sessionId as string;
   if (!sessionId) return res.status(400).json({ error: "sessionId required" });
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
 
   const progress = await getOrCreateProgress(sessionId);
   const currentLevel = getLevelFromXp(progress.xp);
@@ -157,6 +161,9 @@ router.get("/progress", async (req, res) => {
 router.post("/progress/win", async (req, res) => {
   const { sessionId, winType } = req.body as { sessionId: string; winType: string };
   if (!sessionId || !winType) return res.status(400).json({ error: "sessionId and winType required" });
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
 
   const winDef = WIN_TYPES[winType as keyof typeof WIN_TYPES];
   if (!winDef) return res.status(400).json({ error: "unknown win type" });
@@ -167,11 +174,6 @@ router.post("/progress/win", async (req, res) => {
     winLabelAr: winDef.labelAr,
     points: winDef.points,
   }).returning();
-
-  await db
-    .update(userProgressTable)
-    .set({ xp: db.$with("xp_add" as any) as any })
-    .where(eq(userProgressTable.sessionId, sessionId));
 
   const progress = await getOrCreateProgress(sessionId);
   const newXp = progress.xp + winDef.points;
@@ -200,6 +202,9 @@ router.post("/progress/win", async (req, res) => {
 router.get("/loop/today", async (req, res) => {
   const sessionId = req.query.sessionId as string;
   if (!sessionId) return res.status(400).json({ error: "sessionId required" });
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
 
   const today = getTodayDate();
   let [loop] = await db
@@ -238,6 +243,9 @@ router.get("/loop/today", async (req, res) => {
 router.post("/loop/complete", async (req, res) => {
   const { sessionId, loopId } = req.body as { sessionId: string; loopId: string };
   if (!sessionId || !loopId) return res.status(400).json({ error: "sessionId and loopId required" });
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
 
   await db
     .update(dailyLoopsTable)
@@ -285,6 +293,9 @@ router.post("/loop/complete", async (req, res) => {
 router.post("/checkin-complete", async (req, res) => {
   const { sessionId, moodWord, streak } = req.body as { sessionId: string; moodWord: string; streak?: number };
   if (!sessionId) return res.status(400).json({ error: "sessionId required" });
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
 
   const progress = await getOrCreateProgress(sessionId);
   const today = getTodayDate();
@@ -323,7 +334,9 @@ router.post("/checkin-complete", async (req, res) => {
 
   const newWins: { type: string; points: number }[] = [];
 
-  newWins.push({ type: "first_checkin", points: 10 });
+  if (newTotalCheckins === 1) {
+    newWins.push({ type: "first_checkin", points: 10 });
+  }
 
   if (newStreak === 3) {
     await db.insert(microWinsTable).values({
@@ -344,7 +357,7 @@ router.post("/checkin-complete", async (req, res) => {
   } else if (newStreak === 14) {
     await db.insert(microWinsTable).values({
       sessionId,
-      winType: "streak_7",
+      winType: "streak_14",
       winLabelAr: "أسبوعان من الاستمرارية 🌟",
       points: 150,
     });
@@ -389,7 +402,7 @@ router.post("/checkin-complete", async (req, res) => {
   });
 });
 
-router.get("/stats", async (_req, res) => {
+router.get("/stats", requireAdmin, async (_req, res) => {
   const allProgress = await db.select().from(userProgressTable);
   const LEVELS = [
     { key: "awareness", labelAr: "الوعي", minXp: 0, maxXp: 300, color: "#6B7FD7" },

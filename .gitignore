@@ -71,6 +71,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# ── Claude Code (local editor config) ────────────────────────────────────────
+.claude/
+
 # ── Replit-specific ───────────────────────────────────────────────────────────
 .local/
 .cache/

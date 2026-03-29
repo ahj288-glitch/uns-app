@@ -270,7 +270,7 @@ export default function HomeScreen() {
                 colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
                 style={styles.avatarCircle}
               >
-                <Text style={styles.avatarText}>س</Text>
+                <Text style={styles.avatarText}>أ</Text>
               </LinearGradient>
             </Pressable>
             <Text style={styles.headerLogo}>أُنْس</Text>

@@ -25,12 +25,18 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
 
-// ── API base URL guard ────────────────────────────────────────────────────────
-// Fail visibly if the domain env var is missing rather than silently calling
-// "https://undefined" and showing a blank app with no error.
+// ── API base URL configuration ────────────────────────────────────────────────
+// Two env vars supported:
+//   EXPO_PUBLIC_API_URL  — full URL (e.g. http://localhost:3000) — used for local/dev
+//   EXPO_PUBLIC_DOMAIN   — hostname only (e.g. my.replit.dev) — used for Replit/prod
+// EXPO_PUBLIC_API_URL takes precedence so local dev overrides don't need the https:// assumption.
 const DOMAIN = process.env["EXPO_PUBLIC_DOMAIN"];
-if (DOMAIN) {
-  setBaseUrl(`https://${DOMAIN}`);
+const API_URL =
+  process.env["EXPO_PUBLIC_API_URL"] ??
+  (DOMAIN ? `https://${DOMAIN}` : null);
+
+if (API_URL) {
+  setBaseUrl(API_URL);
 }
 
 // ── React Query — sane global defaults ───────────────────────────────────────
@@ -116,8 +122,8 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError) return null;
 
-  // Show a meaningful error screen if the API domain is not configured
-  if (!DOMAIN) {
+  // Show a meaningful error screen if neither API env var is configured
+  if (!API_URL) {
     return (
       <SafeAreaProvider>
         <ConfigErrorScreen />
