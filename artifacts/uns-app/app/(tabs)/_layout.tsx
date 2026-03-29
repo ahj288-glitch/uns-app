@@ -2,7 +2,7 @@ import { BlurView } from "expo-blur";
 import { Tabs, router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import { Platform, StyleSheet, View, ActivityIndicator, Text } from "react-native";
+import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
