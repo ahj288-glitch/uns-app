@@ -73,8 +73,8 @@ function ProgressBar({ current, max, trackColor, fillColor }: { current: number;
 }
 
 const barStyles = StyleSheet.create({
-  track: { height: 6, borderRadius: 3, overflow: "hidden" as const },
-  fill: { height: "100%" as const, borderRadius: 3 },
+  track: { height: 8, borderRadius: 4, overflow: "hidden" as const },
+  fill: { height: "100%" as const, borderRadius: 4 },
 });
 
 interface GamificationProgress {
@@ -181,6 +181,15 @@ export default function JourneyScreen() {
                 isLocked && styles.stageCardLocked,
               ]}
             >
+              {isCurrent && (
+                <LinearGradient
+                  colors={["rgba(116,198,157,0.24)", "rgba(52,180,110,0.06)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
+                />
+              )}
               <View style={styles.stageLeft}>
                 <View style={[styles.stageIconCircle, isCurrent && styles.stageIconCircleCurrent]}>
                   <Text style={styles.stageIcon}>{isLocked ? "🔒" : level.icon}</Text>
@@ -211,6 +220,13 @@ export default function JourneyScreen() {
       </View>
 
       <Animated.View entering={FadeInDown.duration(500).delay(500)} style={styles.quoteCard}>
+        <LinearGradient
+          colors={["rgba(116,198,157,0.13)", "rgba(212,184,150,0.07)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
         <Text style={styles.quotePrefix}>✦ إلهام اليوم</Text>
         <Text style={styles.quoteText}>
           "السكينة لا تعني أن تكون في مكان يخلو من الضجيج والمشاكل، بل أن تكون في قلبها وتظل هادئاً في أعماقك."
@@ -219,10 +235,24 @@ export default function JourneyScreen() {
 
       <Animated.View entering={FadeInDown.duration(500).delay(600)} style={styles.metricsRow}>
         <View style={styles.metricCard}>
+          <LinearGradient
+            colors={["rgba(116,198,157,0.10)", "rgba(116,198,157,0.02)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
           <Text style={styles.metricValue}>{data?.totalCheckins ?? 0}</Text>
           <Text style={styles.metricLabel}>دقائق الوعي</Text>
         </View>
         <View style={styles.metricCard}>
+          <LinearGradient
+            colors={["rgba(116,198,157,0.10)", "rgba(116,198,157,0.02)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
           <Text style={styles.metricValue}>{data?.totalLoopsCompleted ?? 0}</Text>
           <Text style={styles.metricLabel}>جلسات التنفس</Text>
         </View>
@@ -296,6 +326,10 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       borderRadius: Radius.lg,
       padding: 18,
       alignItems: "flex-start",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: T.ghostBorder,
+      ...Shadow.subtle,
     },
     stageCardCurrent: {
       backgroundColor: T.primaryContainer,
@@ -376,6 +410,9 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       alignItems: "flex-end",
       gap: Spacing.md,
       marginBottom: Spacing.lg,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: T.ghostBorder,
     },
     quotePrefix: {
       ...Typography.label,
@@ -399,6 +436,9 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
       padding: Spacing.xl,
       alignItems: "flex-end",
       gap: Spacing.xs,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: T.ghostBorder,
     },
     metricValue: {
       ...Typography.display,

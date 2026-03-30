@@ -149,34 +149,35 @@ const orbStyles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    height: 220,
+    height: 264,
     marginTop: Spacing.sm,
   },
   outerRing: {
     position: "absolute",
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 238,
+    height: 238,
+    borderRadius: 119,
     borderWidth: 1,
     borderStyle: "dashed",
   },
   greenLayer: {
     position: "absolute",
-    width: 184,
-    height: 184,
-    borderRadius: 92,
+    width: 218,
+    height: 218,
+    borderRadius: 109,
   },
   goldLayer: {
     position: "absolute",
-    width: 170,
-    height: 170,
-    borderRadius: 85,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
   orbMid: {
-    width: 152,
-    height: 152,
-    borderRadius: 76,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     overflow: "hidden",
+    ...Shadow.glow,
   },
   orbGradient: {
     flex: 1,
@@ -190,8 +191,8 @@ const orbStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#F8F0FF",
-    borderRadius: 76,
+    backgroundColor: "#F0F8FF",
+    borderRadius: 90,
   },
   orbLabel: {
     ...Typography.h2,
@@ -200,9 +201,8 @@ const orbStyles = StyleSheet.create({
   },
   orbSub: {
     ...Typography.caption,
-    color: "rgba(255,255,255,0.75)",
+    color: "rgba(255,255,255,0.78)",
     textAlign: "center",
-    
   },
 });
 
@@ -359,7 +359,12 @@ export default function HomeScreen() {
             </View>
           )}
 
-          <View style={styles.dailyFlashCard}>
+          <LinearGradient
+            colors={["#0C2C1E", "#1A4030"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.dailyFlashCard}
+          >
             <LinearGradient
               colors={["#C8A882", "#D4B896"]}
               start={{ x: 0, y: 0 }}
@@ -374,9 +379,9 @@ export default function HomeScreen() {
                 "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
               </Text>
               {recipe?.source ? (
-                <Text style={styles.dailyAttrib}>- {recipe.source}</Text>
+                <Text style={styles.dailyAttrib}>— {recipe.source}</Text>
               ) : !recipe ? (
-                <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
+                <Text style={styles.dailyAttrib}>— حكمة عربية</Text>
               ) : null}
               <Pressable
                 style={styles.dailyCTA}
@@ -403,7 +408,7 @@ export default function HomeScreen() {
                 </Text>
               </Pressable>
             </View>
-          </View>
+          </LinearGradient>
 
           <Pressable
             style={styles.communityCard}
@@ -503,10 +508,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     width: "100%",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.35)",
+    borderColor: "rgba(255,255,255,0.45)",
+    ...Shadow.glow,
   },
   startNowBtnGrad: {
-    paddingVertical: 14,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: Radius.xl,
@@ -514,7 +520,6 @@ const styles = StyleSheet.create({
   startNowText: {
     ...Typography.h2,
     color: "#FFFFFF",
-    
   },
   moodCard: {
     marginHorizontal: Spacing.lg,
@@ -562,14 +567,14 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.lg,
     marginBottom: Spacing.lg,
     borderRadius: Spacing.xl,
-    backgroundColor: "#10231c",
+    overflow: "hidden",
     padding: Spacing.cardPad,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 14,
     borderWidth: 1,
-    borderColor: "rgba(116,198,157,0.18)",
-    ...Shadow.subtle,
+    borderColor: "rgba(116,198,157,0.22)",
+    ...Shadow.card,
   },
   dailyThumbnail: {
     width: 72,
