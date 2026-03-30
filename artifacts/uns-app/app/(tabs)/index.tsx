@@ -210,7 +210,7 @@ const orbStyles = StyleSheet.create({
 // ─── Home Screen ──────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { greeting, gender, sessionId, setLastMoodWord, authFetch } = useSession();
+  const { greeting, gender, displayName, sessionId, setLastMoodWord, authFetch } = useSession();
   const { theme } = useThemeContext();
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
@@ -274,7 +274,7 @@ export default function HomeScreen() {
                 colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.15)"]}
                 style={styles.avatarCircle}
               >
-                <Text style={styles.avatarText}>س</Text>
+                <Text style={styles.avatarText}>{displayName ? displayName[0] : "أ"}</Text>
               </LinearGradient>
             </Pressable>
             <Text style={styles.headerLogo}>أُنْس</Text>

@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import Colors, { useTokens } from "@/constants/colors";
 import EmptyState from "@/components/EmptyState";
 import { useSession } from "@/contexts/SessionContext";
@@ -295,13 +296,16 @@ export default function ProgramsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.headerBar, { paddingTop: webTop + Spacing.sm }]}>
-        <Pressable style={styles.headerBtn}>
-          <Feather name="settings" size={18} color="#555555" />
+        <Pressable
+          style={styles.headerBtn}
+          onPress={() => router.back()}
+          accessibilityLabel="رجوع"
+          accessibilityRole="button"
+        >
+          <Feather name="arrow-right" size={20} color={T.onSurface} />
         </Pressable>
         <Text style={styles.headerTitle}>مسارات أُنْس</Text>
-        <Pressable style={styles.headerBtn}>
-          <Feather name="chevron-right" size={20} color="#555555" />
-        </Pressable>
+        <View style={styles.headerBtn} />
       </View>
 
       <HeroBanner />

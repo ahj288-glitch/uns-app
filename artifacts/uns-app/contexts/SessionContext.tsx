@@ -6,15 +6,32 @@ import { API_BASE } from "@/lib/api";
 
 const BASE = API_BASE;
 
+// Keys used in @-prefixed form (onboarding) and non-prefixed form (register/session)
+// We read both variants for backward compatibility.
+async function readKey(...candidates: string[]): Promise<string | null> {
+  for (const key of candidates) {
+    const v = await AsyncStorage.getItem(key);
+    if (v) return v;
+  }
+  return null;
+}
+
+function buildGreeting(name: string): string {
+  if (name.trim()) return `أهلاً ${name.trim()} 👋`;
+  return "أهلاً بك في مساحتك الخاصة";
+}
+
 interface SessionContextType {
   sessionId: string | null;
   dialect: string;
   greeting: string;
   gender: Gender;
+  displayName: string;
   authToken: string | null;
   authFetch: (url: string, init?: RequestInit) => Promise<Response>;
   setDialect: (d: string) => void;
   setGender: (g: Gender) => void;
+  setDisplayName: (n: string) => void;
   isReady: boolean;
   initError: string | null;
   retryInit: () => void;
@@ -26,12 +43,14 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType>({
   sessionId: null,
   dialect: "gulf",
-  greeting: "هلا وغلا!",
+  greeting: "أهلاً بك في مساحتك الخاصة",
   gender: "female",
+  displayName: "",
   authToken: null,
   authFetch: (url, init) => fetch(url, init),
   setDialect: () => {},
   setGender: () => {},
+  setDisplayName: () => {},
   isReady: false,
   initError: null,
   retryInit: () => {},
@@ -43,8 +62,9 @@ const SessionContext = createContext<SessionContextType>({
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [dialect, setDialectState] = useState("gulf");
-  const [greeting, setGreeting] = useState("هلا وغلا!");
+  const [greeting, setGreeting] = useState("أهلاً بك في مساحتك الخاصة");
   const [gender, setGenderState] = useState<Gender>("female");
+  const [displayName, setDisplayNameState] = useState("");
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
@@ -120,22 +140,38 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setInitError(null);
 
     try {
-      const [storedId, storedToken, storedRefreshToken, storedDialect, storedGender, storedMood] =
-        await Promise.all([
-          AsyncStorage.getItem("uns_session_id"),
-          AsyncStorage.getItem("uns_access_token"),
-          AsyncStorage.getItem("uns_refresh_token"),
-          AsyncStorage.getItem("uns_dialect"),
-          AsyncStorage.getItem("uns_gender"),
-          AsyncStorage.getItem("uns_last_mood"),
-        ]);
+      const [
+        storedId,
+        storedToken,
+        storedRefreshToken,
+        storedDialect,
+        storedGender,
+        storedMood,
+        storedName,
+      ] = await Promise.all([
+        AsyncStorage.getItem("uns_session_id"),
+        AsyncStorage.getItem("uns_access_token"),
+        AsyncStorage.getItem("uns_refresh_token"),
+        // Read dialect from both key formats
+        readKey("uns_dialect", "@uns_dialect"),
+        // Read gender from both key formats (register saves @uns_gender)
+        readKey("uns_gender", "@uns_gender"),
+        AsyncStorage.getItem("uns_last_mood"),
+        // Read display name from both key formats (onboarding saves @uns_display_name)
+        readKey("uns_display_name", "@uns_display_name", "uns_name"),
+      ]);
 
       if (signal.aborted || !mountedRef.current) return;
 
       const resolvedDialect = storedDialect ?? "gulf";
       const resolvedGender = (storedGender as Gender) ?? "female";
+      const resolvedName = storedName ?? "";
+
       setDialectState(resolvedDialect);
       setGenderState(resolvedGender);
+      setDisplayNameState(resolvedName);
+      setGreeting(buildGreeting(resolvedName));
+
       if (storedMood) setLastMoodWordState(storedMood);
 
       if (storedId && storedToken) {
@@ -155,7 +191,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // No stored credentials — leave sessionId null so onboarding guard redirects to registration
+      // No stored credentials — leave sessionId null so onboarding guard redirects
     } catch (e) {
       if ((e as { name?: string }).name === "AbortError") return;
       if (!mountedRef.current) return;
@@ -181,7 +217,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function setGender(g: Gender) {
     setGenderState(g);
-    await AsyncStorage.setItem("uns_gender", g);
+    // Write to both keys for compatibility
+    await Promise.all([
+      AsyncStorage.setItem("uns_gender", g),
+      AsyncStorage.setItem("@uns_gender", g),
+    ]);
+  }
+
+  async function setDisplayName(n: string) {
+    setDisplayNameState(n);
+    setGreeting(buildGreeting(n));
+    await Promise.all([
+      AsyncStorage.setItem("uns_display_name", n),
+      AsyncStorage.setItem("@uns_display_name", n),
+    ]);
   }
 
   // Real logout: revoke refresh token on the server, then clear all local
@@ -233,10 +282,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         dialect,
         greeting,
         gender,
+        displayName,
         authToken,
         authFetch,
         setDialect,
         setGender,
+        setDisplayName,
         isReady,
         initError,
         retryInit,
