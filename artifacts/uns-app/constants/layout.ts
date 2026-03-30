@@ -20,18 +20,36 @@ export const Radius = {
 };
 
 export const Shadow = {
-  card: {
-    shadowColor: "#1B4332",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
-  },
+  // Subtle depth for inline cards
   subtle: {
-    shadowColor: "#1B4332",
+    shadowColor: "#071C12",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  // Standard card elevation
+  card: {
+    shadowColor: "#071C12",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.13,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+  // Floating elements (FABs, modals)
+  float: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.20,
+    shadowRadius: 30,
+    elevation: 12,
+  },
+  // Sage glow — for orbs, active buttons
+  glow: {
+    shadowColor: "#74C69D",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.40,
+    shadowRadius: 24,
+    elevation: 10,
   },
 };

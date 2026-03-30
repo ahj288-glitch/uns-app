@@ -104,6 +104,16 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: 
   const T = useTokens();
   const styles = makeStyles(T);
   const isUser = message.role === "user";
+
+  const crisisRow = message.crisisDetected ? (
+    <View style={styles.crisisBox}>
+      <Feather name="phone" size={11} color={T.error} />
+      <Text style={styles.crisisText}>
+        {CRISIS_RESOURCES.map(r => `${r.country}: ${r.number}`).join("  |  ")}
+      </Text>
+    </View>
+  ) : null;
+
   return (
     <Animated.View
       entering={FadeInDown.duration(300)}
@@ -114,26 +124,30 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: 
           <Text style={styles.avatarText}>أ</Text>
         </View>
       )}
-      <View style={[
-        styles.bubble,
-        isUser ? styles.bubbleUser : styles.bubbleCompanion,
-        message.isError && styles.bubbleError,
-      ]}>
-        {!isUser && bubbleTint !== "transparent" && (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: bubbleTint, borderRadius: 18, borderBottomLeftRadius: 4 }]} />
-        )}
-        <Text style={[styles.bubbleText, isUser ? styles.bubbleTextUser : styles.bubbleTextCompanion]}>
-          {message.content}
-        </Text>
-        {message.crisisDetected && (
-          <View style={styles.crisisBox}>
-            <Feather name="phone" size={11} color={T.error} />
-            <Text style={styles.crisisText}>
-              {CRISIS_RESOURCES.map(r => `${r.country}: ${r.number}`).join("  |  ")}
-            </Text>
-          </View>
-        )}
-      </View>
+
+      {isUser ? (
+        <LinearGradient
+          colors={message.isError ? ["#3A1010", "#2A0808"] : ["#2E7A52", "#194030"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.bubble, styles.bubbleUser]}
+        >
+          <Text style={[styles.bubbleText, styles.bubbleTextUser]}>{message.content}</Text>
+          {crisisRow}
+        </LinearGradient>
+      ) : (
+        <View style={[
+          styles.bubble,
+          styles.bubbleCompanion,
+          message.isError && styles.bubbleError,
+        ]}>
+          {bubbleTint !== "transparent" && (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: bubbleTint, borderRadius: 18, borderBottomLeftRadius: 4 }]} />
+          )}
+          <Text style={[styles.bubbleText, styles.bubbleTextCompanion]}>{message.content}</Text>
+          {crisisRow}
+        </View>
+      )}
     </Animated.View>
   );
 }
@@ -582,7 +596,7 @@ export default function ChatScreen() {
                 accessibilityState={{ disabled: !canSend }}
               >
                 <LinearGradient
-                  colors={["#74C69D", "#1B4332"]}
+                  colors={["#85D7AD", "#2E7A52"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.sendBtn}
@@ -713,6 +727,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     borderRadius: 18,
     borderBottomLeftRadius: 4,
     padding: 14,
+    borderWidth: 1,
+    borderColor: T.ghostBorder,
   },
   welcomeText: {
     ...Typography.body,
@@ -744,12 +760,14 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     gap: 6,
   },
   bubbleUser: {
-    backgroundColor: T.primaryContainer,
     borderBottomRightRadius: 4,
+    overflow: "hidden",
   },
   bubbleCompanion: {
     backgroundColor: T.surfaceContainer,
     borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: T.ghostBorder,
   },
   bubbleError: {
     backgroundColor: T.error + "18",
@@ -759,7 +777,7 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     textAlign: "right",
   },
   bubbleTextUser: {
-    color: T.primary,
+    color: "rgba(255,255,255,0.95)",
   },
   bubbleTextCompanion: {
     color: T.onSurface,
@@ -819,6 +837,8 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
     backgroundColor: T.surface,
+    borderTopWidth: 1,
+    borderTopColor: T.border,
   },
   inputBar: {
     flex: 1,
