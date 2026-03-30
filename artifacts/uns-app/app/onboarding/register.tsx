@@ -251,12 +251,19 @@ export default function RegisterScreen() {
       console.log("[register] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
 
       if (!IS_VERIFICATION_ENABLED) {
+        const trimmedName = name.trim();
         await Promise.all([
           AsyncStorage.setItem("uns_session_id", data.sessionId),
           AsyncStorage.setItem("uns_access_token", data.accessToken),
           AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
           AsyncStorage.setItem("@uns_onboarding_complete", "1"),
+          // Save gender with both key formats for SessionContext compatibility
+          AsyncStorage.setItem("uns_gender", gender),
           AsyncStorage.setItem("@uns_gender", gender),
+          // Save display name so SessionContext can build the greeting
+          AsyncStorage.setItem("uns_name", trimmedName),
+          AsyncStorage.setItem("uns_display_name", trimmedName),
+          AsyncStorage.setItem("@uns_display_name", trimmedName),
           AsyncStorage.removeItem("@uns_pending_userId"),
           AsyncStorage.removeItem("@uns_pending_email"),
           AsyncStorage.removeItem("@uns_pending_gender"),
@@ -266,10 +273,17 @@ export default function RegisterScreen() {
         return;
       }
 
+      const trimmedName = name.trim();
       await Promise.all([
         AsyncStorage.setItem("@uns_pending_userId", data.userId),
         AsyncStorage.setItem("@uns_pending_email", data.email),
         AsyncStorage.setItem("@uns_pending_gender", gender),
+        // Pre-save name and gender so they're available after verification
+        AsyncStorage.setItem("uns_name", trimmedName),
+        AsyncStorage.setItem("uns_display_name", trimmedName),
+        AsyncStorage.setItem("@uns_display_name", trimmedName),
+        AsyncStorage.setItem("uns_gender", gender),
+        AsyncStorage.setItem("@uns_gender", gender),
       ]);
 
       router.push({
