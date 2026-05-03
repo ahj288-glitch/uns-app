@@ -1,0 +1,127 @@
+Great — now we move to VERIFICATION mode (not development).
+
+I want a strict, production-level validation of what was just implemented in Batch 1–3.
+
+Do NOT assume anything is working.
+Prove everything step by step.
+
+---
+
+### 1. API Verification
+
+Run and show results for:
+
+- GET /api/health
+- GET /api/healthz
+- POST /api/companion/message
+- GET /api/companion/history?sessionId=...
+
+For each endpoint:
+- Show request
+- Show full response
+- Confirm expected behavior vs actual
+
+---
+
+### 2. AI Validation (Critical)
+
+I want proof that the chatbot is NOT hardcoded anymore.
+
+Test with 3 completely different inputs:
+
+1. "أنا متوتر اليوم"
+2. "احكي لي قصة"
+3. "ما عندي شعور محدد بس أفكر كثير"
+
+Requirements:
+- Responses must be different
+- Must NOT match any static mapping
+- Must show real variation
+
+Also confirm:
+- Which model is used (Groq / model name)
+- Where the API key is read from
+- What happens if key is missing
+
+---
+
+### 3. Chat History Validation
+
+Test:
+
+1. Send 2–3 messages
+2. Close app / refresh session
+3. Reopen chat
+
+Confirm:
+- Messages are fetched from backend
+- Order is correct
+- No duplication
+- No loss
+
+---
+
+### 4. Logout & Auth Validation
+
+Test:
+
+- Call POST /api/auth/logout
+- Confirm token is invalidated server-side
+- Try calling protected endpoint after logout → must fail
+
+Also confirm:
+- Where refresh tokens are stored
+- How they are revoked
+
+---
+
+### 5. Network / Offline Handling
+
+Simulate:
+
+- Turn off internet
+- Try sending message
+- Turn internet back on
+
+Confirm:
+- isOffline state triggers
+- NetworkBanner appears
+- Recovery polling works
+- Pending message is retried
+
+---
+
+### 6. UI Functional Validation
+
+Confirm:
+
+- "+" button removed from chat
+- NetworkBanner visible globally (not just chat)
+- App does NOT show false "offline" anymore
+
+---
+
+### 7. Files Changed
+
+Provide:
+- Full list of modified files
+- Brief description per file
+
+---
+
+### 8. Final Status
+
+Give me:
+
+- What is 100% working now
+- What is partially working
+- What is still broken
+- Any hidden risks
+
+---
+
+IMPORTANT:
+If anything fails — DO NOT HIDE IT.
+Fix it immediately and show before/after.
+
+Start verification now.
