@@ -1,0 +1,162 @@
+Decision made:
+
+  1. Repo visibility — STAY PRIVATE. Do not flip public.
+  2. Commit strategy — SQUASH all 5 auto-checkpoints + the uncommitted 
+     CHANGE 4 into ONE clean commit on master. The auto-checkpoint 
+     messages are generic and don't reflect the actual engineering work; 
+     a single well-structured commit serves future readers (and the 
+     6-month-from-now version of me) far better.
+  3. Commit message — provided below in full. Use it verbatim.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION PLAN
+═══════════════════════════════════════════════════════════════════════════════
+
+This requires destructive git (rewriting the 5 auto-checkpoints into one). 
+Per platform rules, prepare this as a project task. Do not run destructive 
+git from the main agent.
+
+The task should:
+
+STEP 1 — Verify starting state
+    - Confirm we're on branch `master`
+    - Confirm remote `github` exists and points to ahj288-glitch/uns-app
+    - Confirm `git log github/master..HEAD --oneline` shows exactly 5 
+      auto-checkpoints (the ones listed in your final report: ea92d9b, 
+      f3ec4a2, b8dee28, 9b7793a, 7a2a66c)
+    - Confirm `git status` shows the uncommitted CHANGE 4 in 
+      _layout.tsx + audit-fixes-status.md
+    - If any of the above doesn't match, STOP and report.
+
+STEP 2 — Stage and commit the uncommitted CHANGE 4
+    git add artifacts/uns-app/app/\(tabs\)/_layout.tsx \
+            docs/audit-fixes-status.md
+    git commit -m "wip: change 4 (will be squashed)"
+    
+    (This is a throwaway commit; it gets folded into the squash. The 
+    purpose is to bring CHANGE 4 into the history so the squash captures 
+    everything in one shot.)
+
+STEP 3 — Verify the workspace-only commit (7a2a66c) doesn't include real changes
+    git show --stat 7a2a66c
+    
+    If 7a2a66c only touches files under attached_assets/ (it should — it 
+    was your prompt being saved), then the squash will incidentally pull 
+    that into the final commit. That's not wanted.
+    
+    If 7a2a66c contains ONLY attached_assets/, drop it during the squash 
+    by using interactive rebase and marking it `drop`. If it touches any 
+    real source file, STOP and report — we need to handle that.
+
+STEP 4 — Squash to a single commit
+    Approach: soft reset to github/master, then commit everything in one go.
+    
+    git reset --soft github/master
+    git status   # should show all real changes staged, no attached_assets/
+    
+    If attached_assets/ files appear in `git status`, run:
+        git reset HEAD -- attached_assets/
+        git checkout -- attached_assets/
+    so the workspace prompt files don't leak into the commit.
+    
+    Then create the final commit:
+    
+    git commit -m "feat(p0): unify mood picker + reorder tabs + fix gamification crash
+
+CHANGES (4 product-facing):
+
+1. Unified mood picker source of truth (lib/gender.ts)
+   - 9 mood options per gender (was 5 + duplicate hardcoded list in mood.tsx)
+   - Adds reassured, happy, anxious, exhausted; removes legacy
+     grateful/angry/hopeful from the picker (server-side maps retain
+     these for historical user data — see audit-fixes-status.md)
+   - New helpers: MoodOption type, findMoodByEn, findMoodByWord,
+     getHomeQuickPickMoods (curated 5-mood subset for home strip)
+   - getContextualSuggestions extended for new keys (exhausted groups
+     with tired; happy/reassured share suggestions)
+
+2. Home → Mood pre-selection wired
+   - Home strip now uses getHomeQuickPickMoods (5 chips, fits small phones)
+   - Tapping a mood on home stores its en key in SessionContext.lastMoodWord
+   - Mood screen reads lastMoodWord and pre-selects the matching chip,
+     then clears the value so it doesn't persist across unrelated visits
+
+3. Tab bar reorder (Arabic-first RTL)
+   - Visible (right→left on screen): الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+   - Code declaration order: index → chat → journey → insights → profile
+   - حسابي (profile) was previously hidden via href:null and only
+     reachable via the home avatar button — now a first-class tab
+   - share moved to hidden (still accessible via router.push)
+   - chat title renamed محادثة → أُنس
+   - insights icon trending-up → bar-chart-2, title → الرؤى
+   - Generic TabIcon used for all 5; raised/prominent treatment for أُنس
+     deferred (needs design input — see audit-fixes-status.md)
+
+4. REL-4 fix: gamification null-guard in mood checkin
+   - mood.tsx no longer crashes when /gamification/checkin-complete
+     returns a non-OK response or non-JSON body
+   - Mood IS still saved on the primary endpoint; gamification failure
+     degrades silently rather than surfacing an error to the user
+
+DEFERRED (documented in docs/audit-fixes-status.md):
+- /onboarding/login expo-router type map (TestFlight blocker — likely
+  stale typed-routes manifest, needs regenerate)
+- recipe.source schema drift (TestFlight blocker — original handover §18)
+- BreathingSession grateful chip (UX inconsistency, low harm)
+- community.ts seeded circles with legacy mood tags (orphaned but not broken)
+- gamification.ts recommendations for legacy keys (zombie code, harmless)
+- أُنس tab visual prominence (design decision)
+
+VERIFICATION:
+- pnpm typecheck: 4 pre-existing errors, 0 new
+- 5 files modified: lib/gender.ts, app/(tabs)/{index,mood,_layout}.tsx,
+  docs/audit-fixes-status.md
+- All edits applied incrementally with typecheck baseline preserved
+  between each CHANGE"
+
+STEP 5 — Verify the squash
+    git log --oneline -3   # should show: <new sha> + c387f0d + previous
+    git show --stat HEAD   # should show exactly 5 files modified
+    git diff github/master..HEAD --stat   # same 5 files
+    
+    If anything other than these 5 files appears, STOP — something leaked:
+      artifacts/uns-app/lib/gender.ts
+      artifacts/uns-app/app/(tabs)/index.tsx
+      artifacts/uns-app/app/(tabs)/mood.tsx
+      artifacts/uns-app/app/(tabs)/_layout.tsx
+      docs/audit-fixes-status.md
+
+STEP 6 — Push
+    git push github master
+    
+    NO --force, NO --force-with-lease. The remote is at c387f0d, this push 
+    is purely additive (we squashed before push, so the remote never sees 
+    the auto-checkpoint history). A regular fast-forward push works.
+    
+    If push is rejected (which would mean someone pushed to remote in the 
+    meantime), STOP and report. Do not force.
+
+STEP 7 — Final report
+    Output:
+      ✅ Pushed
+      Remote master: <new sha>
+      Files in commit: 5
+      Push was fast-forward, no force used.
+      
+      Recommended next session: tackle the two TestFlight blockers
+      documented as deferred (/onboarding/login type map + recipe.source).
+
+═══════════════════════════════════════════════════════════════════════════════
+SAFETY RAILS
+═══════════════════════════════════════════════════════════════════════════════
+
+- Repo stays PRIVATE throughout. No visibility flip.
+- No --force on push under any circumstance. The squash is local; the 
+  push is fast-forward.
+- If the squash accidentally includes attached_assets/ or any unrelated 
+  file, STOP and clean before committing — do not push a polluted commit.
+- If at any STEP the verification fails, STOP and report. Do not "fix it 
+  up" by improvising. The five files are the entire surface area.
+- Working tree must be clean after STEP 6 (`git status` shows nothing).
+
+Begin with STEP 1.
