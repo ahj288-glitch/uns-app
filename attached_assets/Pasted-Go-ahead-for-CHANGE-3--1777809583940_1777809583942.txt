@@ -1,0 +1,139 @@
+Go-ahead for CHANGE 3.
+
+═══════════════════════════════════════════════════════════════════════════════
+CHANGE 3 — app/(tabs)/mood.tsx
+═══════════════════════════════════════════════════════════════════════════════
+
+Goal: drop the hardcoded MOODS array, source from lib/gender.ts, pre-select 
+from lastMoodWord, fix REL-4 (gamification null-guard), and use 
+gender-aware mood question.
+
+Required edits:
+
+EDIT 3.1 — Update React imports
+    Add useEffect and useMemo if not already imported. The current import 
+    line is likely:
+        import React, { useState } from "react";
+    Replace with:
+        import React, { useEffect, useMemo, useState } from "react";
+    Show me what you found.
+
+EDIT 3.2 — Add gender.ts imports
+    After existing @/lib/api import, add:
+        import {
+          MOOD_OPTIONS,
+          getMoodQuestion,
+          findMoodByEn,
+          type MoodOption,
+        } from "@/lib/gender";
+    Note: the path order should match the existing import style in the 
+    file (alphabetical or logical group — match what's already there).
+
+EDIT 3.3 — Delete the hardcoded MOODS array
+    Find and remove the entire block that defines:
+        const MOODS = [
+          { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
+          { word: "هادئ", en: "calm", color: "#A8C5B2", intensity: 3 },
+          { word: "ممتنّ", en: "grateful", ... },
+          ...
+        ];
+    Keep MICRO_WIN_LABELS untouched.
+
+EDIT 3.4 — Update MoodChip prop type
+    Find the MoodChip component declaration. Its prop type currently uses:
+        mood: (typeof MOODS)[0];
+    Replace with:
+        mood: MoodOption;
+
+EDIT 3.5 — Update MoodScreen state and add gender-aware derivation
+    Inside MoodScreen function, locate the useSession destructuring and 
+    extend it:
+        const { sessionId, authFetch, gender, lastMoodWord, setLastMoodWord } = useSession();
+    
+    Just below the styles = makeStyles(T) line, add:
+        // Single source of truth — derived from gender so the user always 
+        // sees the grammatically correct form (مرتاح / مرتاحة, etc).
+        const MOODS = useMemo(() => MOOD_OPTIONS[gender], [gender]);
+        const moodQuestion = getMoodQuestion(gender);
+    
+    Update the selectedMood state type:
+        const [selectedMood, setSelectedMood] = useState<MoodOption | null>(null);
+
+EDIT 3.6 — Add pre-select effect from lastMoodWord
+    After the state declarations and before saveCheckin, add:
+        // ── Pre-select from home ────────────────────────────────────────────
+        // When the user taps a mood chip on the home screen, SessionContext 
+        // stores its `en` key in lastMoodWord. We honour that here so the 
+        // user lands on the mood screen with their choice already selected, 
+        // then clear it so the selection doesn't persist across unrelated 
+        // future visits.
+        useEffect(() => {
+          if (!lastMoodWord || selectedMood) return;
+          const match = findMoodByEn(gender, lastMoodWord);
+          if (match) {
+            setSelectedMood(match);
+            setIntensity(match.intensity);
+            setLastMoodWord(null);
+          }
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [lastMoodWord, gender]);
+
+EDIT 3.7 — Replace hardcoded header title with gender-aware question
+    Find the header Text containing the hardcoded mood question (likely 
+    "كيف تحس اليوم؟" or similar).
+    Replace its content with: {moodQuestion}
+
+EDIT 3.8 — REL-4 fix: guard gamification response
+    Locate the saveCheckin function. Find the block where it calls 
+    /gamification/checkin-complete. Current pattern likely:
+        const progressRes = await authFetch(...);
+        const progressData = await progressRes.json();
+        setSaved(true);
+        if (Platform.OS !== "web") Haptics.notificationAsync(...);
+        if (progressData.xpEarned > 0 || progressData.newWins?.length > 0) {
+          setTimeout(() => setWinResult(progressData), 800);
+        }
+    
+    Replace with:
+        const progressRes = await authFetch(...);
+        // ── REL-4 fix ──────────────────────────────────────────────────────
+        // The gamification endpoint can fail independently of the mood 
+        // checkin. We must not crash the success flow if it returns an 
+        // error JSON: the mood IS saved, the user shouldn't see an error.
+        let progressData: WinResult | null = null;
+        if (progressRes.ok) {
+          try {
+            progressData = await progressRes.json();
+          } catch {
+            progressData = null;
+          }
+        }
+        setSaved(true);
+        if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        if (progressData && (progressData.xpEarned > 0 || (progressData.newWins?.length ?? 0) > 0)) {
+          const win = progressData;
+          setTimeout(() => setWinResult(win), 800);
+        }
+    
+    The `const win = progressData` capture inside the if-block is needed so 
+    TypeScript narrows the type correctly inside the setTimeout closure.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+After all eight edits:
+  1. Run `pnpm typecheck`. Compare to the post-CHANGE-2 baseline (4 
+     pre-existing errors, expecting recipe.source line numbers may have 
+     shifted by ±a few but other errors unchanged). If any new error 
+     appears in mood.tsx specifically, STOP and report.
+  2. Run `git diff artifacts/uns-app/app/(tabs)/mood.tsx`. Show full diff.
+  3. STOP and wait for go-ahead before CHANGE 4 (tabs reorder).
+
+If anything in EDITS 3.1–3.8 doesn't match the actual current file 
+content (e.g. the destructuring already includes gender, or the header 
+text differs from what I described), STOP and ask before making 
+assumptions. The patch was generated against stale base 9853de5; mood.tsx 
+may have evolved.
+
+No staging, no commit, no push.

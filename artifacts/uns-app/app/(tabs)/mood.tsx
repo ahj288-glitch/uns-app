@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -28,17 +28,12 @@ import CharCounter from "@/components/ui/CharCounter";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius } from "@/constants/layout";
 import { API_BASE } from "@/lib/api";
-
-const MOODS = [
-  { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
-  { word: "هادئ", en: "calm", color: "#A8C5B2", intensity: 3 },
-  { word: "ممتنّ", en: "grateful", color: "#9B59B6", intensity: 4 },
-  { word: "متعب", en: "tired", color: "#7A9A8A", intensity: 2 },
-  { word: "قلق", en: "anxious", color: "#6B7FD7", intensity: 3 },
-  { word: "حزين", en: "sad", color: "#5D6D8A", intensity: 2 },
-  { word: "غاضب", en: "angry", color: "#B00020", intensity: 2 },
-  { word: "متفائل", en: "hopeful", color: "#74C69D", intensity: 4 },
-];
+import {
+  MOOD_OPTIONS,
+  getMoodQuestion,
+  findMoodByEn,
+  type MoodOption,
+} from "@/lib/gender";
 
 const MICRO_WIN_LABELS: Record<string, string> = {
   first_checkin: "تسجيل المشاعر للمرة الأولى اليوم ✨",
@@ -53,7 +48,7 @@ function MoodChip({
   selected,
   onPress,
 }: {
-  mood: (typeof MOODS)[0];
+  mood: MoodOption;
   selected: boolean;
   onPress: () => void;
 }) {
@@ -144,10 +139,14 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
 
 export default function MoodScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId, authFetch } = useSession();
+  const { sessionId, authFetch, gender, lastMoodWord, setLastMoodWord } = useSession();
   const T = useTokens();
   const styles = makeStyles(T);
-  const [selectedMood, setSelectedMood] = useState<(typeof MOODS)[0] | null>(null);
+  // Single source of truth — derived from gender so the user always
+  // sees the grammatically correct form (مرتاح / مرتاحة, etc).
+  const MOODS = useMemo(() => MOOD_OPTIONS[gender], [gender]);
+  const moodQuestion = getMoodQuestion(gender);
+  const [selectedMood, setSelectedMood] = useState<MoodOption | null>(null);
   const [intensity, setIntensity] = useState(3);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -161,6 +160,23 @@ export default function MoodScreen() {
 
   const NOTES_MAX = LIMITS.MOOD_NOTES_MAX_CHARS;
   const NOTES_WARN = LIMITS.MOOD_NOTES_WARN_AT_CHARS;
+
+  // ── Pre-select from home ────────────────────────────────────────────
+  // When the user taps a mood chip on the home screen, SessionContext
+  // stores its `en` key in lastMoodWord. We honour that here so the
+  // user lands on the mood screen with their choice already selected,
+  // then clear it so the selection doesn't persist across unrelated
+  // future visits.
+  useEffect(() => {
+    if (!lastMoodWord || selectedMood) return;
+    const match = findMoodByEn(gender, lastMoodWord);
+    if (match) {
+      setSelectedMood(match);
+      setIntensity(match.intensity);
+      setLastMoodWord(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMoodWord, gender]);
 
   function showToast(message: string, severity: typeof toast.severity = "error") {
     setToast({ visible: true, message, severity });
@@ -203,11 +219,23 @@ export default function MoodScreen() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, moodWord: selectedMood.en }),
       });
-      const progressData = await progressRes.json();
+      // ── REL-4 fix ──────────────────────────────────────────────────────
+      // The gamification endpoint can fail independently of the mood
+      // checkin. We must not crash the success flow if it returns an
+      // error JSON: the mood IS saved, the user shouldn't see an error.
+      let progressData: WinResult | null = null;
+      if (progressRes.ok) {
+        try {
+          progressData = await progressRes.json();
+        } catch {
+          progressData = null;
+        }
+      }
       setSaved(true);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      if (progressData.xpEarned > 0 || progressData.newWins?.length > 0) {
-        setTimeout(() => setWinResult(progressData), 800);
+      if (progressData && (progressData.xpEarned > 0 || (progressData.newWins?.length ?? 0) > 0)) {
+        const win = progressData;
+        setTimeout(() => setWinResult(win), 800);
       }
       setTimeout(() => {
         setSaved(false);
@@ -237,7 +265,7 @@ export default function MoodScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={[styles.header, { paddingTop: webTop + Spacing.lg }]}>
-          <Text style={styles.headerTitle}>كيف تحس اليوم؟</Text>
+          <Text style={styles.headerTitle}>{moodQuestion}</Text>
           <Text style={styles.headerSub}>سجّل مشاعرك — كل مشاعر لها قيمة</Text>
         </View>
 
