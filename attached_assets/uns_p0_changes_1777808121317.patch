@@ -1,0 +1,1131 @@
+diff --git a/artifacts/api-server/.env.example b/artifacts/api-server/.env.example
+index 0a87030..76956aa 100644
+--- a/artifacts/api-server/.env.example
++++ b/artifacts/api-server/.env.example
+@@ -14,7 +14,9 @@ SMTP_USER=noreply@example.com
+ SMTP_PASS=smtp-password
+ 
+ # ── Optional (features degrade gracefully when absent) ───────────────────────
+-OPENAI_API_KEY=sk-...
++# Groq API key — when absent, companion falls back to rule-based responses.
++# Get a key at https://console.groq.com/keys
++GROQ_API_KEY=gsk_...
+ 
+ # ── CORS — leave empty in local dev (all origins allowed automatically) ───────
+ # In production, set to a comma-separated list of allowed frontend origins:
+diff --git a/artifacts/api-server/src/index.ts b/artifacts/api-server/src/index.ts
+index c62d1d7..b0a401e 100644
+--- a/artifacts/api-server/src/index.ts
++++ b/artifacts/api-server/src/index.ts
+@@ -7,7 +7,7 @@ const REQUIRED: string[] = ["PORT", "DATABASE_URL", "JWT_SECRET"];
+ 
+ // These degrade specific features when absent; warn in all envs.
+ const WARN_IF_MISSING: string[] = [
+-  "OPENAI_API_KEY",  // AI companion degrades to rule-based responses
++  "GROQ_API_KEY",    // AI companion degrades to rule-based responses
+   "ADMIN_SECRET",    // Admin panel login will be blocked
+   "SMTP_HOST",       // Email verification cannot send OTP in non-dev
+   "SMTP_USER",
+@@ -76,7 +76,7 @@ logger.info({
+     : nodeEnv === "development"
+       ? "disabled — OTP printed to stdout (dev only; login/verify will NOT work in production without SMTP)"
+       : "NOT CONFIGURED — login and OTP verification will fail with 500",
+-  openai: process.env["OPENAI_API_KEY"] ? "configured" : "absent — rule-based fallback",
++  groq: process.env["GROQ_API_KEY"] ? "configured" : "absent — rule-based fallback",
+   adminSecret: process.env["ADMIN_SECRET"] ? "present" : "absent — admin login blocked",
+   emailVerification: process.env["VERIFICATION_ENABLED"] === "true" ? "enabled" : "disabled",
+   cors: allowedOriginsCount > 0
+diff --git a/artifacts/api-server/src/lib/aiConfig.ts b/artifacts/api-server/src/lib/aiConfig.ts
+index 959f26c..c80a1cc 100644
+--- a/artifacts/api-server/src/lib/aiConfig.ts
++++ b/artifacts/api-server/src/lib/aiConfig.ts
+@@ -19,6 +19,6 @@ export const aiConfig: AiConfig = {
+   spiritualLayerEnabled: true,
+   crisisThreshold: "standard",
+   familyModeEnabled: false,
+-  modelTier: "gpt-4o",
++  modelTier: "llama-3.3-70b-versatile",
+   systemPromptSuffix: "",
+ };
+diff --git a/artifacts/api-server/src/routes/companion.ts b/artifacts/api-server/src/routes/companion.ts
+index cc7df6e..74a99a0 100644
+--- a/artifacts/api-server/src/routes/companion.ts
++++ b/artifacts/api-server/src/routes/companion.ts
+@@ -15,13 +15,22 @@ import pino from "pino";
+ const router = Router();
+ const logger = pino({ name: "companion" });
+ 
+-// ── OpenAI client — lazy-initialised only when API key is present ─────────────
+-let openaiClient: OpenAI | null = null;
+-function getOpenAI(): OpenAI | null {
+-  const key = process.env["OPENAI_API_KEY"];
++// ── Groq client (OpenAI-compatible API) ────────────────────────────────────────
++// We use the OpenAI SDK pointed at Groq's OpenAI-compatible endpoint.
++// This lets us reuse the same ChatCompletion interface without a separate SDK.
++// Lazily initialised so the server starts even when GROQ_API_KEY is absent
++// (we fall back to rule-based responses in that case).
++const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
++const GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile";
++
++let groqClient: OpenAI | null = null;
++function getGroq(): OpenAI | null {
++  const key = process.env["GROQ_API_KEY"];
+   if (!key) return null;
+-  if (!openaiClient) openaiClient = new OpenAI({ apiKey: key });
+-  return openaiClient;
++  if (!groqClient) {
++    groqClient = new OpenAI({ apiKey: key, baseURL: GROQ_BASE_URL });
++  }
++  return groqClient;
+ }
+ 
+ // ── Crisis detection ──────────────────────────────────────────────────────────
+@@ -87,7 +96,7 @@ Your role:
+   return prompt;
+ }
+ 
+-// ── Rule-based fallback (used when OPENAI_API_KEY is not set) ─────────────────
++// ── Rule-based fallback (used when GROQ_API_KEY is not set) ───────────────────
+ function buildFallbackResponse(userMessage: string, dialect: string): { response: string; emotion: string } {
+   const lowerMsg = userMessage.toLowerCase();
+   let emotion = "neutral";
+@@ -137,13 +146,13 @@ function buildFallbackResponse(userMessage: string, dialect: string): { response
+   return { response, emotion };
+ }
+ 
+-// ── LLM call via OpenAI ───────────────────────────────────────────────────────
++// ── LLM call via Groq (OpenAI-compatible) ─────────────────────────────────────
+ async function callLLM(
+   userMessage: string,
+   dialect: string,
+   history: { role: "user" | "assistant"; content: string }[]
+ ): Promise<{ response: string; emotion: string }> {
+-  const client = getOpenAI();
++  const client = getGroq();
+   if (!client) {
+     return buildFallbackResponse(userMessage, dialect);
+   }
+@@ -157,7 +166,7 @@ async function callLLM(
+     ];
+ 
+     const completion = await client.chat.completions.create({
+-      model: aiConfig.modelTier || "gpt-4o",
++      model: aiConfig.modelTier || GROQ_DEFAULT_MODEL,
+       messages,
+       max_tokens: 300,
+       temperature: 0.7,
+@@ -175,7 +184,7 @@ async function callLLM(
+     return { response, emotion };
+   } catch (err: unknown) {
+     const message = err instanceof Error ? err.message : String(err);
+-    logger.error({ err: message }, "[companion] LLM call failed — falling back to rule-based");
++    logger.error({ err: message }, "[companion] Groq call failed — falling back to rule-based");
+     return buildFallbackResponse(userMessage, dialect);
+   }
+ }
+@@ -302,7 +311,7 @@ router.post("/companion/chat", async (req, res) => {
+     messageId: aiMsg.id,
+     dailyUsed: todayCount + 1,
+     dailyLimit: DAILY_MESSAGE_LIMIT,
+-    llmUsed: !!getOpenAI(),
++    llmUsed: !!getGroq(),
+   });
+ });
+ 
+diff --git a/artifacts/uns-app/app/(tabs)/_layout.tsx b/artifacts/uns-app/app/(tabs)/_layout.tsx
+index 047782b..737fe70 100644
+--- a/artifacts/uns-app/app/(tabs)/_layout.tsx
++++ b/artifacts/uns-app/app/(tabs)/_layout.tsx
+@@ -2,14 +2,26 @@ import { BlurView } from "expo-blur";
+ import { Tabs, router } from "expo-router";
+ import { Feather } from "@expo/vector-icons";
+ import React, { useEffect } from "react";
+-import { Platform, StyleSheet, View, ActivityIndicator, Text } from "react-native";
++import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
+ import { useSafeAreaInsets } from "react-native-safe-area-context";
+ import Colors from "@/constants/colors";
+ import { useSession } from "@/contexts/SessionContext";
+ 
++// ── Tab order — Arabic-first RTL ──────────────────────────────────────────────
++// React Native Tabs renders left-to-right in source order. Because the device's
++// I18nManager is set to RTL for Arabic, that physical order flips on screen,
++// so the FIRST tab declared appears on the FAR RIGHT — which is what we want
++// for an Arabic UX:
++//
++//   ← visual order (what the user sees) ←
++//   حسابي  |  الرؤى  |  رحلتي  |  أُنس  |  الرئيسية
++//
++//   ← code order (declaration order) ←
++//   index → chat → journey → insights → profile
++
+ type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
+ 
+-// Regular tab icon — small pill background when focused
++// Standard tab icon — small pill background when focused
+ function TabIcon({ name, color, focused }: { name: FeatherIconName; color: string; focused: boolean }) {
+   return (
+     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+@@ -18,7 +30,7 @@ function TabIcon({ name, color, focused }: { name: FeatherIconName; color: strin
+   );
+ }
+ 
+-// Center chat tab — larger, raised, always prominent
++// Center chat tab — slightly raised, always prominent
+ function ChatTabIcon({ focused }: { focused: boolean }) {
+   return (
+     <View style={[styles.chatIconOuter, focused && styles.chatIconOuterActive]}>
+@@ -83,18 +95,18 @@ export default function TabLayout() {
+         tabBarShowLabel: true,
+       }}
+     >
+-      {/* Tab 1 — Journey */}
++      {/* 1 — الرئيسية (far right in RTL) */}
+       <Tabs.Screen
+-        name="journey"
++        name="index"
+         options={{
+-          title: "رحلتي",
++          title: "الرئيسية",
+           tabBarIcon: ({ color, focused }) => (
+-            <TabIcon name="map" color={color} focused={focused} />
++            <TabIcon name="home" color={color} focused={focused} />
+           ),
+         }}
+       />
+ 
+-      {/* Tab 2 — Chat (center, primary action) */}
++      {/* 2 — أُنس (chat — primary action, visually highlighted) */}
+       <Tabs.Screen
+         name="chat"
+         options={{
+@@ -109,24 +121,44 @@ export default function TabLayout() {
+         }}
+       />
+ 
+-      {/* Tab 3 — Home */}
++      {/* 3 — رحلتي */}
+       <Tabs.Screen
+-        name="index"
++        name="journey"
+         options={{
+-          title: "الرئيسية",
++          title: "رحلتي",
++          tabBarIcon: ({ color, focused }) => (
++            <TabIcon name="map" color={color} focused={focused} />
++          ),
++        }}
++      />
++
++      {/* 4 — الرؤى */}
++      <Tabs.Screen
++        name="insights"
++        options={{
++          title: "الرؤى",
++          tabBarIcon: ({ color, focused }) => (
++            <TabIcon name="bar-chart-2" color={color} focused={focused} />
++          ),
++        }}
++      />
++
++      {/* 5 — حسابي (far left in RTL) */}
++      <Tabs.Screen
++        name="profile"
++        options={{
++          title: "حسابي",
+           tabBarIcon: ({ color, focused }) => (
+-            <TabIcon name="feather" color={color} focused={focused} />
++            <TabIcon name="user" color={color} focused={focused} />
+           ),
+         }}
+       />
+ 
+-      {/* Hidden tabs — accessible via router.push but not shown in bar */}
+-      <Tabs.Screen name="insights"   options={{ href: null }} />
+-      <Tabs.Screen name="share"      options={{ href: null }} />
+-      <Tabs.Screen name="mood"       options={{ href: null }} />
+-      <Tabs.Screen name="community"  options={{ href: null }} />
+-      <Tabs.Screen name="programs"   options={{ href: null }} />
+-      <Tabs.Screen name="profile"    options={{ href: null }} />
++      {/* Hidden tabs — accessible via router.push but not shown in the bar */}
++      <Tabs.Screen name="share"     options={{ href: null }} />
++      <Tabs.Screen name="mood"      options={{ href: null }} />
++      <Tabs.Screen name="community" options={{ href: null }} />
++      <Tabs.Screen name="programs"  options={{ href: null }} />
+     </Tabs>
+   );
+ }
+diff --git a/artifacts/uns-app/app/(tabs)/chat.tsx b/artifacts/uns-app/app/(tabs)/chat.tsx
+index f4aef91..ffc687f 100644
+--- a/artifacts/uns-app/app/(tabs)/chat.tsx
++++ b/artifacts/uns-app/app/(tabs)/chat.tsx
+@@ -26,7 +26,6 @@ import { CRISIS_RESOURCES } from "@/lib/crisis";
+ import { API_BASE } from "@/lib/api";
+ import * as Haptics from "expo-haptics";
+ import ErrorToast from "@/components/ui/ErrorToast";
+-import NetworkBanner from "@/components/ui/NetworkBanner";
+ import CharCounter from "@/components/ui/CharCounter";
+ import LimitBlocker from "@/components/ui/LimitBlocker";
+ 
+@@ -141,7 +140,7 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint:
+ 
+ export default function ChatScreen() {
+   const insets = useSafeAreaInsets();
+-  const { sessionId, greeting, gender, lastMoodWord, authFetch } = useSession();
++  const { sessionId, greeting, gender, lastMoodWord, authFetch, isOffline, reportNetworkFailure } = useSession();
+   const { theme } = useThemeContext();
+   const T = useTokens();
+   const styles = makeStyles(T);
+@@ -157,9 +156,9 @@ export default function ChatScreen() {
+   const [dailyLimitReached, setDailyLimitReached] = useState(false);
+   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
+ 
+-  // Network state
+-  const [isOffline, setIsOffline] = useState(false);
+-  const [isReconnecting, setIsReconnecting] = useState(false);
++  // Network state — isOffline / isReconnecting now come from SessionContext.
++  // We keep a local pendingMessage so we can retry the user's draft once we
++  // detect the connection has come back.
+   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+ 
+   // Toast
+@@ -168,7 +167,6 @@ export default function ChatScreen() {
+   const rateLimitTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+   const lastSentAt = useRef<number>(0);
+-  const offlineCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+ 
+   const webTop = Platform.OS === "web" ? 67 : insets.top;
+   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
+@@ -208,30 +206,25 @@ export default function ChatScreen() {
+     }, 1000);
+   }
+ 
+-  // ─── Offline detection (polling) ──────────────────────────────────────
+-
++  // ─── Retry pending message on reconnect ───────────────────────────────
++  // SessionContext owns offline detection and polling; here we just react to
++  // the moment the connection is restored. If the user typed a message while
++  // offline (queued in pendingMessage), send it automatically once we're back.
++  // The pendingHandled ref guards against double-sending if the effect re-runs.
++  const pendingHandled = useRef(false);
+   useEffect(() => {
+-    if (Platform.OS === "web") return;
+-    offlineCheckRef.current = setInterval(async () => {
+-      try {
+-        await fetch(`${API_BASE}/health`, { method: "HEAD" });
+-        if (isOffline) {
+-          setIsReconnecting(true);
+-          setIsOffline(false);
+-          setTimeout(() => setIsReconnecting(false), 2000);
+-          if (pendingMessage) {
+-            const msg = pendingMessage;
+-            setPendingMessage(null);
+-            sendMessage(msg);
+-          }
+-        }
+-      } catch {
+-        if (!isOffline) setIsOffline(true);
+-      }
+-    }, 5000);
+-    return () => {
+-      if (offlineCheckRef.current) clearInterval(offlineCheckRef.current);
+-    };
++    if (isOffline) {
++      pendingHandled.current = false;
++      return;
++    }
++    if (!pendingMessage || pendingHandled.current) return;
++    pendingHandled.current = true;
++    const msg = pendingMessage;
++    setPendingMessage(null);
++    sendMessage(msg);
++    // sendMessage is intentionally omitted from deps — it's stable enough for
++    // this purpose, and adding it would re-fire the effect on every render.
++    // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isOffline, pendingMessage]);
+ 
+   // ─── Send message ─────────────────────────────────────────────────────
+@@ -370,8 +363,9 @@ export default function ChatScreen() {
+         const isNetwork = err instanceof TypeError;
+ 
+         if (isNetwork) {
+-          // Actual network failure
+-          setIsOffline(true);
++          // Actual network failure — bubble up to the global offline state.
++          // The SessionContext owns the polling/reconnect lifecycle from here.
++          reportNetworkFailure();
+           setPendingMessage(msg);
+           showToast(ERRORS.NETWORK_OFFLINE.ar, "warning");
+           setDailyCount(c => c - 1);
+@@ -419,7 +413,6 @@ export default function ChatScreen() {
+       {theme.surfaceTint !== "transparent" && (
+         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
+       )}
+-      <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />
+ 
+       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
+         <Pressable onPress={() => router.push("/(tabs)/community")} style={styles.headerBtn}>
+diff --git a/artifacts/uns-app/app/(tabs)/index.tsx b/artifacts/uns-app/app/(tabs)/index.tsx
+index 5eb1156..07f5002 100644
+--- a/artifacts/uns-app/app/(tabs)/index.tsx
++++ b/artifacts/uns-app/app/(tabs)/index.tsx
+@@ -1,4 +1,4 @@
+-import React, { useEffect, useRef, useState } from "react";
++import React, { useEffect, useMemo, useRef, useState } from "react";
+ import {
+   Animated,
+   Easing,
+@@ -19,7 +19,7 @@ import Colors from "@/constants/colors";
+ import { useSession } from "@/contexts/SessionContext";
+ import { useThemeContext } from "@/contexts/ThemeContext";
+ import BreathingSession from "@/components/BreathingSession";
+-import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
++import { getHomeQuickPickMoods, getMoodQuestion } from "@/lib/gender";
+ import { useGetDailyRecipe, useRecordMoodCheckin } from "@workspace/api-client-react";
+ import { Typography } from "@/constants/typography";
+ import { Spacing, Radius, Shadow } from "@/constants/layout";
+@@ -222,7 +222,10 @@ export default function HomeScreen() {
+ 
+   const { mutate: recordMood } = useRecordMoodCheckin();
+ 
+-  const MOODS = MOOD_OPTIONS[gender];
++  // Home strip shows a curated 5-mood quick-pick. Tapping one navigates to
++  // the full mood screen (which shows all 9 from MOOD_OPTIONS) with the chip
++  // pre-selected via SessionContext.lastMoodWord.
++  const MOODS = useMemo(() => getHomeQuickPickMoods(gender), [gender]);
+ 
+   const handleMoodSelect = (idx: number) => {
+     setSelectedMood(idx);
+diff --git a/artifacts/uns-app/app/(tabs)/mood.tsx b/artifacts/uns-app/app/(tabs)/mood.tsx
+index 1ee09d8..2fd9c6b 100644
+--- a/artifacts/uns-app/app/(tabs)/mood.tsx
++++ b/artifacts/uns-app/app/(tabs)/mood.tsx
+@@ -1,4 +1,4 @@
+-import React, { useState } from "react";
++import React, { useEffect, useMemo, useState } from "react";
+ import {
+   ActivityIndicator,
+   Modal,
+@@ -28,17 +28,12 @@ import CharCounter from "@/components/ui/CharCounter";
+ import { Typography } from "@/constants/typography";
+ import { Spacing, Radius } from "@/constants/layout";
+ import { API_BASE } from "@/lib/api";
+-
+-const MOODS = [
+-  { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
+-  { word: "هادئ", en: "calm", color: "#A8C5B2", intensity: 3 },
+-  { word: "ممتنّ", en: "grateful", color: "#9B59B6", intensity: 4 },
+-  { word: "متعب", en: "tired", color: "#7A9A8A", intensity: 2 },
+-  { word: "قلق", en: "anxious", color: "#6B7FD7", intensity: 3 },
+-  { word: "حزين", en: "sad", color: "#5D6D8A", intensity: 2 },
+-  { word: "غاضب", en: "angry", color: "#B00020", intensity: 2 },
+-  { word: "متفائل", en: "hopeful", color: "#74C69D", intensity: 4 },
+-];
++import {
++  MOOD_OPTIONS,
++  getMoodQuestion,
++  findMoodByEn,
++  type MoodOption,
++} from "@/lib/gender";
+ 
+ const MICRO_WIN_LABELS: Record<string, string> = {
+   first_checkin: "تسجيل المشاعر للمرة الأولى اليوم ✨",
+@@ -53,7 +48,7 @@ function MoodChip({
+   selected,
+   onPress,
+ }: {
+-  mood: (typeof MOODS)[0];
++  mood: MoodOption;
+   selected: boolean;
+   onPress: () => void;
+ }) {
+@@ -144,10 +139,16 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () =>
+ 
+ export default function MoodScreen() {
+   const insets = useSafeAreaInsets();
+-  const { sessionId, authFetch } = useSession();
++  const { sessionId, authFetch, gender, lastMoodWord, setLastMoodWord } = useSession();
+   const T = useTokens();
+   const styles = makeStyles(T);
+-  const [selectedMood, setSelectedMood] = useState<(typeof MOODS)[0] | null>(null);
++
++  // Single source of truth — derived from gender so the user always sees the
++  // grammatically correct form (مرتاح / مرتاحة, etc).
++  const MOODS = useMemo(() => MOOD_OPTIONS[gender], [gender]);
++  const moodQuestion = getMoodQuestion(gender);
++
++  const [selectedMood, setSelectedMood] = useState<MoodOption | null>(null);
+   const [intensity, setIntensity] = useState(3);
+   const [notes, setNotes] = useState("");
+   const [isSaving, setIsSaving] = useState(false);
+@@ -159,6 +160,23 @@ export default function MoodScreen() {
+     severity: "error",
+   });
+ 
++  // ── Pre-select from home ────────────────────────────────────────────────────
++  // When the user taps a mood chip on the home screen, SessionContext stores
++  // its `en` key in lastMoodWord. We honour that here so the user lands on the
++  // mood screen with their choice already selected, then clear it so the
++  // selection doesn't persist across unrelated future visits.
++  useEffect(() => {
++    if (!lastMoodWord || selectedMood) return;
++    const match = findMoodByEn(gender, lastMoodWord);
++    if (match) {
++      setSelectedMood(match);
++      setIntensity(match.intensity);
++      setLastMoodWord(null);
++    }
++    // We intentionally only run this when the screen first sees a lastMoodWord.
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [lastMoodWord, gender]);
++
+   const NOTES_MAX = LIMITS.MOOD_NOTES_MAX_CHARS;
+   const NOTES_WARN = LIMITS.MOOD_NOTES_WARN_AT_CHARS;
+ 
+@@ -203,11 +221,25 @@ export default function MoodScreen() {
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ sessionId, moodWord: selectedMood.en }),
+       });
+-      const progressData = await progressRes.json();
++
++      // ── REL-4 fix ──────────────────────────────────────────────────────────
++      // The gamification endpoint can fail independently of the mood checkin.
++      // We must not crash the success flow if it returns an error JSON: the
++      // mood IS saved, the user shouldn't see an error.
++      let progressData: WinResult | null = null;
++      if (progressRes.ok) {
++        try {
++          progressData = await progressRes.json();
++        } catch {
++          progressData = null;
++        }
++      }
++
+       setSaved(true);
+       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+-      if (progressData.xpEarned > 0 || progressData.newWins?.length > 0) {
+-        setTimeout(() => setWinResult(progressData), 800);
++      if (progressData && (progressData.xpEarned > 0 || (progressData.newWins?.length ?? 0) > 0)) {
++        const win = progressData;
++        setTimeout(() => setWinResult(win), 800);
+       }
+       setTimeout(() => {
+         setSaved(false);
+@@ -237,7 +269,7 @@ export default function MoodScreen() {
+         keyboardShouldPersistTaps="handled"
+       >
+         <View style={[styles.header, { paddingTop: webTop + Spacing.lg }]}>
+-          <Text style={styles.headerTitle}>كيف تحس اليوم؟</Text>
++          <Text style={styles.headerTitle}>{moodQuestion}</Text>
+           <Text style={styles.headerSub}>سجّل مشاعرك — كل مشاعر لها قيمة</Text>
+         </View>
+ 
+diff --git a/artifacts/uns-app/app/_layout.tsx b/artifacts/uns-app/app/_layout.tsx
+index 9446254..2ce0c24 100644
+--- a/artifacts/uns-app/app/_layout.tsx
++++ b/artifacts/uns-app/app/_layout.tsx
+@@ -20,7 +20,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
+ import { View, Text, StyleSheet } from "react-native";
+ import { setBaseUrl } from "@workspace/api-client-react";
+ import { ErrorBoundary } from "@/components/ErrorBoundary";
+-import { SessionProvider } from "@/contexts/SessionContext";
++import NetworkBanner from "@/components/ui/NetworkBanner";
++import { SessionProvider, useSession } from "@/contexts/SessionContext";
+ import { ThemeProvider } from "@/contexts/ThemeContext";
+ 
+ SplashScreen.preventAutoHideAsync();
+@@ -103,6 +104,14 @@ function RootLayoutNav() {
+   );
+ }
+ 
++// ── GlobalNetworkBanner ───────────────────────────────────────────────────────
++// Pulls offline/reconnecting state from SessionContext so a single banner
++// appears on every screen — not just chat. Must live INSIDE SessionProvider.
++function GlobalNetworkBanner() {
++  const { isOffline, isReconnecting } = useSession();
++  return <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />;
++}
++
+ export default function RootLayout() {
+   const [fontsLoaded, fontError] = useFonts({
+     Tajawal_400Regular,
+@@ -140,6 +149,7 @@ export default function RootLayout() {
+               <GestureHandlerRootView style={{ flex: 1 }}>
+                 <KeyboardProvider>
+                   <RootLayoutNav />
++                  <GlobalNetworkBanner />
+                 </KeyboardProvider>
+               </GestureHandlerRootView>
+             </ThemeProvider>
+diff --git a/artifacts/uns-app/components/ui/NetworkBanner.tsx b/artifacts/uns-app/components/ui/NetworkBanner.tsx
+index 71ca7cd..17bfabe 100644
+--- a/artifacts/uns-app/components/ui/NetworkBanner.tsx
++++ b/artifacts/uns-app/components/ui/NetworkBanner.tsx
+@@ -1,28 +1,52 @@
+ import React, { useEffect, useRef } from "react";
+ import { Animated, Platform, StyleSheet, Text, View } from "react-native";
++import { useSafeAreaInsets } from "react-native-safe-area-context";
+ import { Feather } from "@expo/vector-icons";
+ import Colors from "@/constants/colors";
+ 
++// ── NetworkBanner ─────────────────────────────────────────────────────────────
++// Renders a sliding banner at the very top of the screen indicating offline /
++// reconnecting state. Mounted globally in app/_layout.tsx so it appears on
++// every screen, not just chat.
++//
++// Copy is intentionally soft and reassuring (per product brief): we never want
++// the user to feel blamed for connectivity issues. The reconnecting state
++// flashes briefly before clearing — the SessionContext handles the transition.
++
+ interface NetworkBannerProps {
+   offline: boolean;
+   reconnecting?: boolean;
+ }
+ 
+ export default function NetworkBanner({ offline, reconnecting }: NetworkBannerProps) {
+-  const translateY = useRef(new Animated.Value(-60)).current;
++  const insets = useSafeAreaInsets();
++  const translateY = useRef(new Animated.Value(-100)).current;
++
++  // Show whenever offline OR reconnecting (so the "reconnected" flash is visible)
++  const visible = offline || reconnecting;
+ 
+   useEffect(() => {
+     Animated.spring(translateY, {
+-      toValue: offline ? 0 : -60,
++      toValue: visible ? 0 : -100,
+       useNativeDriver: true,
+       tension: 80,
+       friction: 14,
+     }).start();
+-  }, [offline]);
++  }, [visible]);
++
++  // Sit below the status bar / notch on native; web uses a fixed offset.
++  const topOffset = Platform.OS === "web" ? 0 : insets.top;
+ 
+   return (
+     <Animated.View
+-      style={[styles.banner, { transform: [{ translateY }] }]}
++      pointerEvents={visible ? "auto" : "none"}
++      style={[
++        styles.banner,
++        {
++          paddingTop: 10 + topOffset,
++          transform: [{ translateY }],
++        },
++      ]}
+       accessibilityRole="alert"
+       accessibilityLiveRegion="assertive"
+     >
+@@ -34,8 +58,8 @@ export default function NetworkBanner({ offline, reconnecting }: NetworkBannerPr
+         />
+         <Text style={[styles.text, { color: reconnecting ? Colors.accent : "#F4B942" }]}>
+           {reconnecting
+-            ? "جارٍ إعادة الاتصال..."
+-            : "لا يوجد اتصال — سيتم الإرسال تلقائياً عند عودة الاتصال"}
++            ? "عاد الاتصال — جارٍ المزامنة…"
++            : "يبدو أن الاتصال هادئ الآن… سنحاول مجدداً خلال لحظات"}
+         </Text>
+       </View>
+     </Animated.View>
+@@ -45,11 +69,11 @@ export default function NetworkBanner({ offline, reconnecting }: NetworkBannerPr
+ const styles = StyleSheet.create({
+   banner: {
+     position: "absolute",
+-    top: Platform.OS === "web" ? 60 : 0,
++    top: 0,
+     left: 0,
+     right: 0,
+     backgroundColor: Colors.surfaceContainerHigh,
+-    paddingVertical: 10,
++    paddingBottom: 10,
+     paddingHorizontal: 16,
+     zIndex: 900,
+   },
+diff --git a/artifacts/uns-app/contexts/SessionContext.tsx b/artifacts/uns-app/contexts/SessionContext.tsx
+index f15b4b5..062c15f 100644
+--- a/artifacts/uns-app/contexts/SessionContext.tsx
++++ b/artifacts/uns-app/contexts/SessionContext.tsx
+@@ -1,11 +1,18 @@
+ import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
++import { AppState, type AppStateStatus } from "react-native";
+ import AsyncStorage from "@react-native-async-storage/async-storage";
+ import type { Gender } from "@/lib/gender";
+ 
+-import { API_BASE } from "@/lib/api";
++import { API_BASE, apiFetch, healthCheck, isNetworkError } from "@/lib/api";
+ 
+ const BASE = API_BASE;
+ 
++// ── Recovery polling cadence ──────────────────────────────────────────────────
++// When offline, we probe the server every RECOVERY_POLL_MS until it comes back.
++// 8s strikes a balance: fast enough to feel responsive, slow enough to be kind
++// to mobile data and battery. We pause polling when the app is backgrounded.
++const RECOVERY_POLL_MS = 8_000;
++
+ interface SessionContextType {
+   sessionId: string | null;
+   dialect: string;
+@@ -20,6 +27,11 @@ interface SessionContextType {
+   retryInit: () => void;
+   lastMoodWord: string | null;
+   setLastMoodWord: (m: string | null) => void;
++  // ── Network state (global, not per-screen) ──────────────────────────────────
++  isOffline: boolean;
++  isReconnecting: boolean;
++  /** Mark as offline. Called by authFetch on network failure. */
++  reportNetworkFailure: () => void;
+ }
+ 
+ const SessionContext = createContext<SessionContextType>({
+@@ -36,6 +48,9 @@ const SessionContext = createContext<SessionContextType>({
+   retryInit: () => {},
+   lastMoodWord: null,
+   setLastMoodWord: () => {},
++  isOffline: false,
++  isReconnecting: false,
++  reportNetworkFailure: () => {},
+ });
+ 
+ export function SessionProvider({ children }: { children: React.ReactNode }) {
+@@ -47,9 +62,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
+   const [isReady, setIsReady] = useState(false);
+   const [initError, setInitError] = useState<string | null>(null);
+   const [lastMoodWord, setLastMoodWordState] = useState<string | null>(null);
++  const [isOffline, setIsOffline] = useState(false);
++  const [isReconnecting, setIsReconnecting] = useState(false);
+ 
+   const authTokenRef = useRef<string | null>(null);
+   const mountedRef = useRef(true);
++  const recoveryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
++  const initAbortRef = useRef<AbortController | null>(null);
+ 
+   useEffect(() => {
+     authTokenRef.current = authToken;
+@@ -64,18 +83,96 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
+ 
+   useEffect(() => {
+     const controller = new AbortController();
++    initAbortRef.current = controller;
+     initSession(controller.signal);
+-    return () => controller.abort();
++    return () => {
++      controller.abort();
++      initAbortRef.current = null;
++      stopRecoveryPolling();
++    };
++    // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
+ 
++  // ── Recovery polling ────────────────────────────────────────────────────────
++  // When isOffline becomes true, start polling /healthz. When the probe
++  // succeeds, transition through "reconnecting" briefly to give the UI a
++  // chance to show "عاد الاتصال — جارٍ المزامنة…", then clear the flag.
++  useEffect(() => {
++    if (!isOffline) {
++      stopRecoveryPolling();
++      return;
++    }
++
++    async function probe() {
++      const ok = await healthCheck();
++      if (!mountedRef.current) return;
++      if (ok) {
++        setIsReconnecting(true);
++        // Give the UI ~600ms to flash the reconnecting state.
++        setTimeout(() => {
++          if (!mountedRef.current) return;
++          setIsOffline(false);
++          setIsReconnecting(false);
++        }, 600);
++      }
++    }
++
++    // Probe once immediately, then on interval.
++    probe();
++    recoveryTimerRef.current = setInterval(probe, RECOVERY_POLL_MS);
++
++    return stopRecoveryPolling;
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [isOffline]);
++
++  // ── Pause polling when app is backgrounded ──────────────────────────────────
++  // No point burning battery while the user can't see the UI. We resume on
++  // foreground via the dependency on isOffline below.
++  useEffect(() => {
++    const sub = AppState.addEventListener("change", (state: AppStateStatus) => {
++      if (state !== "active" && recoveryTimerRef.current) {
++        stopRecoveryPolling();
++      } else if (state === "active" && isOffline && !recoveryTimerRef.current) {
++        // Re-arm polling on foreground.
++        recoveryTimerRef.current = setInterval(async () => {
++          const ok = await healthCheck();
++          if (ok && mountedRef.current) {
++            setIsReconnecting(true);
++            setTimeout(() => {
++              if (!mountedRef.current) return;
++              setIsOffline(false);
++              setIsReconnecting(false);
++            }, 600);
++          }
++        }, RECOVERY_POLL_MS);
++      }
++    });
++    return () => sub.remove();
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [isOffline]);
++
++  function stopRecoveryPolling() {
++    if (recoveryTimerRef.current) {
++      clearInterval(recoveryTimerRef.current);
++      recoveryTimerRef.current = null;
++    }
++  }
++
++  const reportNetworkFailure = useCallback(() => {
++    if (mountedRef.current && !isOffline) {
++      setIsOffline(true);
++    }
++  }, [isOffline]);
++
+   async function refreshAccessToken(): Promise<string | null> {
+     try {
+       const storedRefresh = await AsyncStorage.getItem("uns_refresh_token");
+       if (!storedRefresh) return null;
+-      const res = await fetch(`${BASE}/auth/refresh`, {
++      const res = await apiFetch(`${BASE}/auth/refresh`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ refreshToken: storedRefresh }),
++        retries: 1,
+       });
+       if (!res.ok) return null;
+       const data = await res.json();
+@@ -100,18 +197,28 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
+       headers["Authorization"] = `Bearer ${token}`;
+     }
+ 
+-    const res = await fetch(url, { ...init, headers });
++    try {
++      const res = await apiFetch(url, { ...init, headers });
+ 
+-    if (res.status === 401 && token) {
+-      const newToken = await refreshAccessToken();
+-      if (newToken) {
+-        headers["Authorization"] = `Bearer ${newToken}`;
+-        return fetch(url, { ...init, headers });
++      if (res.status === 401 && token) {
++        const newToken = await refreshAccessToken();
++        if (newToken) {
++          headers["Authorization"] = `Bearer ${newToken}`;
++          return await apiFetch(url, { ...init, headers });
++        }
+       }
+-    }
+ 
+-    return res;
+-  }, []);
++      return res;
++    } catch (err) {
++      // Only flip the global offline flag for true network errors.
++      // AbortError (timeout / caller cancellation) is a separate concern and
++      // shouldn't poison the offline state.
++      if (isNetworkError(err)) {
++        reportNetworkFailure();
++      }
++      throw err;
++    }
++  }, [reportNetworkFailure]);
+ 
+   async function initSession(signal: AbortSignal) {
+     if (!mountedRef.current) return;
+@@ -166,9 +273,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
+   }
+ 
+   function retryInit() {
++    // Cancel any in-flight init before starting a new one — prevents the
++    // race condition where two concurrent initSession calls could mutate
++    // state in unpredictable order.
++    initAbortRef.current?.abort();
+     setIsReady(false);
+     setInitError(null);
+     const controller = new AbortController();
++    initAbortRef.current = controller;
+     initSession(controller.signal);
+   }
+ 
+@@ -204,6 +316,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
+         retryInit,
+         lastMoodWord,
+         setLastMoodWord,
++        isOffline,
++        isReconnecting,
++        reportNetworkFailure,
+       }}
+     >
+       {children}
+diff --git a/artifacts/uns-app/lib/api.ts b/artifacts/uns-app/lib/api.ts
+index 95c6f80..b153d04 100644
+--- a/artifacts/uns-app/lib/api.ts
++++ b/artifacts/uns-app/lib/api.ts
+@@ -1,3 +1,14 @@
++// ── lib/api.ts — central network layer ────────────────────────────────────────
++// Provides:
++//   - API_BASE constant for building URLs
++//   - apiFetch: fetch wrapper with retries, timeout, abort support
++//   - healthCheck: lightweight liveness probe
++//   - isNetworkError helper for distinguishing network failures from HTTP errors
++//
++// Used by SessionContext (offline detection, recovery polling) and any caller
++// that needs robust network behaviour. Authenticated requests should still go
++// through useSession().authFetch which wraps this with token handling.
++
+ // EXPO_PUBLIC_API_URL takes precedence (full URL for local dev, e.g. http://localhost:3000).
+ // EXPO_PUBLIC_DOMAIN is the Replit/production path (hostname-only → https assumed).
+ const _apiUrl = process.env["EXPO_PUBLIC_API_URL"];
+@@ -8,3 +19,132 @@ export const API_BASE: string = _apiUrl
+   : _domain
+     ? `https://${_domain}/api`
+     : "/api";
++
++// ── Tunables ──────────────────────────────────────────────────────────────────
++const DEFAULT_TIMEOUT_MS = 15_000;
++const DEFAULT_RETRIES = 2;
++const RETRY_BASE_DELAY_MS = 500;
++const HEALTH_TIMEOUT_MS = 5_000;
++
++// ── apiFetch ──────────────────────────────────────────────────────────────────
++// Wraps fetch with:
++//  - timeout via AbortController
++//  - retries on network failure ONLY (not on HTTP 4xx/5xx — those propagate)
++//  - exponential backoff: 500ms, 1000ms
++//
++// IMPORTANT: This only retries true network failures (TypeError "Network request
++// failed", connection refused, DNS errors). HTTP errors are returned as-is
++// because retrying them would mask real server problems and waste server CPU.
++
++export interface ApiFetchOptions extends RequestInit {
++  timeoutMs?: number;
++  retries?: number;
++  /** External signal to abort. Combined with internal timeout signal. */
++  signal?: AbortSignal;
++}
++
++export async function apiFetch(url: string, options: ApiFetchOptions = {}): Promise<Response> {
++  const {
++    timeoutMs = DEFAULT_TIMEOUT_MS,
++    retries = DEFAULT_RETRIES,
++    signal: externalSignal,
++    ...fetchOptions
++  } = options;
++
++  let lastError: unknown;
++
++  for (let attempt = 0; attempt <= retries; attempt++) {
++    const timeoutController = new AbortController();
++    const timeoutId = setTimeout(() => timeoutController.abort(), timeoutMs);
++
++    // Combine external signal with timeout signal
++    const onExternalAbort = () => timeoutController.abort();
++    if (externalSignal) {
++      if (externalSignal.aborted) {
++        clearTimeout(timeoutId);
++        throw new DOMException("Aborted", "AbortError");
++      }
++      externalSignal.addEventListener("abort", onExternalAbort, { once: true });
++    }
++
++    try {
++      const response = await fetch(url, {
++        ...fetchOptions,
++        signal: timeoutController.signal,
++      });
++      clearTimeout(timeoutId);
++      externalSignal?.removeEventListener("abort", onExternalAbort);
++      // HTTP errors are NOT retried — return as-is.
++      return response;
++    } catch (err) {
++      clearTimeout(timeoutId);
++      externalSignal?.removeEventListener("abort", onExternalAbort);
++      lastError = err;
++
++      // Don't retry if the caller aborted.
++      if (externalSignal?.aborted) {
++        throw err;
++      }
++
++      // Don't retry timeouts caused by our own AbortController either —
++      // a slow endpoint won't get faster with another try.
++      const isAbortError = err instanceof Error && err.name === "AbortError";
++      if (isAbortError) {
++        throw err;
++      }
++
++      // Only retry true network errors. TypeError is thrown by fetch on
++      // network failures across React Native, browsers, and node-fetch.
++      const isNetworkErr = isNetworkError(err);
++      if (!isNetworkErr || attempt === retries) {
++        throw err;
++      }
++
++      // Exponential backoff: 500ms → 1000ms → 2000ms
++      const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
++      await sleep(delay);
++    }
++  }
++
++  // Unreachable — the loop always either returns or throws.
++  throw lastError;
++}
++
++// ── healthCheck ───────────────────────────────────────────────────────────────
++// Lightweight probe to determine whether the API server is reachable.
++// Returns true on 2xx, false otherwise (including network errors).
++// Times out aggressively (5s) so it doesn't block the UI.
++
++export async function healthCheck(): Promise<boolean> {
++  try {
++    const res = await apiFetch(`${API_BASE}/healthz`, {
++      method: "GET",
++      timeoutMs: HEALTH_TIMEOUT_MS,
++      retries: 0, // health checks should be a single, fast probe
++    });
++    return res.ok;
++  } catch {
++    return false;
++  }
++}
++
++// ── Helpers ───────────────────────────────────────────────────────────────────
++export function isNetworkError(err: unknown): boolean {
++  if (!err) return false;
++  // React Native and browsers throw TypeError for true network failures
++  // (DNS failure, connection refused, no internet, server not reachable).
++  if (err instanceof TypeError) return true;
++  // Some environments expose a `name` of "NetworkError" or "FetchError".
++  if (err instanceof Error) {
++    const n = err.name;
++    if (n === "NetworkError" || n === "FetchError") return true;
++    // The message is environment-specific but stable enough to check.
++    const msg = err.message || "";
++    if (msg.includes("Network request failed")) return true;
++  }
++  return false;
++}
++
++function sleep(ms: number): Promise<void> {
++  return new Promise((resolve) => setTimeout(resolve, ms));
++}
+diff --git a/artifacts/uns-app/lib/gender.ts b/artifacts/uns-app/lib/gender.ts
+index d51d598..acfbb5a 100644
+--- a/artifacts/uns-app/lib/gender.ts
++++ b/artifacts/uns-app/lib/gender.ts
+@@ -4,27 +4,74 @@ export function getG(maleText: string, femaleText: string, gender: Gender): stri
+   return gender === "male" ? maleText : femaleText;
+ }
+ 
+-export const MOOD_OPTIONS = {
++// ── Mood option model ─────────────────────────────────────────────────────────
++// `en` is a stable, language-agnostic key used for analytics and gamification.
++// `word` is the display text in the user's gender-correct Arabic form.
++// `intensity` is a 1–5 scale where higher = more positive emotional state.
++//
++// Single source of truth: BOTH the home screen quick-pick and the dedicated
++// mood check-in screen import this list. Do NOT duplicate this elsewhere.
++export interface MoodOption {
++  word: string;
++  en: string;
++  emoji: string;
++  color: string;
++  intensity: number;
++}
++
++export const MOOD_OPTIONS: Record<Gender, MoodOption[]> = {
+   female: [
+-    { word: "مرتاحة", en: "calm", emoji: "😌", color: "#74C69D", intensity: 5 },
+-    { word: "هادئة",  en: "peaceful", emoji: "🙂", color: "#85d7ad", intensity: 4 },
+-    { word: "مضغوطة", en: "stressed", emoji: "😟", color: "#6B7FD7", intensity: 2 },
+-    { word: "متعبة",  en: "tired", emoji: "😔", color: "#8E7BB5", intensity: 2 },
+-    { word: "حزينة",  en: "sad", emoji: "😢", color: "#5D6D8A", intensity: 1 },
++    { word: "مطمئنة", en: "reassured", emoji: "🤍", color: "#7CC9A8", intensity: 5 },
++    { word: "سعيدة",  en: "happy",     emoji: "😊", color: "#F4B942", intensity: 5 },
++    { word: "مرتاحة", en: "calm",      emoji: "😌", color: "#74C69D", intensity: 5 },
++    { word: "هادئة",  en: "peaceful",  emoji: "🙂", color: "#85d7ad", intensity: 4 },
++    { word: "قلقة",   en: "anxious",   emoji: "😬", color: "#A89B7E", intensity: 2 },
++    { word: "مضغوطة", en: "stressed",  emoji: "😟", color: "#6B7FD7", intensity: 2 },
++    { word: "متعبة",  en: "tired",     emoji: "😔", color: "#8E7BB5", intensity: 2 },
++    { word: "مرهقة",  en: "exhausted", emoji: "😮‍💨", color: "#7B6FA0", intensity: 1 },
++    { word: "حزينة",  en: "sad",       emoji: "😢", color: "#5D6D8A", intensity: 1 },
+   ],
+   male: [
+-    { word: "مرتاح", en: "calm", emoji: "😌", color: "#74C69D", intensity: 5 },
+-    { word: "هادئ",  en: "peaceful", emoji: "🙂", color: "#85d7ad", intensity: 4 },
+-    { word: "مضغوط", en: "stressed", emoji: "😟", color: "#6B7FD7", intensity: 2 },
+-    { word: "متعب",  en: "tired", emoji: "😔", color: "#8E7BB5", intensity: 2 },
+-    { word: "حزين",  en: "sad", emoji: "😢", color: "#5D6D8A", intensity: 1 },
++    { word: "مطمئن", en: "reassured", emoji: "🤍", color: "#7CC9A8", intensity: 5 },
++    { word: "سعيد",  en: "happy",     emoji: "😊", color: "#F4B942", intensity: 5 },
++    { word: "مرتاح", en: "calm",      emoji: "😌", color: "#74C69D", intensity: 5 },
++    { word: "هادئ",  en: "peaceful",  emoji: "🙂", color: "#85d7ad", intensity: 4 },
++    { word: "قلق",   en: "anxious",   emoji: "😬", color: "#A89B7E", intensity: 2 },
++    { word: "مضغوط", en: "stressed",  emoji: "😟", color: "#6B7FD7", intensity: 2 },
++    { word: "متعب",  en: "tired",     emoji: "😔", color: "#8E7BB5", intensity: 2 },
++    { word: "مرهق",  en: "exhausted", emoji: "😮‍💨", color: "#7B6FA0", intensity: 1 },
++    { word: "حزين",  en: "sad",       emoji: "😢", color: "#5D6D8A", intensity: 1 },
+   ],
+ };
+ 
++// ── Quick-pick subset for the home strip ──────────────────────────────────────
++// The home screen shows moods in a single horizontal row that doesn't scale to
++// 9 chips on small phones. We expose a curated 5-chip subset that spans the
++// emotional range (positive → neutral → tired → anxious → sad). Tapping any of
++// these still navigates to the full mood screen, where the user sees all 9.
++const HOME_QUICK_PICK_KEYS = ["happy", "calm", "tired", "anxious", "sad"] as const;
++
++export function getHomeQuickPickMoods(gender: Gender): MoodOption[] {
++  const all = MOOD_OPTIONS[gender];
++  return HOME_QUICK_PICK_KEYS.map((k) => all.find((m) => m.en === k)).filter(
++    (m): m is MoodOption => Boolean(m),
++  );
++}
++
+ export function getMoodQuestion(gender: Gender): string {
+   return gender === "female" ? "كيف تشعرين اليوم؟" : "كيف تشعر اليوم؟";
+ }
+ 
++/** Find a mood option by its language-agnostic `en` key. */
++export function findMoodByEn(gender: Gender, en: string): MoodOption | undefined {
++  return MOOD_OPTIONS[gender].find((m) => m.en === en);
++}
++
++/** Find a mood option by its display word (what the user tapped). */
++export function findMoodByWord(gender: Gender, word: string): MoodOption | undefined {
++  return MOOD_OPTIONS[gender].find((m) => m.word === word);
++}
++
+ export function getContextualSuggestions(
+   gender: Gender,
+   moodEn: string | null,
+@@ -48,13 +95,20 @@ export function getContextualSuggestions(
+       `ما يهم أنك مش لوحد${isFemale ? "ة" : ""}`,
+     ];
+   }
+-  if (moodEn === "tired") {
++  if (moodEn === "tired" || moodEn === "exhausted") {
+     return [
+       `جسمك يحتاج راحة — خل${suffixK}نا نهدأ`,
+       "أرني كيف أساعدك",
+       "جرّب تمرين الاسترخاء",
+     ];
+   }
++  if (moodEn === "happy" || moodEn === "reassured") {
++    return [
++      `حلو نسمع${suffix} عنه`,
++      `شارك${suffix}ني السبب`,
++      `خل${suffixK}نا نحتفظ بهذي اللحظة`,
++    ];
++  }
+   if (hour >= 5 && hour < 12) {
+     return [
+       `كيف بدأ صباحك؟`,

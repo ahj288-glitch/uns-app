@@ -1,0 +1,155 @@
+You are continuing work on the أُنس (Uns) Arabic emotional wellness app. An external code review produced a unified diff patch that fixes 7 critical P0 issues blocking TestFlight. Your job is to apply this patch correctly, verify it, commit it, and push it.
+
+═══════════════════════════════════════════════════════════════════════════════
+WHAT THE PATCH FIXES
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Migrates the companion LLM from OpenAI to Groq (llama-3.3-70b-versatile).
+2. Adds a real network layer in artifacts/uns-app/lib/api.ts with apiFetch 
+   (timeout + retries on network errors only) and healthCheck (probes /healthz).
+3. Moves isOffline / isReconnecting from chat.tsx local state into 
+   SessionContext as global state with 8-second recovery polling that pauses 
+   when the app is backgrounded.
+4. Mounts NetworkBanner globally in app/_layout.tsx (was only inside chat). 
+   Banner now respects safe-area insets and uses the soft Arabic copy from the 
+   product brief.
+5. Removes the broken setIsOffline call in chat.tsx (the setter was deleted 
+   but a leftover reference remained — would crash on network failure). 
+   Replaced with reportNetworkFailure() from context.
+6. Reorders the tab bar to 5 visible tabs in correct RTL order: 
+   index → chat → journey → insights → profile, which renders as 
+   الرئيسية | أُنس | رحلتي | الرؤى | حسابي from right to left. حسابي was 
+   previously hidden entirely (href: null), making it unreachable.
+7. Unifies the mood list. lib/gender.ts is now the single source of truth 
+   with 9 moods per gender (مطمئن، سعيد، مرتاح، هادئ، قلق، مضغوط، متعب، مرهق، 
+   حزين). mood.tsx imports from it instead of duplicating. Home uses a 
+   curated 5-mood quick-pick subset (getHomeQuickPickMoods) so the horizontal 
+   strip doesn't break on small phones. Tapping a mood on home pre-selects 
+   it on the mood screen via lastMoodWord in SessionContext.
+8. Bonus: fixes REL-4 from the prior audit — mood.tsx no longer crashes 
+   when the gamification endpoint returns a non-OK response.
+
+13 files modified. The patch has been pre-validated with `git apply --check` 
+on a fresh clone of HEAD and applies cleanly.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+Execute these steps strictly in order. Do not skip verification.
+
+STEP 1 — Locate the patch file
+    The user has uploaded a file named `uns_p0_changes.patch` to the Replit 
+    workspace. Confirm it exists at the repo root with `ls uns_p0_changes.patch`. 
+    If not present, STOP and tell the user to upload it via drag-and-drop into 
+    the File Explorer.
+
+STEP 2 — Verify clean working tree
+    Run `git status`. The working tree must be clean (no uncommitted changes) 
+    and on the correct branch (main). If there are uncommitted changes, STOP 
+    and ask the user how to handle them (stash / commit / discard) — do not 
+    decide on their behalf.
+
+STEP 3 — Pull latest from origin
+    Run `git pull origin main` to make sure you're applying the patch on top 
+    of the latest remote state. If pull fails, STOP and report.
+
+STEP 4 — Dry-run the patch
+    Run `git apply --check uns_p0_changes.patch`.
+    If it reports any conflict, STOP, show the user the conflict output, and 
+    do NOT proceed. Patch was generated against commit 9853de5; if the repo 
+    has moved significantly since, conflicts may exist and need manual review.
+
+STEP 5 — Apply the patch
+    Run `git apply uns_p0_changes.patch`.
+    Then run `git status` and verify exactly these 13 files are modified:
+      artifacts/api-server/.env.example
+      artifacts/api-server/src/index.ts
+      artifacts/api-server/src/lib/aiConfig.ts
+      artifacts/api-server/src/routes/companion.ts
+      artifacts/uns-app/app/(tabs)/_layout.tsx
+      artifacts/uns-app/app/(tabs)/chat.tsx
+      artifacts/uns-app/app/(tabs)/index.tsx
+      artifacts/uns-app/app/(tabs)/mood.tsx
+      artifacts/uns-app/app/_layout.tsx
+      artifacts/uns-app/components/ui/NetworkBanner.tsx
+      artifacts/uns-app/contexts/SessionContext.tsx
+      artifacts/uns-app/lib/api.ts
+      artifacts/uns-app/lib/gender.ts
+    If the count or list differs, STOP and report.
+
+STEP 6 — TypeScript verification
+    Run `pnpm typecheck` from the repo root.
+    If type errors appear, show the FULL output and STOP. Do not commit broken 
+    code. Common issues to expect (none should occur but verify):
+      - missing useMemo import in app/(tabs)/index.tsx
+      - missing AppState import in contexts/SessionContext.tsx
+      - MoodOption type not exported from lib/gender.ts
+
+STEP 7 — Stage, commit, push
+    Only proceed if Steps 5 and 6 passed cleanly.
+    Run:
+      git add -A
+      git commit -m "feat(p0): groq migration + global network layer + tab order + unified moods
+
+- Migrate companion LLM from OpenAI to Groq (llama-3.3-70b-versatile)
+- Add lib/api.ts with apiFetch (retries+timeout) and healthCheck
+- Move isOffline/isReconnecting to SessionContext with recovery polling
+- Mount NetworkBanner globally in _layout.tsx (was chat-only)
+- Remove broken setIsOffline reference in chat.tsx (use reportNetworkFailure)
+- Reorder tabs: 5 visible RTL (الرئيسية|أُنس|رحلتي|الرؤى|حسابي)
+- Unify mood list: 9 options in lib/gender.ts; mood.tsx + home use shared source
+- Pre-select mood on /mood when arriving from home via lastMoodWord
+- Fix REL-4: guard gamification response in mood.tsx checkin"
+      git push origin main
+
+STEP 8 — Final report
+    After push succeeds, output a concise summary in this format:
+
+      ✅ P0 patch applied and pushed
+      
+      Commit: <hash>
+      Files changed: 13
+      Branch: main
+      
+      Next steps for the user:
+      1. SSH into VPS (76.13.45.198) and run:
+           cd ~/uns-app
+           git pull origin main
+           cd artifacts/api-server
+           # Add GROQ_API_KEY to .env if not present
+           grep -q GROQ_API_KEY .env || echo "GROQ_API_KEY=gsk_..." >> .env
+           cd ../..
+           pnpm install
+           pnpm build
+           pm2 restart uns-api
+           pm2 logs uns-api --lines 30
+         Confirm the log line shows: groq: configured
+      
+      2. Run the mobile app:
+           cd artifacts/uns-app
+           pnpm start
+         Then verify in Expo Go:
+           - 5 tabs in RTL order: الرئيسية|أُنس|رحلتي|الرؤى|حسابي
+           - Toggle airplane mode → soft offline banner appears on every screen
+           - Toggle back on → "عاد الاتصال — جارٍ المزامنة…" flashes briefly
+           - Send chat message while offline → auto-retries once when back online
+           - Tap a mood on home → mood screen opens with that mood pre-selected
+           - Mood screen shows 9 chips, header text matches user gender
+           - Send a chat message → response is from Groq (not the keyword 
+             matcher); response JSON contains llmUsed: true
+
+═══════════════════════════════════════════════════════════════════════════════
+SAFETY RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+- Do NOT use --force or --force-with-lease for any git operation.
+- Do NOT amend, rebase, or rewrite history.
+- Do NOT modify the patch file's contents under any circumstance.
+- Do NOT touch any file not listed in the expected 13.
+- Do NOT skip the typecheck step. If it fails, STOP — broken code in main 
+  blocks TestFlight and other contributors.
+- Do NOT proceed past any STOP instruction without the user's explicit go-ahead.
+- If anything is ambiguous, ASK the user before acting.
+
+Begin with STEP 1.
