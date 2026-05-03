@@ -7,6 +7,7 @@ import {
   verificationTokensTable,
 } from "@workspace/db/schema";
 import { eq, and, isNull, gt } from "drizzle-orm";
+import { z } from "zod";
 import {
   generateAccessToken,
   generateAdminToken,
@@ -344,20 +345,59 @@ router.post("/auth/admin", (req, res) => {
   return res.json({ accessToken });
 });
 
-router.post("/auth/refresh", (req, res) => {
-  const { refreshToken } = req.body as { refreshToken?: string };
+const RefreshBody = z.object({ refreshToken: z.string().min(1) });
 
-  if (!refreshToken) {
+router.post("/auth/refresh", async (req, res) => {
+  const parsed = RefreshBody.safeParse(req.body);
+  if (!parsed.success) {
     return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
   }
 
   try {
-    const payload = verifyJwt(refreshToken);
+    const payload = verifyJwt(parsed.data.refreshToken);
+
+    // Reject refresh if the session has been revoked (logged out).
+    const rows = await db
+      .select({ revokedAt: companionSessionsTable.revokedAt })
+      .from(companionSessionsTable)
+      .where(eq(companionSessionsTable.sessionId, payload.sub))
+      .limit(1);
+
+    if (rows.length === 0 || rows[0].revokedAt !== null) {
+      return res.status(401).json({ error: "REVOKED", code: "REVOKED" });
+    }
+
     const accessToken = generateAccessToken(payload.sub, "user");
     return res.json({ accessToken });
   } catch {
     return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
   }
+});
+
+const LogoutBody = z.object({ refreshToken: z.string().min(1) });
+
+// POST /auth/logout — revokes the refresh token by marking the underlying
+// session as revoked. Subsequent /auth/refresh calls with the same refresh
+// token return 401. Idempotent: revoking an already-revoked session is a no-op.
+router.post("/auth/logout", async (req, res) => {
+  const parsed = LogoutBody.safeParse(req.body);
+  if (!parsed.success) {
+    // Treat malformed body as success — client is logging out anyway.
+    return res.status(204).end();
+  }
+
+  try {
+    const payload = verifyJwt(parsed.data.refreshToken);
+    await db
+      .update(companionSessionsTable)
+      .set({ revokedAt: new Date() })
+      .where(eq(companionSessionsTable.sessionId, payload.sub));
+    logger.info({ sub: payload.sub }, "[auth/logout] session revoked");
+  } catch {
+    // Invalid token = client is already effectively logged out.
+  }
+
+  return res.status(204).end();
 });
 
 export default router;

@@ -20,6 +20,7 @@ interface SessionContextType {
   retryInit: () => void;
   lastMoodWord: string | null;
   setLastMoodWord: (m: string | null) => void;
+  logout: () => Promise<void>;
 }
 
 const SessionContext = createContext<SessionContextType>({
@@ -36,6 +37,7 @@ const SessionContext = createContext<SessionContextType>({
   retryInit: () => {},
   lastMoodWord: null,
   setLastMoodWord: () => {},
+  logout: async () => {},
 });
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -182,6 +184,42 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem("uns_gender", g);
   }
 
+  // Real logout: revoke refresh token on the server, then clear all local
+  // session state. Best-effort on the network call — local state is always
+  // cleared so the user is logged out even if the server is unreachable.
+  async function logout() {
+    try {
+      const refreshToken = await AsyncStorage.getItem("uns_refresh_token");
+      if (refreshToken) {
+        try {
+          await fetch(`${BASE}/auth/logout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+          });
+        } catch {
+          // Network failure — proceed with local cleanup anyway.
+        }
+      }
+    } finally {
+      await Promise.all([
+        AsyncStorage.removeItem("uns_session_id"),
+        AsyncStorage.removeItem("uns_access_token"),
+        AsyncStorage.removeItem("uns_refresh_token"),
+        AsyncStorage.removeItem("uns_last_mood"),
+        AsyncStorage.removeItem("@uns_pending_userId"),
+        AsyncStorage.removeItem("@uns_pending_email"),
+        AsyncStorage.removeItem("@uns_pending_gender"),
+      ]);
+      if (mountedRef.current) {
+        setSessionId(null);
+        setAuthToken(null);
+        authTokenRef.current = null;
+        setLastMoodWordState(null);
+      }
+    }
+  }
+
   async function setLastMoodWord(m: string | null) {
     setLastMoodWordState(m);
     if (m) await AsyncStorage.setItem("uns_last_mood", m);
@@ -204,6 +242,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         retryInit,
         lastMoodWord,
         setLastMoodWord,
+        logout,
       }}
     >
       {children}

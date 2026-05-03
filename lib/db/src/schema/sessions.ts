@@ -8,6 +8,7 @@ export const companionSessionsTable = pgTable("companion_sessions", {
   emotionalProfile: jsonb("emotional_profile"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActiveAt: timestamp("last_active_at").defaultNow().notNull(),
+  revokedAt: timestamp("revoked_at"),
 });
 
 export const insertSessionSchema = createInsertSchema(companionSessionsTable).omit({ sessionId: true, createdAt: true, lastActiveAt: true });

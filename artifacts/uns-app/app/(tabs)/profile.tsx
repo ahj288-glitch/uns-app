@@ -68,26 +68,28 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const T = useTokens();
   const styles = makeStyles(T);
-  const { dialect, setDialect } = useSession();
+  const { dialect, setDialect, logout } = useSession();
   const [notifications, setNotifications] = useState(true);
   const [spiritual, setSpiritual] = useState(true);
 
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
 
-  async function clearSession() {
+  async function handleLogout() {
     Alert.alert(
-      "إعادة البدء",
-      "هل تريد إنشاء جلسة جديدة؟",
+      "تسجيل الخروج",
+      "هل تريد تسجيل الخروج من حسابك؟",
       [
         { text: "إلغاء", style: "cancel" },
         {
-          text: "نعم",
+          text: "تسجيل الخروج",
           style: "destructive",
           onPress: async () => {
-            await AsyncStorage.removeItem("uns_session_id");
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            Alert.alert("تم", "أعد تشغيل التطبيق لبدء جلسة جديدة.");
+            await logout();
+            if (Platform.OS !== "web") {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
+            router.replace("/onboarding/register");
           },
         },
       ]
@@ -212,10 +214,10 @@ export default function ProfileScreen() {
 
       <View style={styles.section}>
         <SettingRow
-          icon="refresh-cw"
-          title="إعادة البدء"
-          subtitle="إنشاء جلسة جديدة"
-          onPress={clearSession}
+          icon="log-out"
+          title="تسجيل الخروج"
+          subtitle="إنهاء جلستك على هذا الجهاز"
+          onPress={handleLogout}
           danger
         />
       </View>

@@ -20,6 +20,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
 import { setBaseUrl } from "@workspace/api-client-react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import NetworkBanner from "@/components/ui/NetworkBanner";
+import { NetworkProvider, useNetwork } from "@/contexts/NetworkContext";
 import { SessionProvider } from "@/contexts/SessionContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
@@ -88,12 +90,16 @@ const configStyles = StyleSheet.create({
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 function RootLayoutNav() {
+  const { offline, reconnecting } = useNetwork();
   return (
-    <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+      <NetworkBanner offline={offline} reconnecting={reconnecting} />
+    </>
   );
 }
 
@@ -131,11 +137,13 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <SessionProvider>
             <ThemeProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <KeyboardProvider>
-                  <RootLayoutNav />
-                </KeyboardProvider>
-              </GestureHandlerRootView>
+              <NetworkProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <KeyboardProvider>
+                    <RootLayoutNav />
+                  </KeyboardProvider>
+                </GestureHandlerRootView>
+              </NetworkProvider>
             </ThemeProvider>
           </SessionProvider>
         </QueryClientProvider>

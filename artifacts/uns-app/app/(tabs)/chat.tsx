@@ -27,7 +27,7 @@ import { CRISIS_RESOURCES } from "@/lib/crisis";
 import { API_BASE } from "@/lib/api";
 import * as Haptics from "expo-haptics";
 import ErrorToast from "@/components/ui/ErrorToast";
-import NetworkBanner from "@/components/ui/NetworkBanner";
+import { useNetwork } from "@/contexts/NetworkContext";
 import CharCounter from "@/components/ui/CharCounter";
 import LimitBlocker from "@/components/ui/LimitBlocker";
 
@@ -158,9 +158,8 @@ export default function ChatScreen() {
   const [dailyLimitReached, setDailyLimitReached] = useState(false);
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
 
-  // Network state
-  const [isOffline, setIsOffline] = useState(false);
-  const [isReconnecting, setIsReconnecting] = useState(false);
+  // Network state — global, polled by NetworkProvider in app/_layout.tsx
+  const { offline: isOffline, checkNow: checkNetworkNow } = useNetwork();
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
   // Toast
@@ -169,7 +168,6 @@ export default function ChatScreen() {
   const rateLimitTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSentAt = useRef<number>(0);
-  const offlineCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
@@ -209,30 +207,16 @@ export default function ChatScreen() {
     }, 1000);
   }
 
-  // ─── Offline detection (polling) ──────────────────────────────────────
+  // ─── Pending message retry on reconnect ───────────────────────────────
+  // Network polling is owned by NetworkProvider in app/_layout.tsx.
+  // When the global offline flag flips back to false, retry any queued message.
 
   useEffect(() => {
-    if (Platform.OS === "web") return;
-    offlineCheckRef.current = setInterval(async () => {
-      try {
-        await fetch(`${API_BASE}/health`, { method: "HEAD" });
-        if (isOffline) {
-          setIsReconnecting(true);
-          setIsOffline(false);
-          setTimeout(() => setIsReconnecting(false), 2000);
-          if (pendingMessage) {
-            const msg = pendingMessage;
-            setPendingMessage(null);
-            sendMessage(msg);
-          }
-        }
-      } catch {
-        if (!isOffline) setIsOffline(true);
-      }
-    }, 5000);
-    return () => {
-      if (offlineCheckRef.current) clearInterval(offlineCheckRef.current);
-    };
+    if (!isOffline && pendingMessage) {
+      const msg = pendingMessage;
+      setPendingMessage(null);
+      sendMessage(msg);
+    }
   }, [isOffline, pendingMessage]);
 
   // ─── Send message ─────────────────────────────────────────────────────
@@ -371,8 +355,8 @@ export default function ChatScreen() {
         const isNetwork = err instanceof TypeError;
 
         if (isNetwork) {
-          // Actual network failure
-          setIsOffline(true);
+          // Actual network failure — surface banner immediately via global poll
+          void checkNetworkNow();
           setPendingMessage(msg);
           showToast(ERRORS.NETWORK_OFFLINE.ar, "warning");
           setDailyCount(c => c - 1);
@@ -420,8 +404,6 @@ export default function ChatScreen() {
       {theme.surfaceTint !== "transparent" && (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
       )}
-      <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />
-
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
         <Pressable onPress={() => router.push("/(tabs)/community")} style={styles.headerBtn}>
           <Feather name="users" size={18} color={T.muted} />
