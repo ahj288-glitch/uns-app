@@ -1,0 +1,99 @@
+Go-ahead for CHANGE 2. Two bookkeeping items first, then proceed.
+
+═══════════════════════════════════════════════════════════════════════════════
+BOOKKEEPING — Update follow-ups doc with TestFlight blocker context
+═══════════════════════════════════════════════════════════════════════════════
+
+The pre-existing typecheck errors include two that are NOT cosmetic — they 
+are real blockers documented in the original handover but mistakenly 
+classified as "leave alone" in your B1-B3 scratchpad. Update 
+docs/audit-fixes-status.md by appending this section:
+
+---
+
+## Pre-existing typecheck errors — TestFlight blocker reclassification (3 May 2026)
+
+Re-reviewed during P0 mood unification work. Two of the four pre-existing 
+errors are TestFlight blockers, not "leave alone":
+
+### 🔴 BLOCKER — /onboarding/login route not in expo-router type map
+- **Files:** `app/onboarding/index.tsx:143`, `app/onboarding/register.tsx:367`
+- **Symptom:** TypeScript reports `/onboarding/login` not in route map even 
+  though the file `app/onboarding/login.tsx` exists.
+- **Likely cause:** expo-router typed-routes manifest is stale. The file 
+  was added but routes weren't regenerated.
+- **Fix candidates:**
+  1. Run `npx expo customize` or restart `pnpm start` to regenerate 
+     `.expo/types/router.d.ts`
+  2. If that doesn't work, check `app.json` `experiments.typedRoutes` is 
+     true (we already confirmed it is) and that login.tsx exports a 
+     default React component
+- **Why it matters:** without this, the "لديّ حساب بالفعل" button on 
+  onboarding navigates to a route the type system rejects. Even if it 
+  works at runtime today, any future strict-mode build will fail.
+- **Owner:** next P0/P1 session
+
+### 🟠 SCHEMA DRIFT — recipe.source field missing
+- **Files:** `app/(tabs)/index.tsx:376-377`
+- **Symptom:** code reads `recipe.source` but `DailyRecipe` Zod type has 
+  no `source` field
+- **Original handover reference:** §18 "Daily Recipe — recipe.source 
+  referenced but DB table did not have source column. Remove or align 
+  schema."
+- **Fix candidates:**
+  1. Remove the `.source` reads from index.tsx (preferred — simpler)
+  2. Add `source` to the daily_recipes table + Drizzle schema + Zod + 
+     codegen pipeline (heavier, only worth it if there's actual content 
+     to display)
+- **Owner:** next P0/P1 session
+
+The other two pre-existing errors (if any besides these and their 
+duplicates) remain as-is.
+
+---
+
+═══════════════════════════════════════════════════════════════════════════════
+PROCEED WITH CHANGE 2 — app/(tabs)/index.tsx
+═══════════════════════════════════════════════════════════════════════════════
+
+Goal: home screen mood strip switches from full MOOD_OPTIONS[gender] to 
+getHomeQuickPickMoods(gender), and useMemo is added to React imports.
+
+Required edits:
+
+EDIT 2.1 — Update React import
+    Find: import React, { useEffect, useRef, useState } from "react";
+    Replace with: import React, { useEffect, useMemo, useRef, useState } from "react";
+    (If the line already imports useMemo, skip.)
+
+EDIT 2.2 — Replace MOOD_OPTIONS import with getHomeQuickPickMoods
+    Find: import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
+    Replace with: import { getHomeQuickPickMoods, getMoodQuestion } from "@/lib/gender";
+
+EDIT 2.3 — Replace direct MOODS lookup with memoized helper call
+    Find: const MOODS = MOOD_OPTIONS[gender];
+    Replace with:
+        // Home strip shows a curated 5-mood quick-pick. Tapping one navigates
+        // to the full mood screen (which shows all 9 from MOOD_OPTIONS) with
+        // the chip pre-selected via SessionContext.lastMoodWord.
+        const MOODS = useMemo(() => getHomeQuickPickMoods(gender), [gender]);
+
+EDIT 2.4 — Verify setLastMoodWord is called on mood tap
+    Locate the handleMoodSelect function (or whichever handler runs on chip 
+    tap). It should already call setLastMoodWord(moodEn) before navigating 
+    to /mood. If it doesn't, add it. If it already does, leave alone.
+    Show me what you found either way.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+After all four edits:
+  1. Run `pnpm typecheck`. Compare error count to the pre-CHANGE-2 baseline 
+     (4 pre-existing). If new errors appear, STOP and report.
+  2. Run `git diff artifacts/uns-app/app/(tabs)/index.tsx`. Show full diff.
+  3. Run `git diff docs/audit-fixes-status.md` showing only the new 
+     section appended this round.
+  4. STOP and wait for my go-ahead before CHANGE 3.
+
+No staging, no commit, no push.

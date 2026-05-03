@@ -279,3 +279,44 @@ breaking historical user data and require product decisions:
 
 These items are tracked here so they're not silently lost. They do not
 block TestFlight.
+
+---
+
+## Pre-existing typecheck errors — TestFlight blocker reclassification (3 May 2026)
+
+Re-reviewed during P0 mood unification work. Two of the four pre-existing
+errors are TestFlight blockers, not "leave alone":
+
+### 🔴 BLOCKER — /onboarding/login route not in expo-router type map
+- **Files:** `app/onboarding/index.tsx:143`, `app/onboarding/register.tsx:367`
+- **Symptom:** TypeScript reports `/onboarding/login` not in route map even
+  though the file `app/onboarding/login.tsx` exists.
+- **Likely cause:** expo-router typed-routes manifest is stale. The file
+  was added but routes weren't regenerated.
+- **Fix candidates:**
+  1. Run `npx expo customize` or restart `pnpm start` to regenerate
+     `.expo/types/router.d.ts`
+  2. If that doesn't work, check `app.json` `experiments.typedRoutes` is
+     true (we already confirmed it is) and that login.tsx exports a
+     default React component
+- **Why it matters:** without this, the "لديّ حساب بالفعل" button on
+  onboarding navigates to a route the type system rejects. Even if it
+  works at runtime today, any future strict-mode build will fail.
+- **Owner:** next P0/P1 session
+
+### 🟠 SCHEMA DRIFT — recipe.source field missing
+- **Files:** `app/(tabs)/index.tsx:376-377`
+- **Symptom:** code reads `recipe.source` but `DailyRecipe` Zod type has
+  no `source` field
+- **Original handover reference:** §18 "Daily Recipe — recipe.source
+  referenced but DB table did not have source column. Remove or align
+  schema."
+- **Fix candidates:**
+  1. Remove the `.source` reads from index.tsx (preferred — simpler)
+  2. Add `source` to the daily_recipes table + Drizzle schema + Zod +
+     codegen pipeline (heavier, only worth it if there's actual content
+     to display)
+- **Owner:** next P0/P1 session
+
+The other two pre-existing errors (if any besides these and their
+duplicates) remain as-is.

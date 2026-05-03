@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Easing,
@@ -19,7 +19,7 @@ import Colors from "@/constants/colors";
 import { useSession } from "@/contexts/SessionContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import BreathingSession from "@/components/BreathingSession";
-import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
+import { getHomeQuickPickMoods, getMoodQuestion } from "@/lib/gender";
 import { useGetDailyRecipe, useRecordMoodCheckin } from "@workspace/api-client-react";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius, Shadow } from "@/constants/layout";
@@ -222,7 +222,10 @@ export default function HomeScreen() {
 
   const { mutate: recordMood } = useRecordMoodCheckin();
 
-  const MOODS = MOOD_OPTIONS[gender];
+  // Home strip shows a curated 5-mood quick-pick. Tapping one navigates
+  // to the full mood screen (which shows all 9 from MOOD_OPTIONS) with
+  // the chip pre-selected via SessionContext.lastMoodWord.
+  const MOODS = useMemo(() => getHomeQuickPickMoods(gender), [gender]);
 
   const handleMoodSelect = (idx: number) => {
     setSelectedMood(idx);
