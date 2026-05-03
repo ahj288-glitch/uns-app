@@ -219,6 +219,48 @@ export default function ChatScreen() {
     }
   }, [isOffline, pendingMessage]);
 
+  // ─── Hydrate history on mount ─────────────────────────────────────────
+
+  useEffect(() => {
+    if (!sessionId) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await authFetch(`${API_BASE}/companion/history?sessionId=${sessionId}&limit=30`, {
+          signal: controller.signal,
+        });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        const items = Array.isArray(data?.messages) ? data.messages : [];
+        if (items.length === 0 || cancelled) return;
+        const hydrated: Message[] = items
+          .map((m: { id: string; role: "user" | "companion"; content: string; createdAt: string }) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            createdAt: new Date(m.createdAt),
+          }))
+          .reverse();
+        // Merge: keep any optimistic/live messages the user has already added
+        // (dedupe by id; UI keeps newest-first ordering).
+        setMessages(prev => {
+          const seen = new Set(prev.map(m => m.id));
+          const additions = hydrated.filter(m => !seen.has(m.id));
+          return [...prev, ...additions];
+        });
+        setShowWelcome(false);
+      } catch {
+        // Silent — chat still usable from empty state.
+      }
+    })();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
+
   // ─── Send message ─────────────────────────────────────────────────────
 
   async function sendMessage(text?: string) {
@@ -511,9 +553,6 @@ export default function ChatScreen() {
                 tint="dark"
                 style={[styles.inputBar, isOverCharLimit && styles.inputBarError]}
               >
-                <Pressable style={styles.attachBtn}>
-                  <Feather name="plus" size={20} color={T.muted} />
-                </Pressable>
                 <TextInput
                   style={styles.input}
                   value={input}
@@ -795,13 +834,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   inputBarError: {
     borderWidth: 1,
     borderColor: T.error + "66",
-  },
-  attachBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
   },
   input: {
     flex: 1,
