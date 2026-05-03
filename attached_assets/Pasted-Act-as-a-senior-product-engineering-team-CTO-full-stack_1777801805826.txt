@@ -1,0 +1,373 @@
+Act as a senior product engineering team, CTO, full-stack architect, DevOps engineer, QA lead, and Arabic UX specialist.
+
+I previously worked on the app "أُنس" in Replit, then continued development in Claude. Now I want to return to Replit and make sure the latest work, fixes, architecture decisions, and product direction are fully reflected in the Replit project.
+
+Your mission is NOT to code immediately.
+
+Your mission is to:
+1. Audit the entire current Replit project.
+2. Compare its state against the latest intended product direction.
+3. Identify what is missing, outdated, broken, duplicated, or not reflected.
+4. Produce a clear execution plan.
+5. Then wait for my approval before implementing.
+
+==================================================
+PROJECT CONTEXT
+==================================================
+
+"أُنس" is an Arabic-first emotional wellness AI companion.
+
+It should include:
+- Arabic-first premium RTL experience
+- registration/login flow
+- email verification disabled during MVP/testing
+- onboarding tour
+- Home as default landing tab
+- AI chat with history loading
+- mood check-in
+- breathing session
+- journey/gamification
+- insights
+- profile
+- smart sharing/fingerprint card
+- offline/API retry handling
+- global network banner
+- backend API connected to production VPS
+- Supabase/DB integration
+- Groq AI integration
+- consistent Arabic design system
+
+The product must feel:
+- warm
+- calm
+- premium
+- emotionally safe
+- culturally Arabic
+- consistent across all screens
+
+==================================================
+1) FULL PROJECT AUDIT
+==================================================
+
+Review the entire codebase:
+
+- frontend screens
+- backend API
+- auth flow
+- database integration
+- environment variables
+- routing
+- state management
+- design system
+- components
+- assets
+- config files
+- deployment files
+- EAS/TestFlight setup
+
+Do not skip files.
+
+Tell me:
+- what exists
+- what works
+- what is broken
+- what is incomplete
+- what is outdated
+- what is duplicated
+- what is unused
+- what is missing
+
+==================================================
+2) CHECK IF LATEST CLAUDE WORK IS REFLECTED
+==================================================
+
+Verify whether the following latest fixes exist in this Replit project:
+
+1. Chat history loads on mount.
+2. Chat "+" button removed or implemented.
+3. Home is the default tab.
+4. Profile is visible and accessible.
+5. Mood system is unified from one shared source.
+6. Login works with verification disabled during MVP.
+7. OTP/email verification screen is bypassed in testing mode.
+8. Logout calls backend logout endpoint and revokes refresh token.
+9. Notifications toggle is disabled or marked "قريبًا" if not implemented.
+10. Global API retry wrapper exists.
+11. Global offline/network banner exists.
+12. Offline recovery polling exists.
+13. API health check exists.
+14. Arabic typography clipping is fixed.
+15. Registration screen validation is improved.
+16. Date of birth uses proper picker/dropdown.
+17. Arabic gender labels are correct: ذكر / أنثى.
+18. The app uses correct production API URL.
+19. TestFlight/EAS config is updated.
+20. Backend DB connection and Supabase schema are correct.
+
+For each item, mark:
+- Reflected
+- Partially reflected
+- Missing
+- Broken
+
+==================================================
+3) API + DATABASE INVESTIGATION
+==================================================
+
+There were production issues with API/DB connectivity.
+
+Audit:
+
+- EXPO_PUBLIC_API_URL
+- API_BASE
+- backend server URL
+- /api/health endpoint
+- mood save endpoint
+- chat endpoint
+- insights endpoint
+- auth endpoints
+- database connection
+- Supabase env variables
+- RLS policies
+- schema references: public / private / api
+- Drizzle/Supabase client usage
+
+Check if frontend errors are caused by:
+- wrong API URL
+- API server down
+- DB env missing
+- schema mismatch
+- RLS blocking
+- auth token issue
+- endpoint body mismatch
+- server route missing
+- CORS/ATS/HTTP issue
+
+Provide exact root-cause hypotheses and verification steps.
+
+==================================================
+4) ARABIC UX + DESIGN SYSTEM AUDIT
+==================================================
+
+Review the current UI/UX.
+
+Check:
+- Is the app truly Arabic-first?
+- Is RTL correct?
+- Is "الرئيسية" on the far right and "حسابي" on the far left?
+- Are all tabs ordered correctly for Arabic UX?
+- Are buttons, icons, arrows, and input directions correct?
+- Are Arabic letters clipped?
+- Are words cut from the top?
+- Are line heights correct?
+- Are headings readable?
+- Is typography consistent?
+- Is the visual identity consistent across screens?
+- Are some screens dark while others light without reason?
+- Does the app feel native Arabic or translated from English?
+
+Identify every UI/UX issue with file paths.
+
+==================================================
+5) AUTH + ONBOARDING FLOW AUDIT
+==================================================
+
+Review the real user flow:
+
+New user:
+open app → onboarding → registration → verification bypass → tour → home
+
+Returning user:
+open app → session restored → home
+
+Logged-out user:
+login → enter app without OTP during MVP
+
+Check:
+- no onboarding loop
+- no OTP block
+- no dead verification screen
+- tokens persist correctly
+- logout works correctly
+- returning users can recover account
+- no route sends user to wrong place
+
+==================================================
+6) CHAT + AI AUDIT
+==================================================
+
+Review chat system:
+
+- Does chat history load on mount?
+- Does it persist after app restart?
+- Does Groq integration work?
+- Are errors handled gracefully?
+- Are pending messages retried after network recovery?
+- Is crisis detection still working?
+- Are daily limits working?
+- Does AI receive useful user context?
+- Is Arabic tone warm and gender-aware?
+
+Identify gaps.
+
+==================================================
+7) MOOD + BREATHING + INSIGHTS AUDIT
+==================================================
+
+Review:
+
+Mood:
+- shared source?
+- gender-aware?
+- pre-selection works?
+- mood save works?
+
+Breathing:
+- Arabic "تنفّس"
+- start confirmation
+- guided phases
+- شهيق / احتفاظ / زفير
+- counter
+- post-session mood check
+
+Insights:
+- reads real data?
+- handles empty state?
+- charts display correctly?
+- no fake data unless clearly marked
+
+==================================================
+8) PROFILE + SETTINGS AUDIT
+==================================================
+
+Check:
+- profile accessible
+- name/gender displayed correctly
+- logout works
+- delete account works
+- notifications toggle not fake
+- spiritual mode not fake or clearly MVP
+- no unnecessary dialect selector
+- settings are Arabic-first and honest
+
+==================================================
+9) SHARING / FINGERPRINT AUDIT
+==================================================
+
+Review the share feature.
+
+Expected:
+- smart emotional fingerprint generated from user data
+- visual share card, not text-only
+- export/share as image
+- Arabic premium design
+- quote matches fingerprint
+- no random generic text
+- admin/configurable templates if available
+
+Check current state and gaps.
+
+==================================================
+10) CODE QUALITY AUDIT
+==================================================
+
+Inspect:
+- duplicated components
+- dead code
+- unused imports
+- unused styles
+- inconsistent constants
+- scattered API calls
+- hardcoded strings
+- hardcoded colors
+- missing types
+- any `any` usage
+- bad folder structure
+- risky logic
+- unhandled errors
+
+Give specific file paths and recommended fixes.
+
+==================================================
+11) OUTPUT FORMAT
+==================================================
+
+Before implementing anything, give me a structured report:
+
+A. Executive Summary
+- Current project state
+- Is Replit aligned with latest Claude work?
+- Overall readiness score /10
+
+B. Critical Issues
+- P0 blockers
+- P1 high priority
+- P2 improvements
+
+C. Reflection Checklist
+For each latest fix, say:
+- Reflected / Missing / Broken / Partial
+
+D. File-Level Findings
+- file path
+- issue
+- impact
+- recommended fix
+
+E. API/DB Diagnosis
+- current status
+- likely cause
+- exact tests needed
+
+F. UX/Design Findings
+- current identity issues
+- Arabic UX issues
+- typography issues
+
+G. Implementation Plan
+Give a prioritized execution plan:
+1. Stabilize API/DB
+2. Fix auth/onboarding
+3. Fix chat/history
+4. Fix mood/breathing
+5. Fix Arabic UX/navigation
+6. Fix sharing/fingerprint
+7. Clean codebase
+8. Prepare TestFlight
+
+H. Commands / Tests
+Give exact commands to run for:
+- API health check
+- backend logs
+- frontend build
+- EAS build
+- DB verification
+
+==================================================
+12) IMPLEMENTATION RULE
+==================================================
+
+Do NOT start coding until you provide the audit report and I approve.
+
+After I approve, implement fixes in priority order:
+- P0 first
+- then P1
+- then P2
+
+After each batch:
+- list files changed
+- explain what was fixed
+- give test steps
+- confirm no regression
+
+==================================================
+IMPORTANT
+==================================================
+
+Be brutally honest.
+Do not assume the project is updated.
+Do not trust previous work unless verified in this Replit codebase.
+Treat this as a production recovery audit.
+
+Goal:
+Make Replit the single source of truth again and continue development from there safely.
