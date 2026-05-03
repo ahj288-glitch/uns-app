@@ -1,0 +1,153 @@
+Option 1 — proceed with the adjusted plan. STEP 2 is a no-op because 
+c8c5be1 already captured CHANGE 4. Everything else is verbatim from the 
+prior approval.
+
+═══════════════════════════════════════════════════════════════════════════════
+ADJUSTED EXECUTION PLAN
+═══════════════════════════════════════════════════════════════════════════════
+
+Prepare and run the project task with these steps:
+
+STEP 1 — Already verified ✅
+    Branch master, remote github correct, 6 auto-checkpoints ahead of 
+    github/master, working tree clean. Confirmed in your pre-task check.
+
+STEP 2 — SKIPPED (no-op)
+    CHANGE 4 was auto-checkpointed as c8c5be1 between rounds. Nothing 
+    uncommitted to stage. Note this in the task plan as "skipped — 
+    already captured by Replit checkpoint c8c5be1".
+
+STEP 3 — Identify all checkpoints touching attached_assets/ only
+    Run: git log github/master..HEAD --name-only --oneline
+    
+    Identify every commit whose ENTIRE file list is under attached_assets/. 
+    From earlier verification, 7a2a66c is one such commit (1 file, prompt 
+    save). There may be others among the 6 — check all of them.
+    
+    Report the list. We'll handle them in STEP 4 by simply not including 
+    those files in the final squash.
+
+STEP 4 — Soft reset and clean staging
+    git reset --soft github/master
+    
+    After reset, ALL changes from the 6 checkpoints are staged. Some will 
+    be real source changes (the 5 files we want), some will be 
+    attached_assets/ files (the prompt saves we don't want).
+    
+    Unstage and discard attached_assets/:
+        git reset HEAD -- attached_assets/
+        git checkout -- attached_assets/
+        # If there are untracked files in attached_assets/, also:
+        git clean -fd attached_assets/
+    
+    Run `git status` and verify ONLY these 5 files appear staged:
+        artifacts/uns-app/lib/gender.ts
+        artifacts/uns-app/app/(tabs)/index.tsx
+        artifacts/uns-app/app/(tabs)/mood.tsx
+        artifacts/uns-app/app/(tabs)/_layout.tsx
+        docs/audit-fixes-status.md
+    
+    If any other file appears staged or modified, STOP and report. Do 
+    not improvise.
+
+STEP 5 — Create the squashed commit
+    git commit -m "feat(p0): unify mood picker + reorder tabs + fix gamification crash
+
+CHANGES (4 product-facing):
+
+1. Unified mood picker source of truth (lib/gender.ts)
+   - 9 mood options per gender (was 5 + duplicate hardcoded list in mood.tsx)
+   - Adds reassured, happy, anxious, exhausted; removes legacy
+     grateful/angry/hopeful from the picker (server-side maps retain
+     these for historical user data — see audit-fixes-status.md)
+   - New helpers: MoodOption type, findMoodByEn, findMoodByWord,
+     getHomeQuickPickMoods (curated 5-mood subset for home strip)
+   - getContextualSuggestions extended for new keys (exhausted groups
+     with tired; happy/reassured share suggestions)
+
+2. Home → Mood pre-selection wired
+   - Home strip now uses getHomeQuickPickMoods (5 chips, fits small phones)
+   - Tapping a mood on home stores its en key in SessionContext.lastMoodWord
+   - Mood screen reads lastMoodWord and pre-selects the matching chip,
+     then clears the value so it doesn't persist across unrelated visits
+
+3. Tab bar reorder (Arabic-first RTL)
+   - Visible (right→left on screen): الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+   - Code declaration order: index → chat → journey → insights → profile
+   - حسابي (profile) was previously hidden via href:null and only
+     reachable via the home avatar button — now a first-class tab
+   - share moved to hidden (still accessible via router.push)
+   - chat title renamed محادثة → أُنس
+   - insights icon trending-up → bar-chart-2, title → الرؤى
+   - Generic TabIcon used for all 5; raised/prominent treatment for أُنس
+     deferred (needs design input — see audit-fixes-status.md)
+
+4. REL-4 fix: gamification null-guard in mood checkin
+   - mood.tsx no longer crashes when /gamification/checkin-complete
+     returns a non-OK response or non-JSON body
+   - Mood IS still saved on the primary endpoint; gamification failure
+     degrades silently rather than surfacing an error to the user
+
+DEFERRED (documented in docs/audit-fixes-status.md):
+- /onboarding/login expo-router type map (TestFlight blocker — likely
+  stale typed-routes manifest, needs regenerate)
+- recipe.source schema drift (TestFlight blocker — original handover §18)
+- BreathingSession grateful chip (UX inconsistency, low harm)
+- community.ts seeded circles with legacy mood tags (orphaned but not broken)
+- gamification.ts recommendations for legacy keys (zombie code, harmless)
+- أُنس tab visual prominence (design decision)
+
+VERIFICATION:
+- pnpm typecheck: 4 pre-existing errors, 0 new
+- 5 files modified: lib/gender.ts, app/(tabs)/{index,mood,_layout}.tsx,
+  docs/audit-fixes-status.md
+- All edits applied incrementally with typecheck baseline preserved
+  between each CHANGE"
+
+STEP 6 — Verify squash before push
+    git log --oneline -3
+    # Expected: <new sha>  feat(p0): ...
+    #            c387f0d   <previous github/master tip>
+    #            <older>
+    
+    git show --stat HEAD
+    # Must show exactly the 5 files listed above, no more, no fewer.
+    
+    git diff github/master..HEAD --stat
+    # Same 5 files.
+    
+    If file count != 5 or any unexpected path appears, STOP and report.
+
+STEP 7 — Push (fast-forward, no force)
+    git push github master
+    
+    NO --force. NO --force-with-lease. This is a fast-forward push 
+    because we squashed before pushing — the remote sees one new commit 
+    on top of c387f0d.
+    
+    If push is rejected, STOP and report. Do not force under any 
+    circumstance.
+
+STEP 8 — Final report
+    Output:
+      ✅ Pushed
+      Remote master: <new sha>
+      Files in commit: 5
+      Push type: fast-forward (no force used)
+      Repo visibility: still private (unchanged)
+      
+      Recommended next session: tackle the two TestFlight blockers
+      documented as deferred (/onboarding/login type map + recipe.source).
+
+═══════════════════════════════════════════════════════════════════════════════
+SAFETY RAILS (UNCHANGED FROM PRIOR APPROVAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+- Repo stays PRIVATE throughout.
+- NO --force on push.
+- attached_assets/ MUST NOT appear in the final commit. If it does, STOP 
+  and clean before pushing.
+- If verification fails at any STEP, STOP and report. Do not improvise.
+- Working tree must be clean after STEP 7.
+
+Prepare the project task now and run it.
