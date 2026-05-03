@@ -1,0 +1,83 @@
+Approved on both changes, but please run two pre-flight checks before 
+writing CHANGE 1:
+
+PRE-FLIGHT 1 — Find all consumers of getContextualSuggestions
+    Run: grep -rn "getContextualSuggestions" artifacts/ --include="*.ts" --include="*.tsx"
+    For each call site, confirm:
+      - The caller passes a moodEn string from MOOD_OPTIONS keys (not 
+        from the old mood.tsx list which had keys like "grateful", "angry", 
+        "hopeful")
+      - The caller does not rely on the array having a specific length
+      - The caller does not index into the result by a fixed position
+    If any caller uses old keys (grateful/angry/hopeful) or assumes a 
+    specific shape, report it before writing.
+
+PRE-FLIGHT 2 — Search for orphaned mood keys in DB writes
+    Run: grep -rn "grateful\|angry\|hopeful\|متفائل\|ممتنّ\|غاضب" \
+         artifacts/uns-app artifacts/api-server --include="*.ts" --include="*.tsx"
+    These were keys in the old hardcoded mood.tsx list. If they appear 
+    anywhere — especially in API routes, DB seeds, insights queries, or 
+    gamification logic — report them. Records may exist in production 
+    with these moodWord values, and we need to know whether queries 
+    will silently miss them.
+
+If both pre-flights come back clean, proceed:
+
+═══════════════════════════════════════════════════════════════════════════════
+PROCEED WITH CHANGE 1 — lib/gender.ts
+═══════════════════════════════════════════════════════════════════════════════
+
+Write the new content as you proposed. After writing:
+  1. Run `pnpm typecheck` from repo root.
+  2. Run `git diff artifacts/uns-app/lib/gender.ts | head -100` and show me 
+     the first chunk so I can spot-check.
+  3. STOP and wait for my go-ahead before CHANGE 2.
+
+═══════════════════════════════════════════════════════════════════════════════
+CHANGE 4 APPROVED — Tab reordering (apply AFTER CHANGE 3 succeeds)
+═══════════════════════════════════════════════════════════════════════════════
+
+Target visible order in RTL (right → left, what user sees):
+    الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+
+Code declaration order (top → bottom in JSX):
+    1. index    → الرئيسية
+    2. chat     → أُنس (center, prominent — keep ChatTabIcon styling)
+    3. journey  → رحلتي
+    4. insights → الرؤى
+    5. profile  → حسابي
+
+Hidden tabs (href: null):
+    share, mood, community, programs
+
+Reasoning for approval:
+- حسابي contains logout, settings, crisis resources, and account deletion. 
+  Hiding it from the tab bar is a serious UX regression — users have no 
+  reliable path to log out or access crisis support.
+- مشاركة (share) is a feature accessed contextually from other screens, 
+  not a primary daily destination. Hiding it from the bar matches the 
+  product brief.
+
+Special handling for the chat tab:
+- Keep the ChatTabIcon component (raised/highlighted variant) — chat is 
+  the emotional core and should stay visually prominent even though it's 
+  no longer the center slot in code order.
+- If your current implementation centers the chat icon by relying on its 
+  middle position (slot 3 of 5), that visual centering will still work 
+  because slot 2 of 5 is also near-center on screen. But verify by eye 
+  before declaring done.
+
+═══════════════════════════════════════════════════════════════════════════════
+SEQUENCING
+═══════════════════════════════════════════════════════════════════════════════
+
+Order of execution:
+  1. Pre-flight 1 + 2  → report results, wait if anything flagged
+  2. CHANGE 1 (gender.ts) → typecheck → show diff → STOP
+  3. (await my go) CHANGE 2 (index.tsx home)  → typecheck → show diff → STOP
+  4. (await my go) CHANGE 3 (mood.tsx)  → typecheck → show diff → STOP
+  5. (await my go) CHANGE 4 (tabs _layout.tsx) → typecheck → show diff → STOP
+  6. Final report: list all files changed, summary, no commit yet.
+
+Do not stage, commit, or push anything until I explicitly say so. Repo 
+visibility decision is still pending.
