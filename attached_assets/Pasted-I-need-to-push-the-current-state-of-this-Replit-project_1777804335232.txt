@@ -1,0 +1,53 @@
+I need to push the current state of this Replit project to GitHub so I can share 
+the public repository link with another tool for code review.
+
+Please do the following, in order:
+
+1. CHECK GIT STATUS
+   - Run `git status` and show me the current branch and any uncommitted changes.
+   - Confirm whether this project is already linked to a GitHub remote (`git remote -v`).
+
+2. IF NO GITHUB REMOTE EXISTS
+   - Tell me clearly that I need to:
+     a) Create a new PUBLIC repository on GitHub manually (e.g. github.com/<my-username>/uns-app)
+     b) Provide you the repo URL
+   - Then wait for my response before continuing.
+
+3. IF GITHUB REMOTE EXISTS
+   - Show me which remote it points to.
+   - Confirm the repository is PUBLIC (not private). If you cannot verify, ask me to confirm.
+
+4. PREPARE A CLEAN COMMIT
+   - Make sure `.gitignore` excludes:
+     * node_modules/
+     * .env, .env.local, .env.production
+     * any secrets, API keys, Supabase keys, Groq keys
+     * build artifacts (dist/, build/, .expo/, ios/build/, android/build/)
+     * .DS_Store
+   - Run `git status` again to confirm no secrets or large binaries are staged.
+   - Show me the list of files about to be committed BEFORE committing.
+
+5. COMMIT AND PUSH
+   - Stage all changes: `git add .`
+   - Commit with message: "chore: sync latest state for external code review"
+   - Push to the main branch (or whichever branch is current).
+   - Confirm the push succeeded.
+
+6. SHARE THE FINAL LINK
+   - Print the full GitHub repository URL in this format:
+     https://github.com/<username>/<repo-name>
+   - Also print the current branch name.
+   - Also print the latest commit hash and message.
+
+IMPORTANT SAFETY RULES:
+- Do NOT commit any .env file or any file containing API keys, tokens, passwords, 
+  Supabase service keys, Groq keys, or database credentials.
+- If you find any secrets in tracked files, STOP and warn me before pushing.
+- Do NOT force-push.
+- Do NOT change branches without telling me.
+- If anything is unclear, ASK before acting.
+
+After you finish, give me a short summary of:
+- What was pushed
+- The repo URL
+- Anything I should be aware of (large files, missing files, secrets you blocked, etc.)
