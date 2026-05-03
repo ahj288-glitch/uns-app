@@ -1,0 +1,138 @@
+Go-ahead for CHANGE 4 — final change in this round.
+
+═══════════════════════════════════════════════════════════════════════════════
+CHANGE 4 — app/(tabs)/_layout.tsx
+═══════════════════════════════════════════════════════════════════════════════
+
+Goal: 5 visible tabs in correct RTL order, profile reachable from the bar, 
+share moved to hidden (still accessible via router.push from other screens).
+
+Target visible order (code declaration top → bottom, renders right → left 
+in RTL on the user's screen):
+    1. index    → الرئيسية   (home icon)
+    2. chat     → أُنس        (raised, prominent — keep ChatTabIcon)
+    3. journey  → رحلتي       (map icon)
+    4. insights → الرؤى       (bar-chart-2 icon)
+    5. profile  → حسابي       (user icon)
+
+Hidden tabs (href: null):
+    share, mood, community, programs
+
+═══════════════════════════════════════════════════════════════════════════════
+PRE-FLIGHT — Confirm current state and downstream impact
+═══════════════════════════════════════════════════════════════════════════════
+
+PRE-FLIGHT 4.1 — Read current _layout.tsx
+    Show me the current declaration order and href: null list, so I can 
+    confirm the change footprint matches what you reported earlier 
+    (current: journey | insights | chat | index | share visible; mood, 
+    community, programs, profile hidden).
+
+PRE-FLIGHT 4.2 — Find all references to /(tabs)/share
+    Run: grep -rn "/(tabs)/share\|tabs/share" artifacts/uns-app \
+        --include="*.tsx" --include="*.ts"
+    Report every place that navigates to the share screen. Once share 
+    becomes href: null, those navigations must use router.push (which 
+    works for hidden routes) — NOT any tab-bar focus mechanism. Verify 
+    each call site uses router.push or router.navigate.
+
+PRE-FLIGHT 4.3 — Find all references to /(tabs)/profile
+    Run: grep -rn "/(tabs)/profile\|tabs/profile" artifacts/uns-app \
+        --include="*.tsx" --include="*.ts"
+    Report every place that navigates to profile. After the change, 
+    profile becomes a normal tab — these existing router.push calls will 
+    keep working AND the tab bar will become an additional path. Confirm 
+    no caller depends on profile being hidden.
+
+PRE-FLIGHT 4.4 — Find any references to chat tab being "centered"
+    Run: grep -rn "ChatTabIcon\|chatIcon\|center.*tab\|raised" \
+        artifacts/uns-app/app --include="*.tsx"
+    The current ChatTabIcon visual treatment (raised/highlighted) is 
+    designed assuming chat is in a specific slot. After reorder, chat 
+    moves to slot 2 of 5. Report whether the ChatTabIcon styling depends 
+    on positional centering or is purely standalone.
+
+If any pre-flight surfaces something unexpected (a navigation pattern that 
+would break, ChatTabIcon depending on slot 3 of 5, etc.), STOP and report 
+before editing.
+
+═══════════════════════════════════════════════════════════════════════════════
+EDITS
+═══════════════════════════════════════════════════════════════════════════════
+
+If all pre-flights are clean, proceed:
+
+EDIT 4.1 — Reorder Tabs.Screen declarations
+    Place the five visible tabs in this exact order:
+        <Tabs.Screen name="index" ...الرئيسية... />
+        <Tabs.Screen name="chat" ...أُنس... />        {/* keep ChatTabIcon */}
+        <Tabs.Screen name="journey" ...رحلتي... />
+        <Tabs.Screen name="insights" ...الرؤى... />
+        <Tabs.Screen name="profile" ...حسابي... />
+
+EDIT 4.2 — Update href: null list
+    Hidden tabs (href: null), in any order:
+        share, mood, community, programs
+
+EDIT 4.3 — Icons
+    - index    → "home"
+    - chat     → ChatTabIcon (existing component, raised styling preserved)
+    - journey  → "map"
+    - insights → "bar-chart-2"
+    - profile  → "user"
+
+EDIT 4.4 — Add header comment explaining RTL ordering
+    At the top of the TabLayout function (or just above the <Tabs> 
+    element), add a comment block:
+        // ── Tab order — Arabic-first RTL ────────────────────────────────────
+        // React Native renders tabs left-to-right in source order. With the 
+        // device's I18nManager set to RTL for Arabic, that physical order 
+        // flips on screen — so the FIRST tab declared appears on the FAR 
+        // RIGHT, which is what an Arabic UX expects:
+        //
+        //   visual order (what the user sees, right→left):
+        //     الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+        //
+        //   code order (declaration order, top→bottom):
+        //     index → chat → journey → insights → profile
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+After edits:
+  1. Run `pnpm typecheck`. Compare to post-CHANGE-3 baseline (4 pre-existing 
+     errors). If any new error appears, STOP and report.
+  2. Run `git diff artifacts/uns-app/app/(tabs)/_layout.tsx`. Show full diff.
+  3. Run `git status` to show all modified files across the four CHANGES.
+  4. Produce a final summary in this format:
+  
+         ✅ All four CHANGES complete — ready for review/commit
+         
+         Files modified:
+           - artifacts/uns-app/lib/gender.ts            (CHANGE 1)
+           - docs/audit-fixes-status.md                  (CHANGES 1+2 follow-ups)
+           - artifacts/uns-app/app/(tabs)/index.tsx     (CHANGE 2)
+           - artifacts/uns-app/app/(tabs)/mood.tsx      (CHANGE 3)
+           - artifacts/uns-app/app/(tabs)/_layout.tsx   (CHANGE 4)
+         
+         Typecheck: 4 pre-existing errors, 0 new errors.
+         Pre-existing errors documented as TestFlight blocker reclassification.
+         
+         Net-new product impact:
+           - Mood picker: 9 unified options per gender (was 5 + duplicates)
+           - Home → Mood pre-selection wired via lastMoodWord
+           - Tab bar: حسابي now reachable, share moved to programmatic-only
+           - REL-4 fixed: mood checkin no longer crashes on gamification 5xx
+         
+         Awaiting decision on:
+           1. Repo visibility before push (still private)
+           2. Commit message + branch (current branch: master, remote: github)
+
+  5. STOP. No staging, no commit, no push.
+
+If pre-flight 4.4 reveals ChatTabIcon styling depends on chat being in a 
+specific slot (e.g. uses position-aware sizing or a custom spacing hack 
+that assumes 5 tabs with chat as slot 3), STOP and ask. The visual 
+treatment of أُنس must remain prominent — that's a product brief 
+requirement.
