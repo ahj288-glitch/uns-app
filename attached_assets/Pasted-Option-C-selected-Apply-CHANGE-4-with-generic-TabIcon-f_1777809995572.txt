@@ -1,0 +1,127 @@
+Option C selected. Apply CHANGE 4 with generic TabIcon for chat (no raised 
+treatment), and document the deferred design work in audit-fixes-status.md.
+
+═══════════════════════════════════════════════════════════════════════════════
+EDITS — exact specification
+═══════════════════════════════════════════════════════════════════════════════
+
+EDIT 4.1 — Reorder Tabs.Screen declarations
+    Visible tabs (top → bottom in code, right → left in RTL on screen):
+        1. index    → title "الرئيسية", icon "home"
+        2. chat     → title "أُنس",      icon "message-circle"  ← rename from "محادثة"
+        3. journey  → title "رحلتي",     icon "map"
+        4. insights → title "الرؤى",     icon "bar-chart-2"     ← if current is "trending-up", change to "bar-chart-2" per the original target spec
+        5. profile  → title "حسابي",     icon "user"
+    
+    All five use the existing generic TabIcon wrapper. No new components.
+
+EDIT 4.2 — Update href: null list
+    Hidden tabs:
+        share, mood, community, programs
+
+EDIT 4.3 — Add header comment explaining RTL ordering
+    Just above the <Tabs ...> JSX in TabLayout, add this comment block:
+    
+        // ── Tab order — Arabic-first RTL ────────────────────────────────────
+        // React Native renders tabs left-to-right in source order. With the 
+        // device's I18nManager set to RTL for Arabic, that physical order 
+        // flips on screen — so the FIRST tab declared appears on the FAR 
+        // RIGHT, which is what an Arabic UX expects:
+        //
+        //   visual order (what the user sees, right→left):
+        //     الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+        //
+        //   code order (declaration order, top→bottom):
+        //     index → chat → journey → insights → profile
+        //
+        // Note: أُنس (chat) is the product's core feature. A raised/prominent 
+        // visual treatment was originally proposed (ChatTabIcon component 
+        // with chatIconOuter / chatIconInner styles) but was deferred — 
+        // see docs/audit-fixes-status.md "Tab bar visual prominence" entry.
+
+EDIT 4.4 — Verify icon name change for insights
+    If the current insights tab uses "trending-up", change to "bar-chart-2" 
+    (matches the original visual spec). If it's already something else 
+    intentionally chosen during B1-B3 work, KEEP whatever is there and 
+    note it in your report — don't override a deliberate choice.
+
+═══════════════════════════════════════════════════════════════════════════════
+DOCS UPDATE
+═══════════════════════════════════════════════════════════════════════════════
+
+Append a new section to docs/audit-fixes-status.md:
+
+---
+
+## Tab bar visual prominence — deferred (3 May 2026)
+
+CHANGE 4 reordered the tab bar to surface حسابي (profile) and renamed 
+محادثة → أُنس. A raised/prominent visual treatment for the أُنس tab was 
+originally proposed in the external review patch:
+
+- A new `ChatTabIcon` component (vs the generic `TabIcon` wrapper)
+- Styles `chatIconOuter`, `chatIconOuterActive`, `chatIconInner`, 
+  `chatIconInnerActive` — none of which existed in the codebase
+- Larger icon size (24 vs 20), accent-color fill when focused, slight 
+  elevation/shadow
+
+This was deferred because:
+1. Building it from inference would make product/design decisions without 
+   design review
+2. The patch's surrounding context truncated the actual style values, so 
+   reproducing the intended look would require guessing
+3. The functional reorder + rename is the user-visible win for this 
+   round; visual prominence is a polish concern
+
+Pick-up criteria: design input on what "أُنس is the core" should look 
+like in the tab bar (raised pill? center notch? larger icon? color 
+treatment?). When ready, the implementation is a straightforward 
+component swap inside (tabs)/_layout.tsx — no other files affected.
+
+---
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+After edits:
+  1. Run `pnpm typecheck`. Compare to the post-CHANGE-3 baseline (4 
+     pre-existing errors). If any new error appears, STOP and report.
+  2. Run `git diff artifacts/uns-app/app/(tabs)/_layout.tsx`. Show full diff.
+  3. Run `git diff docs/audit-fixes-status.md`. Show only the new section 
+     appended this round.
+  4. Run `git status` to show all modified files across the four CHANGES.
+  5. Produce the final summary in this format:
+  
+         ✅ All four CHANGES complete — ready for review/commit
+         
+         Files modified:
+           - artifacts/uns-app/lib/gender.ts            (CHANGE 1)
+           - artifacts/uns-app/app/(tabs)/index.tsx     (CHANGE 2)
+           - artifacts/uns-app/app/(tabs)/mood.tsx      (CHANGE 3)
+           - artifacts/uns-app/app/(tabs)/_layout.tsx   (CHANGE 4)
+           - docs/audit-fixes-status.md                  (follow-ups: blockers + tab prominence)
+         
+         Typecheck: 4 pre-existing errors, 0 new errors.
+         
+         Net-new product impact:
+           - Mood picker: 9 unified options per gender (was 5 + duplicates)
+           - Home → Mood pre-selection wired via lastMoodWord
+           - Tab bar: حسابي now reachable from the bar, share moved to 
+             programmatic-only navigation
+           - Chat tab renamed from محادثة → أُنس
+           - REL-4 fixed: mood checkin no longer crashes on gamification 5xx
+         
+         Documented as deferred:
+           - /onboarding/login type-map blocker (TestFlight blocker)
+           - recipe.source schema drift (TestFlight blocker)
+           - Mood unification follow-ups (BreathingSession grateful chip, 
+             community.ts seeded circles, gamification recommendations 
+             for legacy keys)
+           - Tab bar visual prominence for أُنس
+         
+         Awaiting decision on:
+           1. Repo visibility before push (still private)
+           2. Commit message + branch (master, remote: github)
+  
+  6. STOP. No staging, no commit, no push.

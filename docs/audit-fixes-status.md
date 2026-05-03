@@ -320,3 +320,30 @@ errors are TestFlight blockers, not "leave alone":
 
 The other two pre-existing errors (if any besides these and their
 duplicates) remain as-is.
+
+---
+
+## Tab bar visual prominence — deferred (3 May 2026)
+
+CHANGE 4 reordered the tab bar to surface حسابي (profile) and renamed
+محادثة → أُنس. A raised/prominent visual treatment for the أُنس tab was
+originally proposed in the external review patch:
+
+- A new `ChatTabIcon` component (vs the generic `TabIcon` wrapper)
+- Styles `chatIconOuter`, `chatIconOuterActive`, `chatIconInner`,
+  `chatIconInnerActive` — none of which existed in the codebase
+- Larger icon size (24 vs 20), accent-color fill when focused, slight
+  elevation/shadow
+
+This was deferred because:
+1. Building it from inference would make product/design decisions without
+   design review
+2. The patch's surrounding context truncated the actual style values, so
+   reproducing the intended look would require guessing
+3. The functional reorder + rename is the user-visible win for this
+   round; visual prominence is a polish concern
+
+Pick-up criteria: design input on what "أُنس is the core" should look
+like in the tab bar (raised pill? center notch? larger icon? color
+treatment?). When ready, the implementation is a straightforward
+component swap inside (tabs)/_layout.tsx — no other files affected.

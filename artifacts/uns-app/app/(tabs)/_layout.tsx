@@ -36,6 +36,22 @@ export default function TabLayout() {
     );
   }
 
+  // ── Tab order — Arabic-first RTL ────────────────────────────────────
+  // React Native renders tabs left-to-right in source order. With the
+  // device's I18nManager set to RTL for Arabic, that physical order
+  // flips on screen — so the FIRST tab declared appears on the FAR
+  // RIGHT, which is what an Arabic UX expects:
+  //
+  //   visual order (what the user sees, right→left):
+  //     الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+  //
+  //   code order (declaration order, top→bottom):
+  //     index → chat → journey → insights → profile
+  //
+  // Note: أُنس (chat) is the product's core feature. A raised/prominent
+  // visual treatment was originally proposed (ChatTabIcon component
+  // with chatIconOuter / chatIconInner styles) but was deferred —
+  // see docs/audit-fixes-status.md "Tab bar visual prominence" entry.
   return (
     <Tabs
       screenOptions={{
@@ -68,6 +84,24 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="index"
+        options={{
+          title: "الرئيسية",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="home" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: "أُنس",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="message-circle" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="journey"
         options={{
           title: "رحلتي",
@@ -79,43 +113,25 @@ export default function TabLayout() {
       <Tabs.Screen
         name="insights"
         options={{
-          title: "رؤى",
+          title: "الرؤى",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="trending-up" color={color} focused={focused} />
+            <TabIcon name="bar-chart-2" color={color} focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="profile"
         options={{
-          title: "محادثة",
+          title: "حسابي",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="message-circle" color={color} focused={focused} />
+            <TabIcon name="user" color={color} focused={focused} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "الرئيسية",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="feather" color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="share"
-        options={{
-          title: "مشاركة",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="share-2" color={color} focused={focused} />
-          ),
-        }}
-      />
+      <Tabs.Screen name="share" options={{ href: null }} />
       <Tabs.Screen name="mood" options={{ href: null }} />
       <Tabs.Screen name="community" options={{ href: null }} />
       <Tabs.Screen name="programs" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }
