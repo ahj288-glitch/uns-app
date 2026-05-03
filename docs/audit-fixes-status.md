@@ -242,3 +242,40 @@ X-XSS-Protection: 0
 | P1 | 7 | 7 | 0 | 0 |
 | P2 | 8 | 7 | 1 | 1 |
 | **Total** | **23** | **22** | **1** | **1** |
+
+---
+
+## Mood unification follow-ups (deferred from P0 — 3 May 2026)
+
+The mood picker was unified to 9 keys in lib/gender.ts. Three legacy keys
+(grateful, angry, hopeful) are no longer exposed in the picker but remain
+referenced in server-side code. These are intentional carry-overs to avoid
+breaking historical user data and require product decisions:
+
+1. **BreathingSession.tsx (line 55)** — exposes `grateful` chip in the
+   post-breathing mini mood selector. Decide: replace with `reassured`
+   (matches calm post-breathing vibe), or keep as a breathing-flow-only
+   key.
+
+2. **api-server/routes/community.ts (lines 100, 116)** — two community
+   circles seeded with moodTag `hopeful` and `grateful`. With those chips
+   gone from the picker, no UI path leads to these circles. Decide:
+   retag with new mood keys (e.g. `reassured`, `peaceful`) or remove the
+   seed entries.
+
+3. **api-server/routes/gamification.ts (lines 368-370)** — RECOMMENDATIONS
+   map has branches for `grateful`, `hopeful`, `angry`. Now zombie code
+   for new check-ins, but keeping them is harmless and protects any
+   in-flight requests for users on stale clients.
+
+4. **api-server/routes/insights.ts (lines 14-37)** — MOOD_ARABIC /
+   MOOD_COLORS / MOOD_INTENSITY maps include the legacy keys. KEEP these
+   indefinitely — they're needed to render historical mood entries
+   correctly for users who recorded them before this change.
+
+5. **api-server/routes/admin.ts (line 33)** — hardcoded demo/mock data,
+   not real queries. Cleanup at the same time as the broader admin
+   dashboard de-faking work (separate ticket).
+
+These items are tracked here so they're not silently lost. They do not
+block TestFlight.

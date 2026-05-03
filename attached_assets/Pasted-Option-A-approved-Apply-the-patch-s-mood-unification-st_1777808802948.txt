@@ -1,0 +1,82 @@
+Option A approved. Apply the patch's mood unification strictly, leave 
+all server-side maps alone. Document the orphan items as follow-up work.
+
+═══════════════════════════════════════════════════════════════════════════════
+ONE LAST PRE-FLIGHT CHECK
+═══════════════════════════════════════════════════════════════════════════════
+
+Before writing CHANGE 1, verify where BreathingSession.tsx writes its 
+post-session mood selection. Run:
+    grep -n "moodWord\|postMood\|/moods\|/breathing" \
+        artifacts/uns-app/components/BreathingSession.tsx
+
+Report:
+  - Which API endpoint receives the breathing post-session mood (if any)
+  - Whether the moodWord is sent to /api/moods/checkin (same table as 
+    main mood picker) or to a separate breathing-specific endpoint
+
+This is information-only — I'm not asking you to change BreathingSession.tsx. 
+I just want to confirm `grateful` from breathing won't cause a downstream 
+schema mismatch. If it goes to /api/moods/checkin, it's fine (the existing 
+records prove the table accepts arbitrary moodWord strings).
+
+═══════════════════════════════════════════════════════════════════════════════
+DOCUMENT THE FOLLOW-UPS
+═══════════════════════════════════════════════════════════════════════════════
+
+After CHANGE 1 succeeds, before moving to CHANGE 2, append the following 
+to docs/audit-fixes-status.md (create the section if it doesn't exist):
+
+---
+
+## Mood unification follow-ups (deferred from P0 — 3 May 2026)
+
+The mood picker was unified to 9 keys in lib/gender.ts. Three legacy keys 
+(grateful, angry, hopeful) are no longer exposed in the picker but remain 
+referenced in server-side code. These are intentional carry-overs to avoid 
+breaking historical user data and require product decisions:
+
+1. **BreathingSession.tsx (line 55)** — exposes `grateful` chip in the 
+   post-breathing mini mood selector. Decide: replace with `reassured` 
+   (matches calm post-breathing vibe), or keep as a breathing-flow-only 
+   key.
+
+2. **api-server/routes/community.ts (lines 100, 116)** — two community 
+   circles seeded with moodTag `hopeful` and `grateful`. With those chips 
+   gone from the picker, no UI path leads to these circles. Decide: 
+   retag with new mood keys (e.g. `reassured`, `peaceful`) or remove the 
+   seed entries.
+
+3. **api-server/routes/gamification.ts (lines 368-370)** — RECOMMENDATIONS 
+   map has branches for `grateful`, `hopeful`, `angry`. Now zombie code 
+   for new check-ins, but keeping them is harmless and protects any 
+   in-flight requests for users on stale clients.
+
+4. **api-server/routes/insights.ts (lines 14-37)** — MOOD_ARABIC / 
+   MOOD_COLORS / MOOD_INTENSITY maps include the legacy keys. KEEP these 
+   indefinitely — they're needed to render historical mood entries 
+   correctly for users who recorded them before this change.
+
+5. **api-server/routes/admin.ts (line 33)** — hardcoded demo/mock data, 
+   not real queries. Cleanup at the same time as the broader admin 
+   dashboard de-faking work (separate ticket).
+
+These items are tracked here so they're not silently lost. They do not 
+block TestFlight.
+
+---
+
+═══════════════════════════════════════════════════════════════════════════════
+PROCEED WITH CHANGE 1
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Run the BreathingSession pre-flight grep above. Report results.
+2. Write the new lib/gender.ts content as previously approved.
+3. Run `pnpm typecheck` from repo root.
+4. Show `git diff artifacts/uns-app/lib/gender.ts | head -100`.
+5. Append the follow-ups section to docs/audit-fixes-status.md. Show 
+   `git diff docs/audit-fixes-status.md`.
+6. STOP and wait for go-ahead before CHANGE 2.
+
+Continue to apply the same sequencing rule for CHANGE 2 / 3 / 4: write → 
+typecheck → diff → STOP. No staging, no commit, no push.
