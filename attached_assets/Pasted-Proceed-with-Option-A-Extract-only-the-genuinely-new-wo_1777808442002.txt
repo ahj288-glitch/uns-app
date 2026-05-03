@@ -1,0 +1,134 @@
+Proceed with Option A. Extract only the genuinely new work from 
+uns_p0_changes.patch and apply it manually on top of current HEAD. Skip every 
+change that overlaps with B1/B2/B3 (Groq SDK migration, NetworkContext, 
+global NetworkBanner, lib/api.ts, chat.tsx network refactor, broken 
+setIsOffline removal).
+
+═══════════════════════════════════════════════════════════════════════════════
+CHANGES TO APPLY
+═══════════════════════════════════════════════════════════════════════════════
+
+CHANGE 1 — Unify mood source of truth in lib/gender.ts
+    Goal: single source for 9 mood options per gender + helpers.
+    Reference: see the `lib/gender.ts` section in uns_p0_changes.patch.
+    
+    Required exports:
+      - type Gender (existing)
+      - getG (existing)
+      - interface MoodOption { word, en, emoji, color, intensity }
+      - const MOOD_OPTIONS: Record<Gender, MoodOption[]> with these 9 keys 
+        per gender (ordered: positive → negative):
+          reassured, happy, calm, peaceful, anxious, stressed, tired, 
+          exhausted, sad
+      - getMoodQuestion(gender) (existing — keep)
+      - findMoodByEn(gender, en): MoodOption | undefined
+      - findMoodByWord(gender, word): MoodOption | undefined
+      - getHomeQuickPickMoods(gender): MoodOption[] — returns the curated 
+        5-mood subset for the home strip. Keys: ["happy", "calm", "tired", 
+        "anxious", "sad"]
+      - getContextualSuggestions(gender, moodEn, hour) (existing — extend 
+        to handle the new mood keys "exhausted" and "reassured" and "happy")
+    
+    Use the exact Arabic words and colors from the patch — they were chosen 
+    deliberately for emotional accuracy.
+
+CHANGE 2 — Home screen quick-pick + lastMoodWord
+    File: artifacts/uns-app/app/(tabs)/index.tsx
+    
+    a) Replace the current MOOD_OPTIONS import with:
+         import { getHomeQuickPickMoods, getMoodQuestion } from "@/lib/gender";
+       (Add `useMemo` to the React imports.)
+    
+    b) Replace `const MOODS = MOOD_OPTIONS[gender];` with:
+         const MOODS = useMemo(() => getHomeQuickPickMoods(gender), [gender]);
+    
+    c) The handleMoodSelect function should already call setLastMoodWord 
+       (per current SessionContext). If it doesn't in HEAD, add:
+         setLastMoodWord(moodEn);
+       just before the router.push to /mood.
+
+CHANGE 3 — Mood screen reads from shared source + pre-select + REL-4 fix
+    File: artifacts/uns-app/app/(tabs)/mood.tsx
+    
+    a) Remove the local hardcoded `MOODS` array entirely.
+    
+    b) Add imports:
+         import { useEffect, useMemo } from "react"; // if not already
+         import { 
+           MOOD_OPTIONS, 
+           getMoodQuestion, 
+           findMoodByEn, 
+           type MoodOption 
+         } from "@/lib/gender";
+    
+    c) Inside MoodScreen, derive MOODS from gender and add pre-select effect:
+         const { gender, lastMoodWord, setLastMoodWord, ... } = useSession();
+         const MOODS = useMemo(() => MOOD_OPTIONS[gender], [gender]);
+         const moodQuestion = getMoodQuestion(gender);
+         
+         useEffect(() => {
+           if (!lastMoodWord || selectedMood) return;
+           const match = findMoodByEn(gender, lastMoodWord);
+           if (match) {
+             setSelectedMood(match);
+             setIntensity(match.intensity);
+             setLastMoodWord(null);
+           }
+           // eslint-disable-next-line react-hooks/exhaustive-deps
+         }, [lastMoodWord, gender]);
+    
+    d) Update MoodChip prop type from `(typeof MOODS)[0]` to `MoodOption`.
+    
+    e) In the header, replace the hardcoded title with `{moodQuestion}`.
+    
+    f) REL-4 fix in saveCheckin — guard the gamification response:
+         const progressRes = await authFetch(...);
+         let progressData: WinResult | null = null;
+         if (progressRes.ok) {
+           try { progressData = await progressRes.json(); }
+           catch { progressData = null; }
+         }
+         setSaved(true);
+         if (Platform.OS !== "web") Haptics.notificationAsync(...);
+         if (progressData && (progressData.xpEarned > 0 || 
+             (progressData.newWins?.length ?? 0) > 0)) {
+           const win = progressData;
+           setTimeout(() => setWinResult(win), 800);
+         }
+
+CHANGE 4 — Tab order verification (DO NOT modify yet)
+    Before changing app/(tabs)/_layout.tsx, do this:
+    
+    a) Read the current file and report:
+       - The exact order of <Tabs.Screen> declarations
+       - Which tabs have `href: null` (hidden)
+       - Which tabs are visible
+    
+    b) Compare against the target from the handover:
+       Visible (right→left in RTL): الرئيسية | أُنس | رحلتي | الرؤى | حسابي
+       Code declaration order: index → chat → journey → insights → profile
+       Hidden: share, mood, community, programs
+    
+    c) If current matches target, SKIP this change entirely and tell me.
+    
+    d) If they differ, show me both side-by-side and WAIT for my decision 
+       before editing.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════════════════════════
+
+- Work on branch master (NOT main). Remote is github (NOT origin).
+- Do NOT run `git apply` on the patch file. Read changes manually.
+- Do NOT push. Stop at "ready to commit" and ask me first — repo visibility 
+  is still being decided.
+- After each CHANGE 1/2/3 finishes, run `pnpm typecheck` and report the 
+  result before moving on. Stop on any type error.
+- For CHANGE 4, do not touch _layout.tsx without explicit go-ahead.
+- Show diffs before staging. Use `git diff` after each change.
+- If anything in the patch text is unclear, ASK rather than guess. The 
+  patch was generated against a stale base (9853de5) and some assumptions 
+  may not hold on current HEAD.
+
+Begin with CHANGE 1 (lib/gender.ts). Show the current file first, then 
+the proposed new content, then wait for my approval before writing.
