@@ -31,7 +31,8 @@ function maskEmail(email: string): string {
 
 export default function VerifyScreen() {
   const insets = useSafeAreaInsets();
-  const { userId, email, gender } = useLocalSearchParams<{ userId: string; email: string; gender: string }>();
+  const { userId, email, gender, isLogin: isLoginParam } = useLocalSearchParams<{ userId: string; email: string; gender: string; isLogin?: string }>();
+  const isLogin = isLoginParam === "1";
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
@@ -90,8 +91,8 @@ export default function VerifyScreen() {
         AsyncStorage.removeItem("@uns_pending_gender"),
       ]);
 
-      console.log("[verify] success — onboarding complete, token stored, navigating to tour");
-      router.replace("/onboarding/tour");
+      console.log("[verify] success — onboarding complete, token stored, navigating to", isLogin ? "tabs" : "tour");
+      router.replace(isLogin ? "/(tabs)" : "/onboarding/tour");
     } catch {
       setError("تعذّر الاتصال بالخادم");
       setHasError(false);

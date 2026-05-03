@@ -376,9 +376,7 @@ export default function HomeScreen() {
               <Text style={styles.dailyQuote} numberOfLines={3}>
                 "{recipe?.summary ?? "لا تحمل الهمّ، فكل عسر يتبعه يسر."}"
               </Text>
-              {recipe?.source ? (
-                <Text style={styles.dailyAttrib}>- {recipe.source}</Text>
-              ) : !recipe ? (
+              {!recipe ? (
                 <Text style={styles.dailyAttrib}>- حكمة عربية</Text>
               ) : null}
               <Pressable

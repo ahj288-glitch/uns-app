@@ -167,6 +167,106 @@ router.post("/auth/register", async (req, res) => {
   });
 });
 
+// In-memory rate limiter for login-start (parallels resendCounts below).
+// 3 attempts per email per 10 min. Prevents OTP spam / email enumeration via timing.
+const loginStartCounts = new Map<string, { count: number; resetAt: number }>();
+
+router.post("/auth/login-start", async (req, res) => {
+  const { email } = req.body as { email?: string };
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "INVALID_EMAIL", code: "INVALID_EMAIL" });
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Rate limit per email
+  const nowMs = Date.now();
+  const record = loginStartCounts.get(normalizedEmail);
+  if (record && nowMs < record.resetAt) {
+    if (record.count >= 3) {
+      return res.status(429).json({ error: "RATE_LIMITED", code: "RATE_LIMITED" });
+    }
+    record.count += 1;
+  } else {
+    loginStartCounts.set(normalizedEmail, { count: 1, resetAt: nowMs + 10 * 60 * 1000 });
+  }
+
+  const users = await db
+    .select({ id: usersTable.id, email: usersTable.email, gender: usersTable.gender })
+    .from(usersTable)
+    .where(eq(usersTable.email, normalizedEmail))
+    .limit(1);
+
+  if (users.length === 0) {
+    // Email enumeration trade-off accepted for MVP — see docs/security-backlog.md
+    return res.status(404).json({ error: "USER_NOT_FOUND", code: "USER_NOT_FOUND" });
+  }
+
+  const user = users[0];
+
+  // VERIFICATION_ENABLED=false branch: log the user straight in, mirroring
+  // /auth/register's bypass at lines 121-143.
+  if (!IS_VERIFICATION_ENABLED) {
+    const [session] = await db
+      .insert(companionSessionsTable)
+      .values({ dialect: "gulf" })
+      .returning();
+
+    const accessToken = generateAccessToken(session.sessionId, "user");
+    const refreshToken = generateRefreshToken(session.sessionId);
+
+    logger.info(
+      { userId: user.id, IS_VERIFICATION_ENABLED, isAuthenticated: true },
+      "[auth/login-start] verification disabled — session created immediately"
+    );
+
+    return res.status(200).json({
+      accessToken,
+      refreshToken,
+      sessionId: session.sessionId,
+      userId: user.id,
+      email: user.email,
+      gender: user.gender,
+      verified: true,
+    });
+  }
+
+  // Verification enabled — invalidate any pending tokens, then issue a fresh OTP
+  await db
+    .update(verificationTokensTable)
+    .set({ usedAt: new Date() })
+    .where(
+      and(
+        eq(verificationTokensTable.userId, user.id),
+        isNull(verificationTokensTable.usedAt)
+      )
+    );
+
+  const otp = generateOtp();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await db.insert(verificationTokensTable).values({
+    userId: user.id,
+    otp,
+    expiresAt,
+  });
+
+  await sendOtpEmail(normalizedEmail, otp);
+
+  logger.info(
+    { userId: user.id, IS_VERIFICATION_ENABLED, maskedEmail: maskEmail(normalizedEmail) },
+    "[auth/login-start] OTP sent — awaiting verification"
+  );
+
+  return res.status(200).json({
+    userId: user.id,
+    email: user.email,
+    gender: user.gender,
+    message: "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+  });
+});
+
 router.post("/auth/verify-email", async (req, res) => {
   const { userId, otp } = req.body as { userId?: string; otp?: string };
 
