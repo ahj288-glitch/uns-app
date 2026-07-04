@@ -82,6 +82,23 @@ const otpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// ── Session helpers ─────────────────────────────────────────────────────────────
+// Fix 6 — create a companion session BOUND to an authenticated user. Centralizing
+// the user_id FK population here (instead of each route inlining an insert) means
+// no authenticated path can silently create an orphaned (user_id = NULL) session.
+// The validation guard is a defensive backstop: callers already establish userId,
+// and on Express 5 a thrown rejection is caught by the global error handler (500).
+export async function createUserSession(userId: string, dialect = "gulf") {
+  if (typeof userId !== "string" || userId.length === 0) {
+    throw new Error("createUserSession: a valid userId is required to link the session");
+  }
+  const [session] = await db
+    .insert(companionSessionsTable)
+    .values({ dialect, userId })
+    .returning();
+  return session;
+}
+
 router.post("/auth/register", async (req, res) => {
   const { name, email, dob, gender } = req.body as {
     name?: string;
@@ -132,11 +149,9 @@ router.post("/auth/register", async (req, res) => {
     .returning();
 
   if (!IS_VERIFICATION_ENABLED) {
-    // Verification disabled — create session immediately and return tokens
-    const [session] = await db
-      .insert(companionSessionsTable)
-      .values({ dialect: "gulf" })
-      .returning();
+    // Verification disabled — create session immediately and return tokens.
+    // Fix 6 — bind the session to the newly-registered user.
+    const session = await createUserSession(user.id);
 
     const accessToken = generateAccessToken(session.sessionId, "user");
     const refreshToken = generateRefreshToken(session.sessionId);
@@ -219,12 +234,10 @@ router.post("/auth/login-start", async (req, res) => {
   const user = users[0];
 
   // VERIFICATION_ENABLED=false branch: log the user straight in, mirroring
-  // /auth/register's bypass at lines 121-143.
+  // /auth/register's bypass above.
   if (!IS_VERIFICATION_ENABLED) {
-    const [session] = await db
-      .insert(companionSessionsTable)
-      .values({ dialect: "gulf" })
-      .returning();
+    // Fix 6 — bind the session to the authenticated user.
+    const session = await createUserSession(user.id);
 
     const accessToken = generateAccessToken(session.sessionId, "user");
     const refreshToken = generateRefreshToken(session.sessionId);
@@ -334,10 +347,9 @@ router.post("/auth/verify-email", otpLimiter, async (req, res) => {
     .set({ verified: true })
     .where(eq(usersTable.id, userId));
 
-  const [session] = await db
-    .insert(companionSessionsTable)
-    .values({ dialect: "gulf" })
-    .returning();
+  // Fix 6 — bind the session to the just-verified user (userId validated above
+  // and confirmed against an unused, unexpired verification token).
+  const session = await createUserSession(userId);
 
   const accessToken = generateAccessToken(session.sessionId, "user");
   const refreshToken = generateRefreshToken(session.sessionId);
@@ -426,6 +438,11 @@ router.post("/auth/session", async (req, res) => {
     }
   }
 
+  // Fix 6 note — INTENTIONALLY anonymous. /auth/session is the pre-registration
+  // onboarding endpoint: it runs before the user has an account, so there is no
+  // userId to link. user_id stays NULL here (the FK is nullable with onDelete
+  // "set null"); the session is later associated with a user via the authenticated
+  // register/login-start/verify-email flows, which use createUserSession().
   const [session] = await db
     .insert(companionSessionsTable)
     .values({

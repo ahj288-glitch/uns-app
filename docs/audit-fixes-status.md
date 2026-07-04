@@ -119,13 +119,19 @@ Path note: the audit refers to routes as `api-server/...` and screens as
 
 - **Finding ID / title:** Fix 6 — `companion_sessions.user_id` had no FK to `users` (audit §5 architecture / data-integrity).
 - **Severity:** P1
-- **Status:** ✅ Fixed
+- **Status:** ✅ Fixed — **fully implemented** (schema FK **and** route wiring) as of the 2026-07-04 pre-merge hardening pass. Previously schema-only.
 - **Files changed:**
-  - `lib/db/src/schema/sessions.ts`
-- **Root cause:** `userId: uuid("user_id")` existed as a bare column with no referential integrity, so orphaned sessions could survive user deletion and cascade cleanup was impossible at the DB layer.
-- **What was implemented:** `userId` declares `.references(() => usersTable.id, { onDelete: "set null" })`, imported from `./users` (no circular import — `users.ts` does not import sessions). The FK is enforced at the schema level; `onDelete: "set null"` preserves session rows (emotional history) when a user is deleted, rather than cascading them away.
-- **How it was tested:** `lib/db` `tsc --build` regenerates declarations; api-server `typecheck` + `build` (which consume the schema) pass, confirming the Drizzle relation type-checks end to end.
-- **Remaining risk (accuracy note added during recovery):** This adds the FK **column/constraint only**. The session-creation routes in `auth.ts` (`register`, `login-start`, `verify-email`) and `/companion/session` currently insert sessions **without** setting `userId` (they run during onboarding/pre-auth), so `user_id` is `NULL` in practice until a route is wired to populate it. Applying the constraint to an existing database also requires `drizzle-kit push`; not run in this environment.
+  - `lib/db/src/schema/sessions.ts` — the FK column
+  - `artifacts/api-server/src/routes/auth.ts` — session-creation now populates `userId`
+  - `artifacts/api-server/src/__tests__/session-userid.test.ts` — automated verification (new)
+  - `artifacts/api-server/scripts/verify-f6.sh` — real-DB manual verification (new)
+- **Root cause:** `userId: uuid("user_id")` existed as a bare column with no referential integrity, and — even after the FK was added — session-creation routes still inserted sessions with `user_id = NULL`, so authenticated sessions were never actually tied to a user.
+- **What was implemented:**
+  1. **Schema:** `userId` declares `.references(() => usersTable.id, { onDelete: "set null" })` (imported from `./users`, no circular import). `set null` preserves session rows (emotional history) when a user is deleted, rather than cascading them away.
+  2. **Route wiring:** a centralized `createUserSession(userId, dialect)` helper (in `auth.ts`) now performs every authenticated session insert. It **validates** that a non-empty `userId` is present (throws otherwise — caught by Express 5's global error handler → 500) and writes `{ dialect, userId }`. All three authenticated paths use it: `/auth/register` (verification-disabled bypass), `/auth/login-start` (bypass), and `/auth/verify-email` (post-OTP).
+- **Intentional NULL case (documented):** `/auth/session` is the **pre-registration onboarding** endpoint — it runs before the user has an account, so there is no `userId` to link. That row is intentionally `user_id = NULL`; it is later associated with a user through the authenticated flows above. This is the only path that creates a NULL-user session.
+- **How it was tested:** `session-userid.test.ts` (4 assertions, all passing) mocks the DB and proves `createUserSession` always writes `userId`, honors a custom dialect, and refuses to create an orphaned session (throws on empty/undefined `userId`). `scripts/verify-f6.sh` provides an end-to-end real-Postgres check (register → assert `companion_sessions.user_id` matches; `/auth/session` → assert NULL). `lib/db tsc --build` + api-server `typecheck`/`build` all green.
+- **Remaining risk:** Applying the FK constraint to an existing database still requires a migration (`drizzle-kit push`); pre-existing `public.companion_sessions` rows with a dangling `user_id` must be reconciled first. Not run in this environment. **See also the DB-architecture conflict flagged in `remediation-evidence.md` §Migration Review — the recovered `migration 001` (private/api schema split) conflicts with master's public-schema RLS lockdown and is NOT part of this fix.**
 
 ---
 

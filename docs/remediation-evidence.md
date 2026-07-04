@@ -245,3 +245,78 @@ F1 `timingSafeEqual` ×3 · F2 `secureTokens.ts` + 6 consumers, **0** residual `
 F3 `otpLimiter` on `/auth/verify-email` · F4 `chat.completions` · F5 `EXPO_PUBLIC_VERIFICATION_ENABLED` ·
 F6 `.references(() => usersTable.id, …)` · F7 consecutive-day streak scan · F8 `__DEV__` gates ·
 F9 `if (fontError)` recovery screen · F10 `gte(moodsTable.createdAt, since)`.
+
+---
+
+## Pre-merge hardening pass (2026-07-04) — F6 completion, test toolchain, migration review
+
+### F6 — now fully implemented (was schema-only)
+Session creation is centralized in `createUserSession(userId, dialect)` (in `auth.ts`),
+which validates a non-empty `userId` and writes it on every authenticated insert
+(`/auth/register` bypass, `/auth/login-start` bypass, `/auth/verify-email`).
+`/auth/session` stays intentionally anonymous (pre-registration onboarding, `user_id = NULL`).
+
+```text
+$ (api-server) npm test
+ ✓ src/__tests__/auth.test.ts          (13 tests | 3 skipped)
+ ✓ src/__tests__/session-userid.test.ts (4 tests)   ← Fix 6
+ Test Files  2 passed (2)
+      Tests  17 passed (17)
+ EXIT 0
+```
+`session-userid.test.ts` mocks `@workspace/db` and asserts: writes `{dialect, userId}`;
+honors custom dialect; **throws instead of creating an orphaned session** when `userId`
+is empty/undefined. `scripts/verify-f6.sh` covers the real-Postgres end-to-end path.
+
+### Test toolchain blocker — fixed (not hidden)
+`npm test` previously died with `Cannot find module '@rollup/rollup-win32-x64-msvc'`.
+**Root cause:** `pnpm-workspace.yaml` `overrides` force-removed Windows-x64 native
+binaries (`rollup>@rollup/rollup-win32-x64-msvc: '-'`, alongside tailwind/lightningcss),
+authored for the Linux deploy target. On a Windows x64 dev box this strips the binary
+Rollup (via Vitest) needs to run. **Fix:** removed only the `rollup-win32-x64-msvc`
+override (left the other-platform strips intact) + `pnpm install`. pnpm OS/CPU-gates
+optional native deps, so this is inert on the Linux target (pnpm skips it there) but
+unblocks `vitest run` on Windows. Lockfile updated accordingly (+1 optional dep).
+
+### Full re-verification (all real)
+```text
+$ (lib/db)     npx tsc --build lib/db --force     → EXIT 0
+$ (api-server) npx tsc -p tsconfig.json --noEmit  → EXIT 0
+$ (api-server) npm run build                      → EXIT 0
+$ (uns-app)    npx tsc --noEmit                    → EXIT 0
+$ (api-server) npm test                           → EXIT 0  (17 passed)
+```
+
+### ⚠️ Migration Review — DB-architecture conflict with the admin-panel line (MERGE BLOCKER)
+Commit `50a62c1` bundled a **DB security re-architecture** that is NOT one of the 10
+audit fixes and **conflicts with `master`** (the admin-panel line). The cherry-pick
+applied it cleanly (no textual conflict) because `master`'s `rls.sql` was unchanged
+from the base, so the semantic clash is invisible to git.
+
+**What the recovery introduces (vs master):**
+- **New migration** `lib/db/src/migrations/001_private_schema.sql` (266 lines) that:
+  - `CREATE SCHEMA private; CREATE SCHEMA api;`
+  - **`ALTER TABLE ... SET SCHEMA private`** for 11 sensitive tables (`users`,
+    `companion_sessions`, `companion_messages`, `mood_checkins`, `refresh_tokens`,
+    `verification_tokens`, `user_progress`, `daily_loops`, `micro_wins`, `waitlist`,
+    `community_posts`) — physically moving them out of `public`.
+  - `SET SCHEMA api` for 3 public-catalog tables (`daily_recipes`, `wellness_programs`,
+    `community_sessions`), with `REVOKE`/`GRANT` re-grants and RLS on those 3 only.
+  - Plus `001_rollback.sql`, `001_verify.sql`, `001_smoke_tests.sh`, `schemas.ts`.
+- **`rls.sql` rewritten 281 → 85 lines**: master's "RLS lockdown on 14 `public.*` tables"
+  is replaced by "RLS on 3 `api.*` tables + `private` schema hidden from PostgREST."
+
+**Migration impact summary:**
+| Dimension | Assessment |
+|---|---|
+| New tables | None (no `CREATE TABLE`) — but **two new schemas** (`private`, `api`) |
+| Altered tables | **All 14** relocated to a different schema via `SET SCHEMA` |
+| RLS changes | Model swap: 14-table `public` RLS lockdown → 3-table `api` RLS + `private` hidden |
+| Backward-compat risk | **High.** Anything referencing `public.<table>` (existing SQL, Supabase PostgREST `exposed_schemas`, the admin-panel RLS commit, external tools) breaks after the move. |
+| Dev/prod data risk | `SET SCHEMA` preserves rows, but is a **breaking structural migration**; running it on a DB already set up per master's `public` model would require coordinated app + PostgREST config changes. Not reversible without `001_rollback.sql`. |
+| Internal consistency | ⚠️ The Drizzle schema `.ts` still uses `pgTable(...)` (public) — inconsistent with the migration's `private`/`api` placement. 50a62c1's own defect. |
+
+**Recommendation:** treat the private/api schema migration as **out of scope** for the
+audit-fix recovery. It should be split into its own PR and reconciled with the
+admin-panel RLS work by that owner. The 10 audit fixes do **not** depend on it
+(F6's FK works in either schema model).
