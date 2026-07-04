@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { randomInt } from "crypto";
+import { randomInt, timingSafeEqual } from "crypto";
+import rateLimit from "express-rate-limit";
 import { db } from "@workspace/db";
 import {
   companionSessionsTable,
@@ -68,6 +69,18 @@ async function sendOtpEmail(email: string, otp: string): Promise<void> {
     `,
   });
 }
+
+// ── Rate limiting ──────────────────────────────────────────────────────────────
+// Fix 3 — brute-force protection for OTP verification. Keyed on userId (falling
+// back to IP) so an attacker cannot iterate all 900k OTP codes against one account.
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5,
+  keyGenerator: (req) => (req.body?.userId as string) ?? req.ip ?? "unknown",
+  message: { error: "Too many attempts. Try again in 10 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 router.post("/auth/register", async (req, res) => {
   const { name, email, dob, gender } = req.body as {
@@ -267,7 +280,7 @@ router.post("/auth/login-start", async (req, res) => {
   });
 });
 
-router.post("/auth/verify-email", async (req, res) => {
+router.post("/auth/verify-email", otpLimiter, async (req, res) => {
   const { userId, otp } = req.body as { userId?: string; otp?: string };
 
   if (!userId || !otp) {
@@ -437,7 +450,20 @@ router.post("/auth/admin", (req, res) => {
   const { secret } = req.body as { secret?: string };
   const adminSecret = process.env["ADMIN_SECRET"];
 
-  if (!adminSecret || !secret || secret !== adminSecret) {
+  if (!adminSecret || !secret) {
+    logger.warn(
+      { ip: req.ip, reason: !adminSecret ? "ADMIN_SECRET_NOT_SET" : "WRONG_SECRET" },
+      "[auth/admin] failed login attempt"
+    );
+    return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
+  }
+
+  // Timing-safe comparison — avoids leaking the secret length/prefix via response
+  // timing. timingSafeEqual requires equal-length buffers, so length-check first.
+  const a = Buffer.from(secret);
+  const b = Buffer.from(adminSecret);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    logger.warn({ ip: req.ip, reason: "WRONG_SECRET" }, "[auth/admin] failed login attempt");
     return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
   }
 

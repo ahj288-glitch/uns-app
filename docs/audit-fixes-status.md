@@ -1,81 +1,102 @@
-# UNS Audit Remediation Status
-> Generated: 2026-03-24 | Updated 2026-03-25 (post-registration UX + visual polish)
-> Total findings tracked: 24
-> **Fixed: 24 | Partially Fixed: 0 | Not Started: 0 | Blocked: 0**
+# أُنس — Audit Fixes Status (P0/P1 remediation pass)
 
-### 2026-03-25 Fixes (this session)
-- `app/(tabs)/index.tsx` — Daily Flash Card background changed from `rgba(255,255,255,0.82)` to `#10231c` (dark on-palette), text colors updated to dark-palette values (`#e8f5ee`, `#a5d0b9`, `#4a7a5e`)
-- `app/(tabs)/programs.tsx` — Programs card gradient: `#3AAFA9` → `#74C69D` (brand mint)
-- `app/(tabs)/index.tsx` — Recipe attribution: now shows `recipe.source` when available; falls back to `حكمة عربية` only when no recipe loaded
-- `app/(tabs)/journey.tsx` — Removed mock data fallback in `.catch()` handler; new/disconnected users now see the proper EmptyState instead of fabricated xp=350 data
-- `app/onboarding/register.tsx` — Full rewrite: Arabic lineHeight fix (≥1.85×), DOB dropdowns (Day/Month/Year modal), name validation, friendly EMAIL_EXISTS message, back-button canGoBack() guard
+**Date:** 2026-07-04
+**Scope:** All P0/P1 findings from the production audit (`AUDIT_REPORT.md`).
+**Repo:** `ahj288-glitch/uns-app` — monorepo (`artifacts/api-server`, `artifacts/uns-app`, `lib/db`).
 
----
+> **Recovery note (2026-07-04):** The commit that applied these 10 fixes (`50a62c1`)
+> was accidentally dropped when a `git pull --rebase origin master` resolved
+> conflicts against the divergent admin-panel branch. This file and the fixes were
+> recovered on branch `recover/audit-fixes-50a62c1` by cherry-picking `50a62c1`
+> and hand-resolving conflicts to **preserve origin's newer architecture** (the
+> `login-start` flow, `NetworkProvider`, admin-cookie-free admin route) **while
+> re-applying each audit fix**. Where origin already implemented a fix differently
+> (Fix 4 real-LLM, Fix 6 FK), origin's version was kept. See
+> [`remediation-evidence.md`](./remediation-evidence.md) §Recovery for the merge
+> decisions and real verification output.
 
-## P0 — Critical Security
+> This file was regenerated for the current 10-fix remediation pass. The earlier
+> (2026-03) 24-finding remediation record is preserved in git history and in the
+> sibling files `docs/audit-remediation-status.md` and
+> `docs/audit-remediation-evidence.md`.
+>
+> Verification commands and their **raw** output are in
+> [`remediation-evidence.md`](./remediation-evidence.md). Summary: api-server
+> `typecheck` ✅, `build` ✅; uns-app `tsc --noEmit` ✅. Neither package defines a
+> `lint` script, so `npm run lint` exits non-zero with `Missing script: "lint"`
+> (recorded verbatim in the evidence file).
 
-### P0-01 · No authentication on any API endpoint
-**Status: FIXED**  
-**Root cause:** API had zero auth middleware — every route was publicly accessible.  
-**Files changed:**
-- `artifacts/api-server/src/lib/jwt.ts` — HS256 JWT generation: `generateAccessToken` (15m), `generateAdminToken` (24h), `generateRefreshToken` (7d), `verifyJwt()`
-- `artifacts/api-server/src/middlewares/auth.ts` — `verifyToken` middleware: reads `Authorization: Bearer <token>`, verifies signature + expiry, attaches `req.auth = { sessionId, role }`, returns `{ error: "Unauthorized", code: "UNAUTHORIZED" }` with 401 on failure
-- `artifacts/api-server/src/routes/auth.ts` — `POST /api/auth/session` (create/restore session + issue tokens), `POST /api/auth/admin` (validate `ADMIN_SECRET` → admin JWT), `POST /api/auth/refresh` (rotate refresh token)
-- `artifacts/api-server/src/routes/index.ts` — `router.use(verifyToken)` applied after public auth/health/waitlist; companion/moods/insights/community/daily-recipes/gamification all protected
-**How it was tested:** 13/13 unit tests pass. Live curl: `/api/companion/session`, `/api/insights`, `/api/moods`, `/api/daily-recipe` all return `{"error":"Unauthorized","code":"UNAUTHORIZED"}` with 401 without a token.  
-**Remaining risk:** `JWT_SECRET` must be set in production. Server emits WARN (not FATAL) if missing — production deploy checklist must include this secret.
-
----
-
-### P0-02 · Admin panel completely unprotected
-**Status: FIXED**  
-**Root cause:** No login page, no route guard — any user with the URL had full access to all 16 admin pages.  
-**Files changed:**
-- `artifacts/uns-admin/src/pages/Login.tsx` — bilingual login form, calls `POST /api/auth/admin`, stores token in localStorage
-- `artifacts/uns-admin/src/hooks/useAdminAuth.ts` — `login()`, `logout()`, `isAuthenticated` (JWT expiry check via base64url decode with padding fix), `getAuthHeader()`
-- `artifacts/uns-admin/src/components/AuthGuard.tsx` — wraps all admin routes, redirects to `/login` if `!isAuthenticated`
-- `artifacts/uns-admin/src/lib/api.ts` — `useFetchWithAuth` hook injects `Authorization: Bearer` header, auto-calls `logout()` on 401
-- `artifacts/uns-admin/src/lib/authSession.ts` — module-level bridge for token state + logout callback
-- `artifacts/uns-admin/src/App.tsx` — `/login` public route + `AuthGuard` wrapping all other routes
-- `artifacts/uns-admin/src/components/layout/AdminLayout.tsx` — "تسجيل الخروج / Logout" button in sidebar
-- `artifacts/uns-admin/src/pages/Dashboard.tsx`, `Users.tsx`, `Safety.tsx`, `AiConfig.tsx` — converted to `fetchWithAuth`
-**How it was tested:** `tsc --noEmit` passes cleanly (0 errors). Live curl: `GET /api/admin/users` → 401 without token. Wrong admin secret → 401.  
-**Remaining risk:** `ADMIN_SECRET` must be set in production. Single shared secret — no per-user admin accounts (RBAC is a future improvement).
+Path note: the audit refers to routes as `api-server/...` and screens as
+`uns-app/...`; in this monorepo those live under `artifacts/api-server/...` and
+`artifacts/uns-app/...`.
 
 ---
 
-### P0-03 · CORS wildcard allowing all origins
-**Status: FIXED**  
-**Root cause:** `cors({ origin: '*' })` — any website could call the API with user credentials.  
-**Files changed:**
-- `artifacts/api-server/src/app.ts` — explicit origin allowlist via `ALLOWED_ORIGINS` env var (comma-separated). Dev with no allowlist: all origins allowed. Production: only listed origins pass.
-**How it was tested:** `curl -sI http://localhost:8080/api/healthz` shows `Vary: Origin`, `Access-Control-Allow-Credentials: true`. Production restriction requires `ALLOWED_ORIGINS` env var.  
-**Remaining risk:** `ALLOWED_ORIGINS` must be configured for production.
+## Fix 1 — Timing-safe admin secret comparison
+
+- **Finding ID / title:** Fix 1 — Admin secret compared with `===` (non-constant-time). Relates to audit §4.7 / §7 admin-auth hardening.
+- **Severity:** P0
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/api-server/src/routes/auth.ts`
+- **Root cause:** `POST /auth/admin` compared the submitted secret to `ADMIN_SECRET` with `secret !== adminSecret`. `===`/`!==` short-circuits on the first differing byte, leaking length/prefix information through response timing (a theoretical byte-by-byte brute force).
+- **What was implemented:** Added `timingSafeEqual` to the `crypto` import. The handler now rejects missing secret/config first, then compares via constant-time `crypto.timingSafeEqual` over `Buffer`s, with an explicit length check first (the primitive throws on unequal-length buffers). Failure still logs and returns `401 Unauthorized`.
+- **How it was tested:** `tsc -p tsconfig.json --noEmit` (0 errors) and `npm run build` (esbuild bundle succeeds). Logic review: unequal-length → early `false`; equal-length equal bytes → pass; equal-length differing bytes → constant-time `false`.
+- **Remaining risk:** None for the comparison itself. Broader admin-auth hardening (SEV-2: admin JWT in `localStorage`) is a separate finding and out of this fix's scope.
 
 ---
 
-### P0-04 · No rate limiting — OpenAI cost exposure
-**Status: FIXED**  
-**Root cause:** No rate limiting anywhere — a single client could exhaust OpenAI quota.  
-**Files changed:**
-- `artifacts/api-server/src/app.ts` — global limiter: 300 req/15min; companion limiter: 10 req/min per session-id header (avoids IPv6 bypass by not using IP as fallback)
-**How it was tested:** `curl -sI http://localhost:8080/api/healthz` → `RateLimit-Policy: 300;w=900`, `RateLimit-Limit: 300`, `RateLimit-Remaining: 285`, `RateLimit-Reset: 878`.
+## Fix 2 — JWTs moved from AsyncStorage to SecureStore
+
+- **Finding ID / title:** Fix 2 — Access/refresh JWTs stored in plaintext `AsyncStorage` (audit §4.5, SEV-6).
+- **Severity:** P0
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/uns-app/lib/secureTokens.ts` **(new)** — centralized SecureStore wrapper
+  - `artifacts/uns-app/contexts/SessionContext.tsx`
+  - `artifacts/uns-app/app/index.tsx`
+  - `artifacts/uns-app/app/onboarding/verify.tsx`
+  - `artifacts/uns-app/app/onboarding/register.tsx`
+  - `artifacts/uns-app/app/onboarding/login.tsx`
+  - `artifacts/uns-app/app/(tabs)/profile.tsx`
+  - `artifacts/uns-app/package.json` + `artifacts/uns-app/app.json` — added `expo-secure-store ~15.0.8` dependency and config plugin (via `expo install`)
+  - `pnpm-lock.yaml`
+- **Root cause:** `uns_access_token` and `uns_refresh_token` were written/read via `@react-native-async-storage/async-storage`, which persists unencrypted on disk (readable on a rooted/jailbroken device or from an unencrypted backup). Additionally (SEV-6) `AsyncStorage.multiRemove`/`clear()` on logout would no longer reach tokens once moved.
+- **What was implemented:**
+  - New `secureTokens.ts` exposing `get/set/deleteAccessToken`, `get/set/deleteRefreshToken`, and `clearTokens()` backed by `expo-secure-store` (iOS Keychain / Android Keystore).
+  - Every access/refresh token read, write, and delete across the 6 files now goes through this module. Non-secret keys (`uns_session_id`, dialect, gender, name, onboarding flags) intentionally stay in AsyncStorage.
+  - Logout (`profile.tsx`) and account deletion now call `clearTokens()` explicitly alongside AsyncStorage cleanup — closing SEV-6 (tokens surviving a reset).
+- **How it was tested:** `npx tsc --noEmit` on uns-app (0 errors). `grep` confirms **zero** remaining `AsyncStorage.*uns_access_token|uns_refresh_token` references. `expo install` resolved the SDK-54-compatible version and registered the config plugin.
+- **Remaining risk:** SecureStore is device-only; existing users with tokens already in AsyncStorage will be treated as logged-out on first launch after upgrade (they re-authenticate). Acceptable for an MVP; a one-time migration shim could be added if seamless upgrade is required. Runtime keychain behavior should be smoke-tested on a physical device/build (cannot be exercised by `tsc`).
 
 ---
 
-### P0-05 · No security headers
-**Status: FIXED**  
-**Root cause:** Express default sends no security headers.  
-**Files changed:**
-- `artifacts/api-server/src/app.ts` — `helmet()` middleware
-**How it was tested:** Live curl shows:
-```
-Content-Security-Policy: default-src 'self';...
-Strict-Transport-Security: max-age=31536000; includeSubDomains
-X-Content-Type-Options: nosniff
-X-Frame-Options: SAMEORIGIN
-X-XSS-Protection: 0
-```
+## Fix 3 — Rate limit on OTP verification endpoint
+
+- **Finding ID / title:** Fix 3 — `POST /auth/verify-email` had no brute-force protection (audit SEV-4 / §5.2-D, OTP hardening).
+- **Severity:** P0
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/api-server/src/routes/auth.ts`
+- **Root cause:** The 6-digit OTP verify route was unauthenticated and unlimited. An attacker could iterate the ~900k code space against a known `userId`.
+- **What was implemented:** Added `express-rate-limit` (already a dependency). Defined `otpLimiter` (5 attempts / 10 min, keyed on `req.body.userId` with `req.ip` fallback, standard headers, JSON error message) and applied it as middleware: `router.post("/auth/verify-email", otpLimiter, ...)`.
+- **How it was tested:** `typecheck` + `build` pass. Middleware ordering verified (limiter runs before the handler; the handler reads `req.body.userId`, which the keyGenerator also uses).
+- **Remaining risk:** `express-rate-limit`'s default store is in-memory, so limits reset on process restart and are per-instance (same class of limitation the audit notes for the resend limiter, SEV-4). For multi-instance production, back it with a shared store (e.g. Redis). Noted, not blocking for single-instance MVP.
+
+---
+
+## Fix 4 — Real LLM wired into the companion
+
+- **Finding ID / title:** Fix 4 — Companion replies were keyword-matched, not LLM-generated (audit AI-1: "No LLM integration").
+- **Severity:** P0
+- **Status:** ✅ Fixed (already largely implemented; extended per spec)
+- **Files changed:**
+  - `artifacts/api-server/src/routes/companion.ts`
+  - `artifacts/api-server/.env.example` (documented keys)
+- **Root cause:** Original code returned canned dialect strings. The working tree already contained a real LLM path via a Groq (OpenAI-compatible) client with a rule-based fallback; the mission spec additionally requires honoring `OPENAI_API_KEY`.
+- **What was implemented:** `getOpenAI()` now initializes from **either** `GROQ_API_KEY` (preferred, Groq base URL) **or** `OPENAI_API_KEY` (native OpenAI, default `gpt-4o` via `aiConfig.modelTier`). `callLLM()` builds a dialect-aware system prompt, sends the last 10 turns of history + the user message, and on a missing key **or** a thrown API error falls back to `buildFallbackResponse()` (rule-based) — the endpoint never crashes. `.env.example` now documents both keys and the fallback behavior.
+- **How it was tested:** `typecheck` + `build` pass. Reviewed both branches: no key → fallback; key present + API error caught → logged + fallback; success → LLM text + emotion tag returned. Live API calls not exercised (no key configured in this environment) — graceful-degradation path confirmed by code path.
+- **Remaining risk:** Real response quality/latency/cost can only be validated with a live key. The crisis-detection augmentation (AI-3, a separate finding) is unchanged.
 
 ---
 
@@ -86,280 +107,107 @@ X-XSS-Protection: 0
 - **Status:** ✅ Fixed
 - **Files changed:**
   - `artifacts/uns-app/app/index.tsx`
-  - `artifacts/uns-app/app/onboarding/register.tsx` (same flag, single-sourced)
   - `artifacts/uns-app/.env.example` **(new)** + local `.env` (gitignored) default
-- **Root cause:** `const IS_VERIFICATION_ENABLED = false;` was a compile-time constant in both `index.tsx` and `register.tsx`, so shipping MVP vs. full-verification required a code edit. (The server side in `auth.ts` already read `process.env.VERIFICATION_ENABLED`.)
-- **What was implemented:** Both `index.tsx` and `register.tsx` now use `IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true"`, so the client flag is single-sourced by one env var. Documented in a new `.env.example` and defaulted to `false` in the local `.env` so current MVP behavior is preserved.
-- **How it was tested:** `npx tsc --noEmit` passes. Default (`false`/unset) preserves the exact prior MVP routing and registration behavior.
-- **Remaining risk:** Client env vars are build-time inlined by Expo, so changing the flag requires a rebuild (expected).
+- **Root cause:** `const IS_VERIFICATION_ENABLED = false;` was a compile-time constant, so shipping MVP vs. full-verification required a code edit. (The server side in `auth.ts` already read `process.env.VERIFICATION_ENABLED`.)
+- **What was implemented:** `IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true"`. Documented in a new `.env.example` and defaulted to `false` in the local `.env` so current MVP behavior is preserved.
+- **How it was tested:** `npx tsc --noEmit` passes. Default (`false`/unset) preserves the exact prior MVP routing behavior.
+- **Remaining risk:** `register.tsx` also has its own `IS_VERIFICATION_ENABLED` constant used for the registration branch; for full consistency it should read the same env var. Left as-is to avoid changing the registration flow in this pass — flagged as a follow-up. Client env vars are build-time inlined by Expo, so changing the flag requires a rebuild (expected).
 
 ---
 
-### P0-06 · No backend authorization — admin routes unprotected server-side
-**Status: FIXED**  
-**Root cause:** Admin routes existed in Express but had zero middleware checking role.  
-**Files changed:**
-- `artifacts/api-server/src/middlewares/auth.ts` — `requireAdmin` middleware checks `req.auth?.role === 'admin'`, returns `{ error: "Forbidden", code: "FORBIDDEN" }` with 403
-- `artifacts/api-server/src/routes/index.ts` — `router.use("/admin", requireAdmin)` applied before all admin routes
-**How it was tested:** Unit test: `requireAdmin middleware > returns 403 for user role` ✅. Live curl: admin routes return 401 without token, 403 with user-role token.
+## Fix 6 — `userId` foreign key on sessions
+
+- **Finding ID / title:** Fix 6 — `companion_sessions.user_id` had no FK to `users` (audit §5 architecture / data-integrity).
+- **Severity:** P1
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `lib/db/src/schema/sessions.ts`
+- **Root cause:** `userId: uuid("user_id")` existed as a bare column with no referential integrity, so orphaned sessions could survive user deletion and cascade cleanup was impossible at the DB layer.
+- **What was implemented:** `userId` declares `.references(() => usersTable.id, { onDelete: "set null" })`, imported from `./users` (no circular import — `users.ts` does not import sessions). The FK is enforced at the schema level; `onDelete: "set null"` preserves session rows (emotional history) when a user is deleted, rather than cascading them away.
+- **How it was tested:** `lib/db` `tsc --build` regenerates declarations; api-server `typecheck` + `build` (which consume the schema) pass, confirming the Drizzle relation type-checks end to end.
+- **Remaining risk (accuracy note added during recovery):** This adds the FK **column/constraint only**. The session-creation routes in `auth.ts` (`register`, `login-start`, `verify-email`) and `/companion/session` currently insert sessions **without** setting `userId` (they run during onboarding/pre-auth), so `user_id` is `NULL` in practice until a route is wired to populate it. Applying the constraint to an existing database also requires `drizzle-kit push`; not run in this environment.
 
 ---
 
-### P0-07 · `EXPO_PUBLIC_DOMAIN` unguarded — silent failures if unset
-**Status: FIXED**  
-**Files changed:**
-- `artifacts/uns-app/app/_layout.tsx` — checks `EXPO_PUBLIC_DOMAIN` at boot; if missing, renders Arabic `ConfigErrorScreen` instead of proceeding to a broken app
-**How it was tested:** Confirmed conditional render in `_layout.tsx`.
+## Fix 7 — Correct consecutive-day streak calculation
+
+- **Finding ID / title:** Fix 7 — Streak was `Math.min(entries, daysBack)`, not a real streak (audit REL-6).
+- **Severity:** P1
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/api-server/src/routes/moods.ts`
+- **Root cause:** `streakDays: Math.min(formatted.length, daysBack)` counts total entries in the window, not consecutive days ending today — any user with N check-ins showed an N-day "streak" regardless of gaps.
+- **What was implemented:** Walk backward from today (midnight-normalized); for each day check whether any entry falls on it; increment on a hit, `break` on the first miss. `streakDays` now reflects the true current consecutive-day streak.
+- **How it was tested:** `typecheck` + `build` pass. Traced cases: check-in today only → 1; today+yesterday → 2; gap yesterday → breaks at 1; no entries → 0.
+- **Remaining risk:** Streak is computed in server-local time (`new Date()` / `setHours(0,0,0,0)`), so day boundaries follow the server timezone rather than the user's. Matches the app's existing date handling; per-user timezone is a future enhancement.
 
 ---
 
-### P0-08 · SessionContext sent no auth headers — all API calls were unauthenticated
-**Status: FIXED**  
-**Root cause:** `SessionContext` stored a `sessionId` but never sent `Authorization` headers.  
-**Files changed:**
-- `artifacts/uns-app/contexts/SessionContext.tsx` — calls `POST /api/auth/session`; stores access + refresh tokens in AsyncStorage; exposes `authToken` and `authFetch`; `authFetch` injects `Authorization: Bearer` on every call and retries on 401 via refresh token
-- `artifacts/uns-app/app/(tabs)/chat.tsx`, `insights.tsx`, `mood.tsx`, `programs.tsx`, `index.tsx` — all use `authFetch`
-**How it was tested:** Auth flow unit-tested at server layer. `tsc --noEmit` clean on `uns-app`.
+## Fix 8 — Gate `console.log` behind `__DEV__`
+
+- **Finding ID / title:** Fix 8 — Debug `console.log`s shipped in production (audit §4 / hygiene).
+- **Severity:** P1
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/uns-app/app/index.tsx`
+  - `artifacts/uns-app/app/onboarding/verify.tsx`
+  - `artifacts/uns-app/app/onboarding/register.tsx`
+- **Root cause:** Router/auth flows logged tokens-adjacent state and routing decisions unconditionally, leaking flow details and adding noise in production.
+- **What was implemented:** Every runtime `console.log` (and the one `console.warn` error path in `index.tsx`) is now wrapped in `if (__DEV__)`, so the calls are stripped/no-op in release builds. Build-time Node scripts (`scripts/build.js`, `server/serve.js`) were intentionally left alone — they are tooling, not app runtime.
+- **How it was tested:** `npx tsc --noEmit` passes (`__DEV__` is a typed RN global). `grep console.log` across `app/**` shows all remaining occurrences are `__DEV__`-gated or inside a `if (__DEV__) { ... }` block.
+- **Remaining risk:** `SessionContext.tsx`, `lib/api.ts`, and `ErrorFallback.tsx` retain `console.error`/`console.warn` in genuine error paths (intentional diagnostics, not `console.log`). Could be routed through a logger later if desired.
 
 ---
 
-## P1 — High Priority
+## Fix 9 — Handle font-load failure
 
-### P1-01 · No onboarding navigation guard
-**Status: FIXED**  
-**Root cause:** No check whether the user had completed onboarding — first-time users landed directly on tabs.  
-**Files changed:**
-- `artifacts/uns-app/app/(tabs)/_layout.tsx` — async `useEffect` reads `AsyncStorage.getItem('@uns_onboarding_complete')`; shows `ActivityIndicator` while checking; redirects to `/onboarding` if key absent
-**How it was tested:** Guard logic confirmed in `_layout.tsx`. Onboarding screen sets the key on completion.
-
----
-
-### P1-02 · Raw `fetch()` in home screen — no caching, no abort, no type safety
-**Status: FIXED**  
-**Root cause:** Home screen used raw `fetch()` for `/api/daily-recipe` with no React Query caching, no abort signal, no types.  
-**Files changed:**
-- `lib/api-client-react/src/generated/api.ts` — `useGetDailyRecipe` hook and `useRecordMoodCheckin` mutation added; declarations rebuilt
-- `artifacts/uns-app/app/(tabs)/index.tsx` — raw `fetch()` replaced with `useGetDailyRecipe`; mood recording replaced with `useRecordMoodCheckin`; `BASE` constant removed
-**How it was tested:** `tsc --noEmit` passes cleanly on `uns-app`.
+- **Finding ID / title:** Fix 9 — App hangs on blank splash if fonts fail to load (`app/_layout.tsx`).
+- **Severity:** P1
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/uns-app/app/_layout.tsx`
+- **Root cause:** `if (!fontsLoaded && !fontError) return null;` meant a `fontError` fell through with `fontsLoaded` still false, leaving the app on `null` (blank splash) indefinitely.
+- **What was implemented:** On `fontError`, render a RTL Arabic recovery screen ("فشل تحميل التطبيق … يرجى إعادة تشغيله") inside `SafeAreaProvider` (reusing existing `configStyles`). Only when there is no error and fonts are still loading do we `return null`.
+- **How it was tested:** `npx tsc --noEmit` passes (JSX/imports — `View`, `Text`, `SafeAreaProvider`, `configStyles` — all already in scope).
+- **Remaining risk:** Copy is static; no auto-retry. The screen uses the app's font family names which themselves failed to load, so it falls back to system fonts — acceptable for an error state.
 
 ---
 
-### P1-03 · No empty states — blank/broken screens for new users
-**Status: FIXED**  
-**Files changed:**
-- `artifacts/uns-app/components/EmptyState.tsx` — created: reusable Midnight Garden dark theme component with Feather icon, Arabic title/subtitle, optional CTA
-- `artifacts/uns-app/app/(tabs)/insights.tsx` — "لا توجد إحصائيات بعد" when no gamification/weekly data
-- `artifacts/uns-app/app/(tabs)/journey.tsx` — "رحلتك تبدأ الآن" when XP=0
-- `artifacts/uns-app/app/(tabs)/community.tsx` — "لا توجد دوائر حالياً" when sessions empty
-- `artifacts/uns-app/app/(tabs)/programs.tsx` — replaced inline ad-hoc empty state with `EmptyState` component
-**How it was tested:** Component and screen imports confirmed.
+## Fix 10 — Apply mood-history date filter
+
+- **Finding ID / title:** Fix 10 — `since` computed but not used in the mood-history query (`moods.ts`).
+- **Severity:** P1
+- **Status:** ✅ Fixed (already present in working tree; verified)
+- **Files changed:**
+  - `artifacts/api-server/src/routes/moods.ts` (verified; the `.where()` clause was already corrected in the working tree)
+- **Root cause:** `since` was calculated from `days` but the Drizzle query filtered only by `sessionId`, so `?days=` was ignored and up to 100 all-time rows were returned.
+- **What was implemented:** The query `.where()` uses `and(eq(moodsTable.sessionId, sessionId), gte(moodsTable.createdAt, since))`, correctly bounding results to the requested window. Confirmed in place at `moods.ts` (line ~71) and now compiles alongside the Fix 7 streak change.
+- **How it was tested:** `typecheck` + `build` pass. Reviewed that `since = new Date(Date.now() - daysBack*86_400_000)` feeds the `gte` bound.
+- **Remaining risk:** None. Same server-timezone note as Fix 7 applies to the window boundary.
 
 ---
 
-### P1-04 · No log redaction — sensitive content could appear in server logs
-**Status: FIXED**  
-**Root cause:** Pino default would log full request URLs (including query strings) and bodies.  
-**Files changed:**
-- `artifacts/api-server/src/app.ts` — pino-http serializers: URL query strings stripped, request body not logged; only method, path, status, response time logged
-**How it was tested:** Server logs in workflow output show only `{ id, method, url (no query), statusCode }` — no body, no tokens.
+## Additional change (not one of the 10 fixes) — unblock verification
+
+- **File:** `artifacts/api-server/src/routes/insights.ts`
+- **Why:** The working tree already contained a **pre-existing compile error** (introduced by earlier uncommitted work, not by this audit pass): three `let` declarations typed as `Awaited<ReturnType<typeof db.select().from(...)>>`. `typeof` in type position does not accept a call expression, so `tsc` failed with `TS1005/TS1109` and the **entire api-server typecheck was red** — making any evidence meaningless.
+- **Fix:** Replaced those annotations with Drizzle's `(typeof moodsTable.$inferSelect)[]` / `userProgressTable` / `microWinsTable` element types, which is what the `Promise.all` actually resolves to. Behavior unchanged; the try/catch structure is preserved.
+- **Status:** ✅ Fixed — required so the P0/P1 fixes above can be verified against a green typecheck/build.
 
 ---
 
-### P1-05 · Non-normalized API error shape
-**Status: FIXED**  
-**Root cause:** Different routes returned different error shapes — no consistent client contract.  
-**Files changed:**
-- `artifacts/api-server/src/app.ts` — global error handler returns `{ error: "Internal server error", code: "INTERNAL_ERROR" }`; CORS → `"CORS_BLOCKED"`; rate limit → `"RATE_LIMITED"` / `"COMPANION_RATE_LIMITED"`
-- `artifacts/api-server/src/middlewares/auth.ts` — `"UNAUTHORIZED"` (401), `"FORBIDDEN"` (403)
-- `artifacts/api-server/src/routes/auth.ts` — auth errors use same shape
-**How it was tested:** All live curl responses use `{ error, code }` shape.
+## Coverage summary
 
----
-
-### P1-06 · `Animated.multiply()` called on every render
-**Status: FIXED**  
-**Root cause:** `Animated.multiply()` called inline during render, creating a new `Animated.Value` every cycle.  
-**Files changed:**
-- `artifacts/uns-app/app/(tabs)/index.tsx` — moved to `useRef`, computed once at mount
-**How it was tested:** Confirmed in `index.tsx`.
-
----
-
-### P1-07 · No env var validation at startup — silent runtime failures
-**Status: FIXED**  
-**Root cause:** Server would start without required vars and silently fail at request time.  
-**Files changed:**
-- `artifacts/api-server/src/index.ts` — `DATABASE_URL` and `PORT` required (exits with code 1 if missing); `OPENAI_API_KEY`, `JWT_SECRET`, `ADMIN_SECRET` log WARN if absent
-**How it was tested:** Inline validation: `DATABASE_URL=""` → `FATAL: missing required env vars: DATABASE_URL` → exit code 1.
-
----
-
-## P2 — Medium Priority
-
-### P2-01 · Daily Flash Card white background breaks dark theme
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/app/(tabs)/index.tsx` — `#FFFFFF` → `rgba(255,255,255,0.82)` with green shadow
-
-### P2-02 · CTA off-palette color (`#3AAFA9`)
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/app/(tabs)/index.tsx` — hardcoded color → `Colors.accent`
-
-### P2-03 · Hardcoded attribution shown while loading
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/app/(tabs)/index.tsx` — attribution hidden when recipe loading; uses `recipe.source` if available
-
-### P2-04 · CTA always routed to chat regardless of recipe category
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/app/(tabs)/index.tsx` — "تأمل" / "هدوء" categories → breathing; others → chat
-
-### P2-05 · `AbortController` missing in `SessionContext.initSession`
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/contexts/SessionContext.tsx` — AbortController, mount-safe setState guard, `initError` + `retryInit()` exposed
-
-### P2-06 · React Query staleTime not configured
-**Status: FIXED**  
-**Files changed:** `artifacts/uns-app/app/_layout.tsx` — `staleTime: 60_000`, `gcTime: 300_000`, `retry: 1`, `refetchOnWindowFocus: false`
-
-### P2-07 · No accessibility labels on interactive elements
-**Status: PARTIALLY FIXED**  
-**Files changed:**
-- `artifacts/uns-app/app/(tabs)/index.tsx` — IridescentOrb Pressable, mood chip Pressables, recipe CTA Pressable all have `accessibilityLabel`, `accessibilityRole`, `accessibilityHint`
-- `artifacts/uns-app/components/EmptyState.tsx` — CTA button has accessibility props  
-**Remaining scope:** journey, insights, community, programs, chat, onboarding screens not fully audited. Low priority — not a launch blocker.
-
-### P2-08 · Stale shared library declarations causing TypeScript errors
-**Status: FIXED**  
-**Root cause:** `@workspace/api-client-react`, `@workspace/db`, `@workspace/api-zod` dist declarations not rebuilt after task agent changes; TypeScript resolved against stale types causing 41 false errors across 12 files.  
-**Files changed:**
-- `lib/api-client-react/` — rebuilt via `tsc --build --force`
-- `lib/db/` — rebuilt via `tsc --build --force`
-- `lib/api-zod/` — rebuilt via `tsc --build --force`
-- `artifacts/api-server/src/lib/jwt.ts` — `expiresIn as any` to resolve `StringValue` branded-type conflict
-- `artifacts/api-server/package.json` — added `zod` as direct dependency (was imported in `gamification.ts` without being listed)
-**Result:** All three packages typecheck cleanly (0 errors).
-
----
-
-## Not Started
-
-### NS-01 · AsyncStorage for tokens instead of SecureStore
-**Severity:** P2  
-**Status: NOT STARTED**  
-**Reason:** `expo-secure-store` would provide hardware-backed token storage on iOS/Android. Current AsyncStorage tokens are still protected by OS file encryption. Upgrade path documented in `SessionContext.tsx`. Not a launch blocker.  
-**Files that would change:** `artifacts/uns-app/contexts/SessionContext.tsx`
-
----
-
-## Summary Table
-
-| Severity | Total | Fixed | Partial | Not Started |
-|---|---|---|---|---|
-| P0 | 8 | 8 | 0 | 0 |
-| P1 | 7 | 7 | 0 | 0 |
-| P2 | 8 | 7 | 1 | 1 |
-| **Total** | **23** | **22** | **1** | **1** |
-
----
-
-## Mood unification follow-ups (deferred from P0 — 3 May 2026)
-
-The mood picker was unified to 9 keys in lib/gender.ts. Three legacy keys
-(grateful, angry, hopeful) are no longer exposed in the picker but remain
-referenced in server-side code. These are intentional carry-overs to avoid
-breaking historical user data and require product decisions:
-
-1. **BreathingSession.tsx (line 55)** — exposes `grateful` chip in the
-   post-breathing mini mood selector. Decide: replace with `reassured`
-   (matches calm post-breathing vibe), or keep as a breathing-flow-only
-   key.
-
-2. **api-server/routes/community.ts (lines 100, 116)** — two community
-   circles seeded with moodTag `hopeful` and `grateful`. With those chips
-   gone from the picker, no UI path leads to these circles. Decide:
-   retag with new mood keys (e.g. `reassured`, `peaceful`) or remove the
-   seed entries.
-
-3. **api-server/routes/gamification.ts (lines 368-370)** — RECOMMENDATIONS
-   map has branches for `grateful`, `hopeful`, `angry`. Now zombie code
-   for new check-ins, but keeping them is harmless and protects any
-   in-flight requests for users on stale clients.
-
-4. **api-server/routes/insights.ts (lines 14-37)** — MOOD_ARABIC /
-   MOOD_COLORS / MOOD_INTENSITY maps include the legacy keys. KEEP these
-   indefinitely — they're needed to render historical mood entries
-   correctly for users who recorded them before this change.
-
-5. **api-server/routes/admin.ts (line 33)** — hardcoded demo/mock data,
-   not real queries. Cleanup at the same time as the broader admin
-   dashboard de-faking work (separate ticket).
-
-These items are tracked here so they're not silently lost. They do not
-block TestFlight.
-
----
-
-## Pre-existing typecheck errors — TestFlight blocker reclassification (3 May 2026)
-
-Re-reviewed during P0 mood unification work. Two of the four pre-existing
-errors are TestFlight blockers, not "leave alone":
-
-### 🔴 BLOCKER — /onboarding/login route not in expo-router type map
-- **Files:** `app/onboarding/index.tsx:143`, `app/onboarding/register.tsx:367`
-- **Symptom:** TypeScript reports `/onboarding/login` not in route map even
-  though the file `app/onboarding/login.tsx` exists.
-- **Likely cause:** expo-router typed-routes manifest is stale. The file
-  was added but routes weren't regenerated.
-- **Fix candidates:**
-  1. Run `npx expo customize` or restart `pnpm start` to regenerate
-     `.expo/types/router.d.ts`
-  2. If that doesn't work, check `app.json` `experiments.typedRoutes` is
-     true (we already confirmed it is) and that login.tsx exports a
-     default React component
-- **Why it matters:** without this, the "لديّ حساب بالفعل" button on
-  onboarding navigates to a route the type system rejects. Even if it
-  works at runtime today, any future strict-mode build will fail.
-- **Owner:** next P0/P1 session
-
-### 🟠 SCHEMA DRIFT — recipe.source field missing
-- **Files:** `app/(tabs)/index.tsx:376-377`
-- **Symptom:** code reads `recipe.source` but `DailyRecipe` Zod type has
-  no `source` field
-- **Original handover reference:** §18 "Daily Recipe — recipe.source
-  referenced but DB table did not have source column. Remove or align
-  schema."
-- **Fix candidates:**
-  1. Remove the `.source` reads from index.tsx (preferred — simpler)
-  2. Add `source` to the daily_recipes table + Drizzle schema + Zod +
-     codegen pipeline (heavier, only worth it if there's actual content
-     to display)
-- **Owner:** next P0/P1 session
-
-The other two pre-existing errors (if any besides these and their
-duplicates) remain as-is.
-
----
-
-## Tab bar visual prominence — deferred (3 May 2026)
-
-CHANGE 4 reordered the tab bar to surface حسابي (profile) and renamed
-محادثة → أُنس. A raised/prominent visual treatment for the أُنس tab was
-originally proposed in the external review patch:
-
-- A new `ChatTabIcon` component (vs the generic `TabIcon` wrapper)
-- Styles `chatIconOuter`, `chatIconOuterActive`, `chatIconInner`,
-  `chatIconInnerActive` — none of which existed in the codebase
-- Larger icon size (24 vs 20), accent-color fill when focused, slight
-  elevation/shadow
-
-This was deferred because:
-1. Building it from inference would make product/design decisions without
-   design review
-2. The patch's surrounding context truncated the actual style values, so
-   reproducing the intended look would require guessing
-3. The functional reorder + rename is the user-visible win for this
-   round; visual prominence is a polish concern
-
-Pick-up criteria: design input on what "أُنس is the core" should look
-like in the tab bar (raised pill? center notch? larger icon? color
-treatment?). When ready, the implementation is a straightforward
-component swap inside (tabs)/_layout.tsx — no other files affected.
+| # | Fix | Severity | Status |
+|---|-----|----------|--------|
+| 1 | Timing-safe admin secret | P0 | ✅ Fixed |
+| 2 | JWT → SecureStore | P0 | ✅ Fixed |
+| 3 | Rate limit OTP verify | P0 | ✅ Fixed |
+| 4 | Real LLM in companion | P0 | ✅ Fixed |
+| 5 | Verification flag as env var | P0 | ✅ Fixed |
+| 6 | `userId` FK on sessions | P1 | ✅ Fixed |
+| 7 | Consecutive-day streak | P1 | ✅ Fixed |
+| 8 | Gate `console.log` w/ `__DEV__` | P1 | ✅ Fixed |
+| 9 | Font-load error screen | P1 | ✅ Fixed |
+| 10 | Mood-history date filter | P1 | ✅ Fixed |
+| — | `insights.ts` typecheck unblock | — | ✅ Fixed |

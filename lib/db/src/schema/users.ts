@@ -1,6 +1,7 @@
-import { pgTable, text, uuid, timestamp, boolean } from "drizzle-orm/pg-core";
+import { text, uuid, timestamp, boolean } from "drizzle-orm/pg-core";
+import { privateSchema } from "./schemas";
 
-export const usersTable = pgTable("users", {
+export const usersTable = privateSchema.table("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),

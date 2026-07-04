@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setAccessToken, setRefreshToken } from "@/lib/secureTokens";
 import Colors from "@/constants/colors";
 
 import { API_BASE } from "@/lib/api";
@@ -31,8 +32,7 @@ function maskEmail(email: string): string {
 
 export default function VerifyScreen() {
   const insets = useSafeAreaInsets();
-  const { userId, email, gender, isLogin: isLoginParam } = useLocalSearchParams<{ userId: string; email: string; gender: string; isLogin?: string }>();
-  const isLogin = isLoginParam === "1";
+  const { userId, email, gender } = useLocalSearchParams<{ userId: string; email: string; gender: string }>();
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
@@ -82,8 +82,8 @@ export default function VerifyScreen() {
 
       await Promise.all([
         AsyncStorage.setItem("uns_session_id", data.sessionId),
-        AsyncStorage.setItem("uns_access_token", data.accessToken),
-        AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
+        setAccessToken(data.accessToken),
+        setRefreshToken(data.refreshToken),
         AsyncStorage.setItem("@uns_onboarding_complete", "1"),
         AsyncStorage.setItem("@uns_gender", gender ?? "female"),
         AsyncStorage.removeItem("@uns_pending_userId"),
@@ -91,8 +91,15 @@ export default function VerifyScreen() {
         AsyncStorage.removeItem("@uns_pending_gender"),
       ]);
 
-      console.log("[verify] success — onboarding complete, token stored, navigating to", isLogin ? "tabs" : "tour");
-      router.replace(isLogin ? "/(tabs)" : "/onboarding/tour");
+      if (data.restored) {
+        // Returning user — skip the tour, go directly to the app
+        if (__DEV__) console.log("[verify] login success — session restored, navigating to tabs");
+        router.replace("/(tabs)");
+      } else {
+        // New user — show the onboarding tour
+        if (__DEV__) console.log("[verify] register success — onboarding complete, navigating to tour");
+        router.replace("/onboarding/tour");
+      }
     } catch {
       setError("تعذّر الاتصال بالخادم");
       setHasError(false);

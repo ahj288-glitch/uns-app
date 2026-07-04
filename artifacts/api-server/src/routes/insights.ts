@@ -3,8 +3,10 @@ import { db } from "@workspace/db";
 import { moodsTable, userProgressTable, microWinsTable } from "@workspace/db/schema";
 import { eq, desc, gte, and } from "drizzle-orm";
 import { GetInsightsQueryParams } from "@workspace/api-zod";
+import pino from "pino";
 
 const router = Router();
+const logger = pino({ name: "insights" });
 
 const MOOD_ARABIC: Record<string, string> = {
   happy: "سعيد",
@@ -57,30 +59,45 @@ router.get("/insights", async (req, res) => {
   }
 
   const { sessionId } = parsed.data;
+
+  // ── Ownership check — caller must own this session ─────────────────────────
+  if (sessionId !== req.auth?.sessionId) {
+    return res.status(403).json({ error: "Forbidden", code: "SESSION_MISMATCH" });
+  }
+
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [entries, progressRows, recentWins] = await Promise.all([
-    db
-      .select()
-      .from(moodsTable)
-      .where(and(
-        eq(moodsTable.sessionId, sessionId as any),
-        gte(moodsTable.createdAt, sevenDaysAgo),
-      ))
-      .orderBy(desc(moodsTable.createdAt))
-      .limit(50),
-    db
-      .select()
-      .from(userProgressTable)
-      .where(eq(userProgressTable.sessionId, sessionId))
-      .limit(1),
-    db
-      .select()
-      .from(microWinsTable)
-      .where(eq(microWinsTable.sessionId, sessionId))
-      .orderBy(desc(microWinsTable.earnedAt))
-      .limit(5),
-  ]);
+  let entries: (typeof moodsTable.$inferSelect)[];
+  let progressRows: (typeof userProgressTable.$inferSelect)[];
+  let recentWins: (typeof microWinsTable.$inferSelect)[];
+
+  try {
+    [entries, progressRows, recentWins] = await Promise.all([
+      db
+        .select()
+        .from(moodsTable)
+        .where(and(
+          eq(moodsTable.sessionId, sessionId as string),
+          gte(moodsTable.createdAt, sevenDaysAgo),
+        ))
+        .orderBy(desc(moodsTable.createdAt))
+        .limit(50),
+      db
+        .select()
+        .from(userProgressTable)
+        .where(eq(userProgressTable.sessionId, sessionId))
+        .limit(1),
+      db
+        .select()
+        .from(microWinsTable)
+        .where(eq(microWinsTable.sessionId, sessionId))
+        .orderBy(desc(microWinsTable.earnedAt))
+        .limit(5),
+    ]);
+  } catch (err) {
+    logger.error({ err, sessionId }, "[insights] DB error");
+    return res.status(500).json({ error: "Internal server error", code: "INTERNAL_ERROR" });
+  }
 
   const progRow = progressRows[0];
 

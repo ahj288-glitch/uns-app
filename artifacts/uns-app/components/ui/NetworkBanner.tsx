@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Platform, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/colors";
 
@@ -9,20 +10,25 @@ interface NetworkBannerProps {
 }
 
 export default function NetworkBanner({ offline, reconnecting }: NetworkBannerProps) {
-  const translateY = useRef(new Animated.Value(-60)).current;
+  const insets = useSafeAreaInsets();
+  const translateY = useRef(new Animated.Value(-80)).current;
 
   useEffect(() => {
     Animated.spring(translateY, {
-      toValue: offline ? 0 : -60,
+      toValue: offline || reconnecting ? 0 : -80,
       useNativeDriver: true,
       tension: 80,
       friction: 14,
     }).start();
-  }, [offline]);
+  }, [offline, reconnecting]);
+
+  // On native: sit directly below the status bar.
+  // On web: push down past the fixed header (~60 px).
+  const topOffset = Platform.OS === "web" ? 60 : insets.top;
 
   return (
     <Animated.View
-      style={[styles.banner, { transform: [{ translateY }] }]}
+      style={[styles.banner, { top: topOffset, transform: [{ translateY }] }]}
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
     >
@@ -34,8 +40,8 @@ export default function NetworkBanner({ offline, reconnecting }: NetworkBannerPr
         />
         <Text style={[styles.text, { color: reconnecting ? Colors.accent : "#F4B942" }]}>
           {reconnecting
-            ? "جارٍ إعادة الاتصال..."
-            : "لا يوجد اتصال — سيتم الإرسال تلقائياً عند عودة الاتصال"}
+            ? "عاد الاتصال — جارٍ المزامنة…"
+            : "يبدو أن الاتصال هادئ الآن… سنحاول مجدداً خلال لحظات"}
         </Text>
       </View>
     </Animated.View>
@@ -45,7 +51,6 @@ export default function NetworkBanner({ offline, reconnecting }: NetworkBannerPr
 const styles = StyleSheet.create({
   banner: {
     position: "absolute",
-    top: Platform.OS === "web" ? 60 : 0,
     left: 0,
     right: 0,
     backgroundColor: Colors.surfaceContainerHigh,

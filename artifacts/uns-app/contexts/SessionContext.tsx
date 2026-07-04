@@ -1,5 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+// Fix 2 — JWTs live in the OS keychain via secure-store, never plaintext AsyncStorage.
+import {
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  deleteAccessToken,
+  deleteRefreshToken,
+} from "@/lib/secureTokens";
 import type { Gender } from "@/lib/gender";
 
 import { API_BASE } from "@/lib/api";
@@ -92,7 +100,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function refreshAccessToken(): Promise<string | null> {
     try {
-      const storedRefresh = await AsyncStorage.getItem("uns_refresh_token");
+      const storedRefresh = await getRefreshToken();
       if (!storedRefresh) return null;
       const res = await fetch(`${BASE}/auth/refresh`, {
         method: "POST",
@@ -102,7 +110,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return null;
       const data = await res.json();
       const newToken: string = data.accessToken;
-      await AsyncStorage.setItem("uns_access_token", newToken);
+      await setAccessToken(newToken);
       if (mountedRef.current) {
         setAuthToken(newToken);
         authTokenRef.current = newToken;
@@ -150,8 +158,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         storedName,
       ] = await Promise.all([
         AsyncStorage.getItem("uns_session_id"),
-        AsyncStorage.getItem("uns_access_token"),
-        AsyncStorage.getItem("uns_refresh_token"),
+        getAccessToken(),
+        getRefreshToken(),
         // Read dialect from both key formats
         readKey("uns_dialect", "@uns_dialect"),
         // Read gender from both key formats (register saves @uns_gender)
@@ -238,7 +246,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   // cleared so the user is logged out even if the server is unreachable.
   async function logout() {
     try {
-      const refreshToken = await AsyncStorage.getItem("uns_refresh_token");
+      const refreshToken = await getRefreshToken();
       if (refreshToken) {
         try {
           await fetch(`${BASE}/auth/logout`, {
@@ -253,8 +261,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     } finally {
       await Promise.all([
         AsyncStorage.removeItem("uns_session_id"),
-        AsyncStorage.removeItem("uns_access_token"),
-        AsyncStorage.removeItem("uns_refresh_token"),
+        deleteAccessToken(),
+        deleteRefreshToken(),
         AsyncStorage.removeItem("uns_last_mood"),
         AsyncStorage.removeItem("@uns_pending_userId"),
         AsyncStorage.removeItem("@uns_pending_email"),

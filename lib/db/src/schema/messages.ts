@@ -1,8 +1,9 @@
-import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
+import { text, uuid, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { privateSchema } from "./schemas";
 
-export const messagesTable = pgTable("companion_messages", {
+export const messagesTable = privateSchema.table("companion_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: uuid("session_id").notNull(),
   role: text("role").notNull(),
