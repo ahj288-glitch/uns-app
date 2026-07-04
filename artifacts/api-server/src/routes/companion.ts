@@ -15,12 +15,20 @@ import pino from "pino";
 const router = Router();
 const logger = pino({ name: "companion" });
 
-// ── OpenAI client — lazy-initialised only when API key is present ─────────────
+// ── LLM client — lazy-initialised when an API key is present ───────────────────
+// Prefers Groq (OpenAI-compatible, fast/cheap) when GROQ_API_KEY is set; falls
+// back to native OpenAI when only OPENAI_API_KEY is present. If neither key is
+// configured, getOpenAI() returns null and callLLM() uses the rule-based reply.
 let openaiClient: OpenAI | null = null;
 function getOpenAI(): OpenAI | null {
-  const key = process.env["OPENAI_API_KEY"];
-  if (!key) return null;
-  if (!openaiClient) openaiClient = new OpenAI({ apiKey: key });
+  const groqKey = process.env["GROQ_API_KEY"];
+  const openaiKey = process.env["OPENAI_API_KEY"];
+  if (!groqKey && !openaiKey) return null;
+  if (!openaiClient) {
+    openaiClient = groqKey
+      ? new OpenAI({ apiKey: groqKey, baseURL: "https://api.groq.com/openai/v1" })
+      : new OpenAI({ apiKey: openaiKey });
+  }
   return openaiClient;
 }
 

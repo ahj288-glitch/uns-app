@@ -1,8 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAccessToken, getRefreshToken, setAccessToken } from "@/lib/secureTokens";
 import type { Gender } from "@/lib/gender";
 
-import { API_BASE } from "@/lib/api";
+import { API_BASE, apiFetch, healthCheck } from "@/lib/api";
 
 const BASE = API_BASE;
 
@@ -37,6 +38,8 @@ interface SessionContextType {
   retryInit: () => void;
   lastMoodWord: string | null;
   setLastMoodWord: (m: string | null) => void;
+  isOffline: boolean;
+  isReconnecting: boolean;
 }
 
 const SessionContext = createContext<SessionContextType>({
@@ -55,6 +58,8 @@ const SessionContext = createContext<SessionContextType>({
   retryInit: () => {},
   lastMoodWord: null,
   setLastMoodWord: () => {},
+  isOffline: false,
+  isReconnecting: false,
 });
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -67,8 +72,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
   const [lastMoodWord, setLastMoodWordState] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
 
   const authTokenRef = useRef<string | null>(null);
+  const isOfflineRef = useRef(false);
+  const recoveryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -88,9 +97,43 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => controller.abort();
   }, []);
 
+  // ─── Offline recovery polling ─────────────────────────────────────────────
+  // When a network failure is detected, poll every 5 s until the server responds.
+  // On recovery: briefly show "reconnecting" before clearing the banner.
+  useEffect(() => {
+    if (!isOffline) {
+      if (recoveryTimerRef.current) {
+        clearInterval(recoveryTimerRef.current);
+        recoveryTimerRef.current = null;
+      }
+      return;
+    }
+
+    recoveryTimerRef.current = setInterval(async () => {
+      const ok = await healthCheck();
+      if (ok && mountedRef.current) {
+        clearInterval(recoveryTimerRef.current!);
+        recoveryTimerRef.current = null;
+        isOfflineRef.current = false;
+        setIsReconnecting(true);
+        setIsOffline(false);
+        setTimeout(() => {
+          if (mountedRef.current) setIsReconnecting(false);
+        }, 2000);
+      }
+    }, 5000);
+
+    return () => {
+      if (recoveryTimerRef.current) {
+        clearInterval(recoveryTimerRef.current);
+        recoveryTimerRef.current = null;
+      }
+    };
+  }, [isOffline]);
+
   async function refreshAccessToken(): Promise<string | null> {
     try {
-      const storedRefresh = await AsyncStorage.getItem("uns_refresh_token");
+      const storedRefresh = await getRefreshToken();
       if (!storedRefresh) return null;
       const res = await fetch(`${BASE}/auth/refresh`, {
         method: "POST",
@@ -100,7 +143,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return null;
       const data = await res.json();
       const newToken: string = data.accessToken;
-      await AsyncStorage.setItem("uns_access_token", newToken);
+      await setAccessToken(newToken);
       if (mountedRef.current) {
         setAuthToken(newToken);
         authTokenRef.current = newToken;
@@ -120,13 +163,43 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(url, { ...init, headers });
+    let res: Response;
+    try {
+      // apiFetch retries network-level failures (TypeError) up to 2×
+      res = await apiFetch(url, { ...init, headers });
+    } catch (err) {
+      // Only mark offline for network-level failures (TypeError).
+      // AbortError = intentional timeout (e.g. 12 s chat timeout) — not an offline signal.
+      const isNetworkFailure = err instanceof TypeError;
+      if (isNetworkFailure && !isOfflineRef.current && mountedRef.current) {
+        console.error("[session] authFetch: network unreachable, marking offline", { url });
+        isOfflineRef.current = true;
+        setIsOffline(true);
+      }
+      throw err;
+    }
+
+    // Successful response → ensure we're marked online
+    if (isOfflineRef.current && mountedRef.current) {
+      isOfflineRef.current = false;
+      setIsOffline(false);
+    }
 
     if (res.status === 401 && token) {
       const newToken = await refreshAccessToken();
       if (newToken) {
         headers["Authorization"] = `Bearer ${newToken}`;
-        return fetch(url, { ...init, headers });
+        try {
+          return await apiFetch(url, { ...init, headers });
+        } catch (err) {
+          const isNetworkFailure = err instanceof TypeError;
+          if (isNetworkFailure && !isOfflineRef.current && mountedRef.current) {
+            console.error("[session] authFetch: 401-retry network error", { url });
+            isOfflineRef.current = true;
+            setIsOffline(true);
+          }
+          throw err;
+        }
       }
     }
 
@@ -148,8 +221,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         storedName,
       ] = await Promise.all([
         AsyncStorage.getItem("uns_session_id"),
-        AsyncStorage.getItem("uns_access_token"),
-        AsyncStorage.getItem("uns_refresh_token"),
+        getAccessToken(),
+        getRefreshToken(),
         // Read dialect from both key formats
         readKey("uns_dialect", "@uns_dialect"),
         // Read gender from both key formats (register saves @uns_gender)
@@ -255,6 +328,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         retryInit,
         lastMoodWord,
         setLastMoodWord,
+        isOffline,
+        isReconnecting,
       }}
     >
       {children}

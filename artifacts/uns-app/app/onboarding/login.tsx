@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setAccessToken, setRefreshToken } from "@/lib/secureTokens";
 import Colors from "@/constants/colors";
 import { API_BASE } from "@/lib/api";
 
@@ -57,7 +59,19 @@ export default function LoginScreen() {
         return;
       }
 
-      // Navigate to verify screen with returned userId
+      // Verification disabled (MVP/staging): tokens returned directly — no OTP step
+      if (data.accessToken && data.sessionId) {
+        await Promise.all([
+          AsyncStorage.setItem("uns_session_id", data.sessionId),
+          setAccessToken(data.accessToken),
+          setRefreshToken(data.refreshToken ?? ""),
+          AsyncStorage.setItem("@uns_onboarding_complete", "1"),
+        ]);
+        router.replace("/(tabs)");
+        return;
+      }
+
+      // Verification enabled: navigate to verify screen with returned userId
       router.push({
         pathname: "/onboarding/verify",
         params: { userId: data.userId, email: data.email },

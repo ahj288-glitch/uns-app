@@ -26,7 +26,6 @@ import { CRISIS_RESOURCES } from "@/lib/crisis";
 import { API_BASE } from "@/lib/api";
 import * as Haptics from "expo-haptics";
 import ErrorToast from "@/components/ui/ErrorToast";
-import NetworkBanner from "@/components/ui/NetworkBanner";
 import CharCounter from "@/components/ui/CharCounter";
 import LimitBlocker from "@/components/ui/LimitBlocker";
 
@@ -155,7 +154,7 @@ function MessageBubble({ message, bubbleTint }: { message: Message; bubbleTint: 
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId, greeting, gender, lastMoodWord, authFetch } = useSession();
+  const { sessionId, greeting, gender, lastMoodWord, authFetch, isOffline } = useSession();
   const { theme } = useThemeContext();
   const T = useTokens();
   const styles = makeStyles(T);
@@ -171,18 +170,19 @@ export default function ChatScreen() {
   const [dailyLimitReached, setDailyLimitReached] = useState(false);
   const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
 
-  // Network state
-  const [isOffline, setIsOffline] = useState(false);
-  const [isReconnecting, setIsReconnecting] = useState(false);
+  // Network state — isOffline / isReconnecting come from SessionContext (global)
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
 
   // Toast
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "", severity: "error" });
 
+  // History loading
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   const rateLimitTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSentAt = useRef<number>(0);
-  const offlineCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevIsOfflineRef = useRef(false);
 
   const webTop = Platform.OS === "web" ? 67 : insets.top;
   const webBottom = Platform.OS === "web" ? 34 : insets.bottom;
@@ -222,31 +222,61 @@ export default function ChatScreen() {
     }, 1000);
   }
 
-  // ─── Offline detection (polling) ──────────────────────────────────────
+  // ─── Load chat history on mount ──────────────────────────────────────
 
   useEffect(() => {
-    if (Platform.OS === "web") return;
-    offlineCheckRef.current = setInterval(async () => {
-      try {
-        await fetch(`${API_BASE}/health`, { method: "HEAD" });
-        if (isOffline) {
-          setIsReconnecting(true);
-          setIsOffline(false);
-          setTimeout(() => setIsReconnecting(false), 2000);
-          if (pendingMessage) {
-            const msg = pendingMessage;
-            setPendingMessage(null);
-            sendMessage(msg);
-          }
+    if (!sessionId) return;
+    setIsLoadingHistory(true);
+    authFetch(
+      `${API_BASE}/companion/history?sessionId=${encodeURIComponent(sessionId)}&limit=30`
+    )
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        const msgs: Message[] = (data.messages ?? []).map((m: {
+          id: string;
+          role: "user" | "companion";
+          content: string;
+          createdAt: string;
+        }) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          createdAt: new Date(m.createdAt),
+        }));
+        // API returns oldest-first; state needs newest-first for inverted FlatList
+        const ordered = [...msgs].reverse();
+        if (ordered.length > 0) {
+          setMessages(ordered);
+          setShowWelcome(false);
+          // Sync today's user message count
+          const today = new Date();
+          const todayCount = ordered.filter(
+            m => m.role === "user" && isSameDay(m.createdAt, today)
+          ).length;
+          setDailyCount(todayCount);
+          if (todayCount >= DAILY_LIMIT) setDailyLimitReached(true);
         }
-      } catch {
-        if (!isOffline) setIsOffline(true);
-      }
-    }, 5000);
-    return () => {
-      if (offlineCheckRef.current) clearInterval(offlineCheckRef.current);
-    };
-  }, [isOffline, pendingMessage]);
+      })
+      .catch(() => {
+        // Silently fail — welcome screen remains as fallback
+      })
+      .finally(() => setIsLoadingHistory(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
+
+  // ─── Pending message retry on reconnect ───────────────────────────────
+  // SessionContext manages the offline/reconnecting state and polls the health
+  // endpoint. When we transition back online, retry any queued message.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (prevIsOfflineRef.current && !isOffline && pendingMessage) {
+      const msg = pendingMessage;
+      setPendingMessage(null);
+      sendMessage(msg);
+    }
+    prevIsOfflineRef.current = isOffline;
+  }, [isOffline]); // pendingMessage/sendMessage intentionally omitted — captured at transition
 
   // ─── Send message ─────────────────────────────────────────────────────
 
@@ -384,8 +414,7 @@ export default function ChatScreen() {
         const isNetwork = err instanceof TypeError;
 
         if (isNetwork) {
-          // Actual network failure
-          setIsOffline(true);
+          // authFetch already set isOffline via SessionContext — just queue the message
           setPendingMessage(msg);
           showToast(ERRORS.NETWORK_OFFLINE.ar, "warning");
           setDailyCount(c => c - 1);
@@ -433,8 +462,6 @@ export default function ChatScreen() {
       {theme.surfaceTint !== "transparent" && (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.surfaceTint, pointerEvents: "none" }]} />
       )}
-      <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />
-
       <View style={[styles.header, { paddingTop: webTop + 12 }]}>
         <Pressable onPress={() => router.push("/(tabs)/community")} style={styles.headerBtn}>
           <Feather name="users" size={18} color={T.muted} />
@@ -463,6 +490,10 @@ export default function ChatScreen() {
             actionLabel="جرّب تمرين التنفس"
             onAction={() => router.push("/(tabs)/journey")}
           />
+        ) : isLoadingHistory ? (
+          <View style={styles.historyLoading}>
+            <ActivityIndicator size="small" color={T.accent} />
+          </View>
         ) : showWelcome && messages.length === 0 ? (
           <Animated.View entering={FadeInUp.duration(500)} style={styles.welcomeContainer}>
             <TimestampPill date={new Date()} />
@@ -529,9 +560,6 @@ export default function ChatScreen() {
                 tint="dark"
                 style={[styles.inputBar, isOverCharLimit && styles.inputBarError]}
               >
-                <Pressable style={styles.attachBtn}>
-                  <Feather name="plus" size={20} color={T.muted} />
-                </Pressable>
                 <TextInput
                   style={styles.input}
                   value={input}
@@ -774,25 +802,10 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
     paddingHorizontal: Spacing.lg,
     borderBottomLeftRadius: 4,
   },
-  quickRepliesRow: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.sm,
-    justifyContent: "flex-end",
-  },
-  quickChip: {
-    backgroundColor: T.surfaceContainerHigh,
-    borderRadius: Radius.lg,
-    paddingHorizontal: 14,
-    paddingVertical: Spacing.sm,
-  },
-  quickChipDisabled: {
-    opacity: 0.4,
-  },
-  quickChipText: {
-    ...Typography.bodySmall,
-    color: T.primary,
+  historyLoading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputContainer: {
     flexDirection: "row",
@@ -818,13 +831,6 @@ function makeStyles(T: import("@/constants/colors").ColorTokens) {
   inputBarError: {
     borderWidth: 1,
     borderColor: T.error + "66",
-  },
-  attachBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
   },
   input: {
     flex: 1,

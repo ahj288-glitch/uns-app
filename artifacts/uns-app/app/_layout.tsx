@@ -20,8 +20,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, Text, StyleSheet } from "react-native";
 import { setBaseUrl } from "@workspace/api-client-react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { SessionProvider } from "@/contexts/SessionContext";
+import { SessionProvider, useSession } from "@/contexts/SessionContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import NetworkBanner from "@/components/ui/NetworkBanner";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -103,6 +104,19 @@ function RootLayoutNav() {
   );
 }
 
+// ── Global offline banner ─────────────────────────────────────────────────────
+// Reads connectivity state from SessionContext (which already runs inside
+// SessionProvider) and renders a slide-down banner on top of all screens.
+function AppShell() {
+  const { isOffline, isReconnecting } = useSession();
+  return (
+    <View style={{ flex: 1 }}>
+      <RootLayoutNav />
+      <NetworkBanner offline={isOffline} reconnecting={isReconnecting} />
+    </View>
+  );
+}
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Tajawal_400Regular,
@@ -120,7 +134,22 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) return null;
+  // Font loading failed — show a recoverable error rather than hanging on a
+  // blank splash forever. The app is still usable with system fonts as fallback.
+  if (fontError) {
+    return (
+      <SafeAreaProvider>
+        <View style={configStyles.container}>
+          <Text style={configStyles.title}>فشل تحميل التطبيق</Text>
+          <Text style={configStyles.body}>
+            تعذّر تحميل الخطوط. يرجى إعادة تشغيل التطبيق.
+          </Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (!fontsLoaded) return null;
 
   // Show a meaningful error screen if neither API env var is configured
   if (!API_URL) {
@@ -139,7 +168,7 @@ export default function RootLayout() {
             <ThemeProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <KeyboardProvider>
-                  <RootLayoutNav />
+                  <AppShell />
                 </KeyboardProvider>
               </GestureHandlerRootView>
             </ThemeProvider>

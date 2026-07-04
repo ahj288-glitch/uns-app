@@ -2,16 +2,18 @@ import React, { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAccessToken } from "@/lib/secureTokens";
 import Colors from "@/constants/colors";
 
 // ── Feature flag — must match register.tsx ────────────────────────────────────
 // false = MVP mode: no OTP screen ever shown, register returns tokens directly.
 // true  = full verification: OTP screen is part of the flow.
-const IS_VERIFICATION_ENABLED = false;
+// Controlled at build time via EXPO_PUBLIC_VERIFICATION_ENABLED so the same
+// binary can ship MVP (off) or full-verification (on) without a code change.
+const IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true";
 
 const KEYS = {
   onboarding: "@uns_onboarding_complete",
-  accessToken: "uns_access_token",
   pendingUserId: "@uns_pending_userId",
   pendingEmail: "@uns_pending_email",
   pendingGender: "@uns_pending_gender",
@@ -26,7 +28,7 @@ export default function RouterGuard() {
         const [onboarding, token, pendingUserId, pendingEmail, pendingGender] =
           await Promise.all([
             AsyncStorage.getItem(KEYS.onboarding),
-            AsyncStorage.getItem(KEYS.accessToken),
+            getAccessToken(),
             AsyncStorage.getItem(KEYS.pendingUserId),
             AsyncStorage.getItem(KEYS.pendingEmail),
             AsyncStorage.getItem(KEYS.pendingGender),
@@ -34,16 +36,18 @@ export default function RouterGuard() {
 
         if (cancelled) return;
 
-        console.log(
-          "[RouterGuard] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED,
-          "| hasCompletedOnboarding:", !!onboarding,
-          "| isAuthenticated:", !!token,
-          "| isEmailVerified:", IS_VERIFICATION_ENABLED ? "pending" : "bypassed",
-          "| pendingUserId:", pendingUserId ?? "none"
-        );
+        if (__DEV__) {
+          console.log(
+            "[RouterGuard] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED,
+            "| hasCompletedOnboarding:", !!onboarding,
+            "| isAuthenticated:", !!token,
+            "| isEmailVerified:", IS_VERIFICATION_ENABLED ? "pending" : "bypassed",
+            "| pendingUserId:", pendingUserId ?? "none"
+          );
+        }
 
         if (!onboarding) {
-          console.log("[RouterGuard] → /onboarding (first time user)");
+          if (__DEV__) console.log("[RouterGuard] → /onboarding (first time user)");
           router.replace("/onboarding");
           return;
         }
@@ -51,7 +55,7 @@ export default function RouterGuard() {
         if (!token) {
           if (IS_VERIFICATION_ENABLED && pendingUserId && pendingEmail) {
             // Mid-registration recovery: user registered but closed app before verifying
-            console.log("[RouterGuard] → /onboarding/verify (mid-registration recovery)");
+            if (__DEV__) console.log("[RouterGuard] → /onboarding/verify (mid-registration recovery)");
             router.replace({
               pathname: "/onboarding/verify",
               params: {
@@ -62,16 +66,16 @@ export default function RouterGuard() {
             });
           } else {
             // No token and not in a mid-verification state → go to register
-            console.log("[RouterGuard] → /onboarding/register (needs auth)");
+            if (__DEV__) console.log("[RouterGuard] → /onboarding/register (needs auth)");
             router.replace("/onboarding/register");
           }
           return;
         }
 
-        console.log("[RouterGuard] → /(tabs) (authenticated)");
+        if (__DEV__) console.log("[RouterGuard] → /(tabs) (authenticated)");
         router.replace("/(tabs)");
       } catch (err) {
-        console.warn("[RouterGuard] storage error — defaulting to /onboarding:", err);
+        if (__DEV__) console.warn("[RouterGuard] storage error — defaulting to /onboarding:", err);
         if (!cancelled) router.replace("/onboarding");
       }
     }

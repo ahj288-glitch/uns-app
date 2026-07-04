@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setAccessToken, setRefreshToken } from "@/lib/secureTokens";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
@@ -248,14 +249,14 @@ export default function RegisterScreen() {
         return;
       }
 
-      console.log("[register] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
+      if (__DEV__) console.log("[register] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
 
       if (!IS_VERIFICATION_ENABLED) {
         const trimmedName = name.trim();
         await Promise.all([
           AsyncStorage.setItem("uns_session_id", data.sessionId),
-          AsyncStorage.setItem("uns_access_token", data.accessToken),
-          AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
+          setAccessToken(data.accessToken),
+          setRefreshToken(data.refreshToken),
           AsyncStorage.setItem("@uns_onboarding_complete", "1"),
           // Save gender with both key formats for SessionContext compatibility
           AsyncStorage.setItem("uns_gender", gender),
@@ -268,7 +269,7 @@ export default function RegisterScreen() {
           AsyncStorage.removeItem("@uns_pending_email"),
           AsyncStorage.removeItem("@uns_pending_gender"),
         ]);
-        console.log("[register] isAuthenticated: true, isEmailVerified: true — routing to tour");
+        if (__DEV__) console.log("[register] isAuthenticated: true, isEmailVerified: true — routing to tour");
         router.replace("/onboarding/tour");
         return;
       }

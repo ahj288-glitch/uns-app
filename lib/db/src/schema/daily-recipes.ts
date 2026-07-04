@@ -1,6 +1,7 @@
-import { pgTable, uuid, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { uuid, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { apiSchema } from "./schemas";
 
-export const dailyRecipesTable = pgTable("daily_recipes", {
+export const dailyRecipesTable = apiSchema.table("daily_recipes", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   summary: text("summary").notNull(),

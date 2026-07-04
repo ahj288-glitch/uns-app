@@ -1,4 +1,5 @@
-import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
+import { text, uuid, timestamp } from "drizzle-orm/pg-core";
+import { privateSchema } from "./schemas";
 
 /**
  * Persisted refresh token store for server-side revocation.
@@ -8,7 +9,7 @@ import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
  * we verify the hash exists and revokedAt IS NULL before issuing a new
  * access token — preventing reuse of stolen/revoked tokens.
  */
-export const refreshTokensTable = pgTable("refresh_tokens", {
+export const refreshTokensTable = privateSchema.table("refresh_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
   // The companion session this token grants access to.
   sessionId: uuid("session_id").notNull(),

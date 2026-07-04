@@ -1,8 +1,9 @@
-import { pgTable, text, uuid, timestamp, integer, boolean, real } from "drizzle-orm/pg-core";
+import { text, uuid, timestamp, integer, boolean, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { apiSchema } from "./schemas";
 
-export const programsTable = pgTable("wellness_programs", {
+export const programsTable = apiSchema.table("wellness_programs", {
   id: uuid("id").primaryKey().defaultRandom(),
   titleAr: text("title_ar").notNull(),
   titleEn: text("title_en").notNull(),

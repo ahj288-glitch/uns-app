@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -28,17 +28,10 @@ import CharCounter from "@/components/ui/CharCounter";
 import { Typography } from "@/constants/typography";
 import { Spacing, Radius } from "@/constants/layout";
 import { API_BASE } from "@/lib/api";
+import { MOOD_OPTIONS, getMoodQuestion } from "@/lib/gender";
 
-const MOODS = [
-  { word: "سعيد", en: "happy", color: "#74C69D", intensity: 4 },
-  { word: "هادئ", en: "calm", color: "#A8C5B2", intensity: 3 },
-  { word: "ممتنّ", en: "grateful", color: "#9B59B6", intensity: 4 },
-  { word: "متعب", en: "tired", color: "#7A9A8A", intensity: 2 },
-  { word: "قلق", en: "anxious", color: "#6B7FD7", intensity: 3 },
-  { word: "حزين", en: "sad", color: "#5D6D8A", intensity: 2 },
-  { word: "غاضب", en: "angry", color: "#B00020", intensity: 2 },
-  { word: "متفائل", en: "hopeful", color: "#74C69D", intensity: 4 },
-];
+// Shared mood option type from lib/gender
+type MoodOption = typeof MOOD_OPTIONS["male"][0];
 
 const MICRO_WIN_LABELS: Record<string, string> = {
   first_checkin: "تسجيل المشاعر للمرة الأولى اليوم ✨",
@@ -53,7 +46,7 @@ function MoodChip({
   selected,
   onPress,
 }: {
-  mood: (typeof MOODS)[0];
+  mood: MoodOption;
   selected: boolean;
   onPress: () => void;
 }) {
@@ -144,11 +137,25 @@ function MicroWinModal({ result, onClose }: { result: WinResult; onClose: () => 
 
 export default function MoodScreen() {
   const insets = useSafeAreaInsets();
-  const { sessionId, authFetch } = useSession();
+  const { sessionId, authFetch, gender, lastMoodWord } = useSession();
   const T = useTokens();
   const styles = makeStyles(T);
-  const [selectedMood, setSelectedMood] = useState<(typeof MOODS)[0] | null>(null);
+
+  // Gender-aware mood options — replaces the old hardcoded MOODS array
+  const MOODS = MOOD_OPTIONS[gender];
+  const moodQuestion = getMoodQuestion(gender);
+
+  const [selectedMood, setSelectedMood] = useState<MoodOption | null>(null);
   const [intensity, setIntensity] = useState(3);
+
+  // Pre-select the mood the user tapped on the home screen
+  useEffect(() => {
+    if (lastMoodWord) {
+      const pre = MOODS.find(m => m.en === lastMoodWord) ?? null;
+      if (pre) setSelectedMood(pre);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -237,7 +244,7 @@ export default function MoodScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={[styles.header, { paddingTop: webTop + Spacing.lg }]}>
-          <Text style={styles.headerTitle}>كيف تحس اليوم؟</Text>
+          <Text style={styles.headerTitle}>{moodQuestion}</Text>
           <Text style={styles.headerSub}>سجّل مشاعرك — كل مشاعر لها قيمة</Text>
         </View>
 

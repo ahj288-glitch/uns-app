@@ -1,3 +1,4 @@
+export * from "./schemas";
 export * from "./waitlist";
 export * from "./sessions";
 export * from "./messages";

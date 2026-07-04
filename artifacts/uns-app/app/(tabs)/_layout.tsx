@@ -83,18 +83,18 @@ export default function TabLayout() {
         tabBarShowLabel: true,
       }}
     >
-      {/* Tab 1 — Journey */}
+      {/* Tab 1 — Home (default landing screen) */}
       <Tabs.Screen
-        name="journey"
+        name="index"
         options={{
-          title: "رحلتي",
+          title: "الرئيسية",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="map" color={color} focused={focused} />
+            <TabIcon name="feather" color={color} focused={focused} />
           ),
         }}
       />
 
-      {/* Tab 2 — Chat (center, primary action) */}
+      {/* Tab 2 — Chat (primary action, visually prominent) */}
       <Tabs.Screen
         name="chat"
         options={{
@@ -109,13 +109,24 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Tab 3 — Home */}
+      {/* Tab 3 — Journey */}
       <Tabs.Screen
-        name="index"
+        name="journey"
         options={{
-          title: "الرئيسية",
+          title: "رحلتي",
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="feather" color={color} focused={focused} />
+            <TabIcon name="map" color={color} focused={focused} />
+          ),
+        }}
+      />
+
+      {/* Tab 4 — Profile */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "حسابي",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="user" color={color} focused={focused} />
           ),
         }}
       />
@@ -126,7 +137,6 @@ export default function TabLayout() {
       <Tabs.Screen name="mood"       options={{ href: null }} />
       <Tabs.Screen name="community"  options={{ href: null }} />
       <Tabs.Screen name="programs"   options={{ href: null }} />
-      <Tabs.Screen name="profile"    options={{ href: null }} />
     </Tabs>
   );
 }

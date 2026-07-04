@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { createHash, randomInt } from "crypto";
+import { createHash, randomInt, timingSafeEqual } from "crypto";
+import rateLimit from "express-rate-limit";
 import { db } from "@workspace/db";
 import {
   companionSessionsTable,
@@ -110,6 +111,18 @@ function clearAdminCookie(res: import("express").Response): void {
   res.clearCookie(ADMIN_COOKIE, { path: "/" });
 }
 
+// ── Rate limiting ──────────────────────────────────────────────────────────────
+// Brute-force protection for OTP verification. Keyed on userId (falling back to
+// IP) so an attacker cannot iterate all 900k OTP codes against a single account.
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5,
+  keyGenerator: (req) => (req.body?.userId as string) ?? req.ip ?? "unknown",
+  message: { error: "Too many attempts. Try again in 10 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 router.post("/auth/register", async (req, res) => {
@@ -206,7 +219,7 @@ router.post("/auth/register", async (req, res) => {
   });
 });
 
-router.post("/auth/verify-email", async (req, res) => {
+router.post("/auth/verify-email", otpLimiter, async (req, res) => {
   const { userId, otp } = req.body as { userId?: string; otp?: string };
 
   if (!userId || !otp) {
@@ -374,6 +387,43 @@ router.post("/auth/login", async (req, res) => {
 
   const user = users[0];
 
+  // ── MVP bypass: skip OTP when verification is disabled (staging / MVP) ────
+  if (!IS_VERIFICATION_ENABLED) {
+    const existingSessions = await db
+      .select()
+      .from(companionSessionsTable)
+      .where(eq(companionSessionsTable.userId, user.id))
+      .orderBy(desc(companionSessionsTable.lastActiveAt))
+      .limit(1);
+
+    if (existingSessions.length > 0) {
+      const session = existingSessions[0];
+      const accessToken = generateAccessToken(session.sessionId, "user");
+      const refreshToken = generateRefreshToken(session.sessionId);
+      await storeRefreshToken(session.sessionId, refreshToken);
+      logger.info(
+        { userId: user.id, IS_VERIFICATION_ENABLED },
+        "[auth/login] verification disabled — session restored directly"
+      );
+      return res.json({
+        accessToken,
+        refreshToken,
+        sessionId: session.sessionId,
+        restored: true,
+      });
+    }
+    // No session yet (edge case) — create one
+    const [session] = await db
+      .insert(companionSessionsTable)
+      .values({ dialect: "gulf", userId: user.id })
+      .returning();
+    const accessToken = generateAccessToken(session.sessionId, "user");
+    const refreshToken = generateRefreshToken(session.sessionId);
+    await storeRefreshToken(session.sessionId, refreshToken);
+    return res.json({ accessToken, refreshToken, sessionId: session.sessionId, restored: false });
+  }
+
+  // ── OTP flow (verification enabled) ──────────────────────────────────────
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -446,11 +496,20 @@ router.post("/auth/admin", (req, res) => {
   const { secret } = req.body as { secret?: string };
   const adminSecret = process.env["ADMIN_SECRET"];
 
-  if (!adminSecret || !secret || secret !== adminSecret) {
+  if (!adminSecret || !secret) {
     logger.warn(
       { ip: req.ip, reason: !adminSecret ? "ADMIN_SECRET_NOT_SET" : "WRONG_SECRET" },
       "[auth/admin] failed login attempt"
     );
+    return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
+  }
+
+  // Timing-safe comparison — avoids leaking the secret length/prefix via response
+  // timing. timingSafeEqual requires equal-length buffers, so length-check first.
+  const a = Buffer.from(secret);
+  const b = Buffer.from(adminSecret);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    logger.warn({ ip: req.ip, reason: "WRONG_SECRET" }, "[auth/admin] failed login attempt");
     return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
   }
 

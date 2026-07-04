@@ -19,6 +19,6 @@ export const aiConfig: AiConfig = {
   spiritualLayerEnabled: true,
   crisisThreshold: "standard",
   familyModeEnabled: false,
-  modelTier: "gpt-4o",
+  modelTier: "llama-3.3-70b-versatile",
   systemPromptSuffix: "",
 };
