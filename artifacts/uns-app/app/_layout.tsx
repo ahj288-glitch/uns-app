@@ -120,6 +120,21 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  // Fix 9 — font load failure must not leave the app on a blank splash forever.
+  // Render a recoverable Arabic error screen instead of returning null.
+  if (fontError) {
+    return (
+      <SafeAreaProvider>
+        <View style={configStyles.container}>
+          <Text style={configStyles.title}>فشل تحميل التطبيق</Text>
+          <Text style={configStyles.body}>
+            تعذّر تحميل الخطوط. يرجى إعادة تشغيل التطبيق.
+          </Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
   if (!fontsLoaded && !fontError) return null;
 
   // Show a meaningful error screen if the API domain is not configured

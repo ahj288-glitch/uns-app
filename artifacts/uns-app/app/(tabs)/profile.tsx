@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getRefreshToken, clearTokens } from "@/lib/secureTokens";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -91,17 +92,14 @@ export default function ProfileScreen() {
     });
   }, []);
 
-  async function toggleNotifications(val: boolean) {
-    setNotifications(val);
-    await AsyncStorage.setItem("uns_notifications", val ? "1" : "0");
+  async function toggleNotifications(_val: boolean) {
+    // Notifications not yet implemented — inform user and save preference for future use
     if (Platform.OS !== "web") Haptics.selectionAsync();
-    if (val && Platform.OS !== "web") {
-      Alert.alert(
-        "التذكيرات اليومية",
-        "سيُذكّرك أُنس بتسجيل مشاعرك كل يوم. يمكنك ضبط الوقت من إعدادات الجهاز.",
-        [{ text: "حسناً" }]
-      );
-    }
+    Alert.alert(
+      "قريباً",
+      "التذكيرات اليومية ستكون متاحة في تحديث قريب. سنُعلمك عند إطلاقها.",
+      [{ text: "حسناً" }]
+    );
   }
 
   async function toggleSpiritual(val: boolean) {
@@ -120,13 +118,26 @@ export default function ProfileScreen() {
           text: "تسجيل الخروج",
           style: "destructive",
           onPress: async () => {
-            await AsyncStorage.multiRemove([
-              "uns_session_id",
-              "uns_access_token",
-              "uns_refresh_token",
+            // Revoke refresh token on backend before clearing local storage
+            try {
+              const refreshToken = await getRefreshToken();
+              if (refreshToken) {
+                await authFetch(`${API_BASE}/auth/logout`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ refreshToken }),
+                });
+              }
+            } catch {
+              // Silently continue — local cleanup is the priority
+            }
+            // Tokens live in SecureStore (not AsyncStorage) — clear both stores.
+            await Promise.all([
+              AsyncStorage.multiRemove(["uns_session_id"]),
+              clearTokens(),
             ]);
             if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            Alert.alert("تم", "أعد تشغيل التطبيق لبدء جلسة جديدة.");
+            router.replace("/");
           },
         },
       ]
@@ -167,7 +178,8 @@ export default function ProfileScreen() {
     } catch {
       // API delete failed — still clear local data
     }
-    await AsyncStorage.clear();
+    // AsyncStorage.clear() does NOT touch SecureStore — clear tokens explicitly.
+    await Promise.all([AsyncStorage.clear(), clearTokens()]);
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     router.replace("/");
   }
@@ -229,13 +241,14 @@ export default function ProfileScreen() {
             <SettingRow
               icon="bell"
               title="التذكيرات اليومية"
-              subtitle="تذكير يومي لتسجيل مشاعرك"
+              subtitle="قريباً — تذكيرات يومية لتسجيل مشاعرك"
               rightElement={
                 <Switch
-                  value={notifications}
+                  value={false}
                   onValueChange={toggleNotifications}
                   trackColor={{ false: T.surfaceContainerHigh, true: T.accent + "CC" }}
-                  thumbColor={notifications ? T.accent : T.muted}
+                  thumbColor={T.muted}
+                  disabled
                 />
               }
             />

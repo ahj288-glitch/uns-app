@@ -123,4 +123,7 @@ overrides:
   rollup>@rollup/rollup-win32-arm64-msvc: '-'
   rollup>@rollup/rollup-win32-ia32-msvc: '-'
   rollup>@rollup/rollup-win32-x64-gnu: '-'
-  rollup>@rollup/rollup-win32-x64-msvc: '-'
+  # NOTE: rollup-win32-x64-msvc is intentionally NOT stripped — Vitest (via Rollup)
+  # requires this native binary to run on Windows x64 dev machines. pnpm already
+  # OS/CPU-gates optional native deps, so keeping it is inert on the Linux deploy
+  # target (pnpm skips it there) but unblocks `vitest run` on Windows.

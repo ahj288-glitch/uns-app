@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+// Fix 2 — JWTs go to the OS keychain, not plaintext AsyncStorage.
+import { setAccessToken, setRefreshToken } from "@/lib/secureTokens";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
@@ -78,21 +80,21 @@ export default function LoginScreen() {
         return;
       }
 
-      console.log("[login] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
+      if (__DEV__) console.log("[login] IS_VERIFICATION_ENABLED:", IS_VERIFICATION_ENABLED, "verified:", data.verified);
 
       // Bypass branch: server returned tokens directly
       if (!IS_VERIFICATION_ENABLED || data.accessToken) {
         await Promise.all([
           AsyncStorage.setItem("uns_session_id", data.sessionId),
-          AsyncStorage.setItem("uns_access_token", data.accessToken),
-          AsyncStorage.setItem("uns_refresh_token", data.refreshToken),
+          setAccessToken(data.accessToken),
+          setRefreshToken(data.refreshToken ?? ""),
           AsyncStorage.setItem("@uns_onboarding_complete", "1"),
           AsyncStorage.setItem("@uns_gender", data.gender ?? "female"),
           AsyncStorage.removeItem("@uns_pending_userId"),
           AsyncStorage.removeItem("@uns_pending_email"),
           AsyncStorage.removeItem("@uns_pending_gender"),
         ]);
-        console.log("[login] isAuthenticated: true — routing to tabs");
+        if (__DEV__) console.log("[login] isAuthenticated: true — routing to tabs");
         router.replace("/(tabs)");
         return;
       }

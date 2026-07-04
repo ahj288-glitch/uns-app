@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { randomInt } from "crypto";
+import { randomInt, timingSafeEqual } from "crypto";
+import rateLimit from "express-rate-limit";
 import { db } from "@workspace/db";
 import {
   companionSessionsTable,
@@ -69,6 +70,35 @@ async function sendOtpEmail(email: string, otp: string): Promise<void> {
   });
 }
 
+// ── Rate limiting ──────────────────────────────────────────────────────────────
+// Fix 3 — brute-force protection for OTP verification. Keyed on userId (falling
+// back to IP) so an attacker cannot iterate all 900k OTP codes against one account.
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5,
+  keyGenerator: (req) => (req.body?.userId as string) ?? req.ip ?? "unknown",
+  message: { error: "Too many attempts. Try again in 10 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// ── Session helpers ─────────────────────────────────────────────────────────────
+// Fix 6 — create a companion session BOUND to an authenticated user. Centralizing
+// the user_id FK population here (instead of each route inlining an insert) means
+// no authenticated path can silently create an orphaned (user_id = NULL) session.
+// The validation guard is a defensive backstop: callers already establish userId,
+// and on Express 5 a thrown rejection is caught by the global error handler (500).
+export async function createUserSession(userId: string, dialect = "gulf") {
+  if (typeof userId !== "string" || userId.length === 0) {
+    throw new Error("createUserSession: a valid userId is required to link the session");
+  }
+  const [session] = await db
+    .insert(companionSessionsTable)
+    .values({ dialect, userId })
+    .returning();
+  return session;
+}
+
 router.post("/auth/register", async (req, res) => {
   const { name, email, dob, gender } = req.body as {
     name?: string;
@@ -119,11 +149,9 @@ router.post("/auth/register", async (req, res) => {
     .returning();
 
   if (!IS_VERIFICATION_ENABLED) {
-    // Verification disabled — create session immediately and return tokens
-    const [session] = await db
-      .insert(companionSessionsTable)
-      .values({ dialect: "gulf" })
-      .returning();
+    // Verification disabled — create session immediately and return tokens.
+    // Fix 6 — bind the session to the newly-registered user.
+    const session = await createUserSession(user.id);
 
     const accessToken = generateAccessToken(session.sessionId, "user");
     const refreshToken = generateRefreshToken(session.sessionId);
@@ -206,12 +234,10 @@ router.post("/auth/login-start", async (req, res) => {
   const user = users[0];
 
   // VERIFICATION_ENABLED=false branch: log the user straight in, mirroring
-  // /auth/register's bypass at lines 121-143.
+  // /auth/register's bypass above.
   if (!IS_VERIFICATION_ENABLED) {
-    const [session] = await db
-      .insert(companionSessionsTable)
-      .values({ dialect: "gulf" })
-      .returning();
+    // Fix 6 — bind the session to the authenticated user.
+    const session = await createUserSession(user.id);
 
     const accessToken = generateAccessToken(session.sessionId, "user");
     const refreshToken = generateRefreshToken(session.sessionId);
@@ -267,7 +293,7 @@ router.post("/auth/login-start", async (req, res) => {
   });
 });
 
-router.post("/auth/verify-email", async (req, res) => {
+router.post("/auth/verify-email", otpLimiter, async (req, res) => {
   const { userId, otp } = req.body as { userId?: string; otp?: string };
 
   if (!userId || !otp) {
@@ -321,10 +347,9 @@ router.post("/auth/verify-email", async (req, res) => {
     .set({ verified: true })
     .where(eq(usersTable.id, userId));
 
-  const [session] = await db
-    .insert(companionSessionsTable)
-    .values({ dialect: "gulf" })
-    .returning();
+  // Fix 6 — bind the session to the just-verified user (userId validated above
+  // and confirmed against an unused, unexpired verification token).
+  const session = await createUserSession(userId);
 
   const accessToken = generateAccessToken(session.sessionId, "user");
   const refreshToken = generateRefreshToken(session.sessionId);
@@ -413,6 +438,11 @@ router.post("/auth/session", async (req, res) => {
     }
   }
 
+  // Fix 6 note — INTENTIONALLY anonymous. /auth/session is the pre-registration
+  // onboarding endpoint: it runs before the user has an account, so there is no
+  // userId to link. user_id stays NULL here (the FK is nullable with onDelete
+  // "set null"); the session is later associated with a user via the authenticated
+  // register/login-start/verify-email flows, which use createUserSession().
   const [session] = await db
     .insert(companionSessionsTable)
     .values({
@@ -437,7 +467,20 @@ router.post("/auth/admin", (req, res) => {
   const { secret } = req.body as { secret?: string };
   const adminSecret = process.env["ADMIN_SECRET"];
 
-  if (!adminSecret || !secret || secret !== adminSecret) {
+  if (!adminSecret || !secret) {
+    logger.warn(
+      { ip: req.ip, reason: !adminSecret ? "ADMIN_SECRET_NOT_SET" : "WRONG_SECRET" },
+      "[auth/admin] failed login attempt"
+    );
+    return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
+  }
+
+  // Timing-safe comparison — avoids leaking the secret length/prefix via response
+  // timing. timingSafeEqual requires equal-length buffers, so length-check first.
+  const a = Buffer.from(secret);
+  const b = Buffer.from(adminSecret);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    logger.warn({ ip: req.ip, reason: "WRONG_SECRET" }, "[auth/admin] failed login attempt");
     return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
   }
 
