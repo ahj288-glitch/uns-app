@@ -1,7 +1,6 @@
-import { uuid, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
-import { privateSchema, apiSchema } from "./schemas";
+import { pgTable, uuid, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 
-export const communitySessionsTable = apiSchema.table("community_sessions", {
+export const communitySessionsTable = pgTable("community_sessions", {
   id: uuid("id").primaryKey().defaultRandom(),
   titleAr: text("title_ar").notNull(),
   titleEn: text("title_en").notNull(),
@@ -16,8 +15,7 @@ export const communitySessionsTable = apiSchema.table("community_sessions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// community_posts contains session_id linkage and moderation flags — private schema
-export const communityPostsTable = privateSchema.table("community_posts", {
+export const communityPostsTable = pgTable("community_posts", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: uuid("session_id").notNull(),
   anonymousName: text("anonymous_name").notNull(),

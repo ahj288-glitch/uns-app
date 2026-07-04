@@ -1,7 +1,6 @@
-import { uuid, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
-import { privateSchema } from "./schemas";
+import { pgTable, uuid, text, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 
-export const userProgressTable = privateSchema.table("user_progress", {
+export const userProgressTable = pgTable("user_progress", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: text("session_id").notNull().unique(),
   level: text("level").notNull().default("awareness"),
@@ -16,7 +15,7 @@ export const userProgressTable = privateSchema.table("user_progress", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const microWinsTable = privateSchema.table("micro_wins", {
+export const microWinsTable = pgTable("micro_wins", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: text("session_id").notNull(),
   winType: text("win_type").notNull(),
@@ -25,7 +24,7 @@ export const microWinsTable = privateSchema.table("micro_wins", {
   earnedAt: timestamp("earned_at").notNull().defaultNow(),
 });
 
-export const dailyLoopsTable = privateSchema.table("daily_loops", {
+export const dailyLoopsTable = pgTable("daily_loops", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: text("session_id").notNull(),
   loopDate: text("loop_date").notNull(),

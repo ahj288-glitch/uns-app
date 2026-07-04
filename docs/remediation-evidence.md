@@ -287,13 +287,21 @@ $ (uns-app)    npx tsc --noEmit                    → EXIT 0
 $ (api-server) npm test                           → EXIT 0  (17 passed)
 ```
 
-### ⚠️ Migration Review — DB-architecture conflict with the admin-panel line (MERGE BLOCKER)
-Commit `50a62c1` bundled a **DB security re-architecture** that is NOT one of the 10
-audit fixes and **conflicts with `master`** (the admin-panel line). The cherry-pick
-applied it cleanly (no textual conflict) because `master`'s `rls.sql` was unchanged
-from the base, so the semantic clash is invisible to git.
+### Migration Review — DB-architecture re-architecture EXCLUDED from this PR ✅
+> **Resolution (2026-07-04):** the DB re-architecture described below was **stripped
+> from this branch** in commit `chore(recover): strip out-of-scope db re-architecture`.
+> `lib/db` is now **byte-identical to `master`** (`git diff master -- lib/db` = 0 lines).
+> This PR keeps `master`'s existing **public-schema + RLS-lockdown** model untouched.
+> Any future private/api schema migration must be a **separate PR coordinated with the
+> admin-panel / DB owner**. The section below is retained as the rationale for exclusion.
 
-**What the recovery introduces (vs master):**
+Commit `50a62c1` had bundled a **DB security re-architecture** that is NOT one of the 10
+audit fixes and **conflicted with `master`** (the admin-panel line). The cherry-pick
+applied it cleanly (no textual conflict) because `master`'s `rls.sql` was unchanged
+from the base, so the semantic clash was invisible to git — which is exactly why it
+was caught in review and removed.
+
+**What it would have introduced (vs master) — now removed:**
 - **New migration** `lib/db/src/migrations/001_private_schema.sql` (266 lines) that:
   - `CREATE SCHEMA private; CREATE SCHEMA api;`
   - **`ALTER TABLE ... SET SCHEMA private`** for 11 sensitive tables (`users`,

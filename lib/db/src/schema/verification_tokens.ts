@@ -1,8 +1,7 @@
-import { text, uuid, timestamp } from "drizzle-orm/pg-core";
-import { privateSchema } from "./schemas";
+import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 
-export const verificationTokensTable = privateSchema.table("verification_tokens", {
+export const verificationTokensTable = pgTable("verification_tokens", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => usersTable.id),
   otp: text("otp").notNull(),

@@ -15,6 +15,14 @@
 > [`remediation-evidence.md`](./remediation-evidence.md) §Recovery for the merge
 > decisions and real verification output.
 
+> **Scope of this PR (2026-07-04):** This branch contains **only the 10 audit fixes +
+> F6 hardening**. The private/api DB schema re-architecture that `50a62c1` had bundled
+> (migration `001_*`, `rls.sql` model-swap, `pgSchema` namespace moves) was
+> **intentionally excluded** — it conflicts with `master`'s public-schema RLS lockdown
+> (the admin-panel line) and is out of scope here. `lib/db` is byte-identical to
+> `master`. Future DB/RLS architecture work must be a **separate PR coordinated with
+> the admin-panel owner**. Details in `remediation-evidence.md` §Migration Review.
+
 > This file was regenerated for the current 10-fix remediation pass. The earlier
 > (2026-03) 24-finding remediation record is preserved in git history and in the
 > sibling files `docs/audit-remediation-status.md` and
@@ -131,7 +139,7 @@ Path note: the audit refers to routes as `api-server/...` and screens as
   2. **Route wiring:** a centralized `createUserSession(userId, dialect)` helper (in `auth.ts`) now performs every authenticated session insert. It **validates** that a non-empty `userId` is present (throws otherwise — caught by Express 5's global error handler → 500) and writes `{ dialect, userId }`. All three authenticated paths use it: `/auth/register` (verification-disabled bypass), `/auth/login-start` (bypass), and `/auth/verify-email` (post-OTP).
 - **Intentional NULL case (documented):** `/auth/session` is the **pre-registration onboarding** endpoint — it runs before the user has an account, so there is no `userId` to link. That row is intentionally `user_id = NULL`; it is later associated with a user through the authenticated flows above. This is the only path that creates a NULL-user session.
 - **How it was tested:** `session-userid.test.ts` (4 assertions, all passing) mocks the DB and proves `createUserSession` always writes `userId`, honors a custom dialect, and refuses to create an orphaned session (throws on empty/undefined `userId`). `scripts/verify-f6.sh` provides an end-to-end real-Postgres check (register → assert `companion_sessions.user_id` matches; `/auth/session` → assert NULL). `lib/db tsc --build` + api-server `typecheck`/`build` all green.
-- **Remaining risk:** Applying the FK constraint to an existing database still requires a migration (`drizzle-kit push`); pre-existing `public.companion_sessions` rows with a dangling `user_id` must be reconciled first. Not run in this environment. **See also the DB-architecture conflict flagged in `remediation-evidence.md` §Migration Review — the recovered `migration 001` (private/api schema split) conflicts with master's public-schema RLS lockdown and is NOT part of this fix.**
+- **Remaining risk:** Applying the FK constraint to an existing database still requires a migration (`drizzle-kit push`); pre-existing `public.companion_sessions` rows with a dangling `user_id` must be reconciled first. Not run in this environment. The FK uses the **existing `public` schema model** (unchanged from master). **The out-of-scope private/api DB re-architecture that `50a62c1` had bundled was intentionally excluded from this PR — see `remediation-evidence.md` §Migration Review.**
 
 ---
 

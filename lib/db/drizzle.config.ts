@@ -11,8 +11,4 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },
-  // Only introspect / push our custom schemas.
-  // Without this, drizzle-kit will also diff against public/supabase/auth schemas
-  // and generate spurious migrations or fail on tables it doesn't own.
-  schemaFilter: ["private", "api"],
 });

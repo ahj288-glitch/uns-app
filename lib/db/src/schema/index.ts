@@ -1,4 +1,3 @@
-export * from "./schemas";
 export * from "./waitlist";
 export * from "./users";
 export * from "./sessions";
