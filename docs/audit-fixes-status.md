@@ -79,6 +79,22 @@ X-XSS-Protection: 0
 
 ---
 
+## Fix 5 — `IS_VERIFICATION_ENABLED` as env var
+
+- **Finding ID / title:** Fix 5 — Verification feature flag hardcoded in client (`app/index.tsx`).
+- **Severity:** P0
+- **Status:** ✅ Fixed
+- **Files changed:**
+  - `artifacts/uns-app/app/index.tsx`
+  - `artifacts/uns-app/app/onboarding/register.tsx` (same flag, single-sourced)
+  - `artifacts/uns-app/.env.example` **(new)** + local `.env` (gitignored) default
+- **Root cause:** `const IS_VERIFICATION_ENABLED = false;` was a compile-time constant in both `index.tsx` and `register.tsx`, so shipping MVP vs. full-verification required a code edit. (The server side in `auth.ts` already read `process.env.VERIFICATION_ENABLED`.)
+- **What was implemented:** Both `index.tsx` and `register.tsx` now use `IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true"`, so the client flag is single-sourced by one env var. Documented in a new `.env.example` and defaulted to `false` in the local `.env` so current MVP behavior is preserved.
+- **How it was tested:** `npx tsc --noEmit` passes. Default (`false`/unset) preserves the exact prior MVP routing and registration behavior.
+- **Remaining risk:** Client env vars are build-time inlined by Expo, so changing the flag requires a rebuild (expected).
+
+---
+
 ### P0-06 · No backend authorization — admin routes unprotected server-side
 **Status: FIXED**  
 **Root cause:** Admin routes existed in Express but had zero middleware checking role.  
