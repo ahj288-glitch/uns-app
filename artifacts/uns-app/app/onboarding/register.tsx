@@ -24,7 +24,9 @@ import { API_BASE } from "@/lib/api";
 const BASE = API_BASE;
 
 // ── Feature flag ──────────────────────────────────────────────────────────────
-const IS_VERIFICATION_ENABLED = false;
+// Single-sourced with app/index.tsx via EXPO_PUBLIC_VERIFICATION_ENABLED so MVP
+// vs. full-verification is a build-time env choice, not a code edit.
+const IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const MONTHS_AR = [

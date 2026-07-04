@@ -96,11 +96,12 @@ Path note: the audit refers to routes as `api-server/...` and screens as
 - **Status:** ✅ Fixed
 - **Files changed:**
   - `artifacts/uns-app/app/index.tsx`
+  - `artifacts/uns-app/app/onboarding/register.tsx` (same flag, single-sourced)
   - `artifacts/uns-app/.env.example` **(new)** + local `.env` (gitignored) default
-- **Root cause:** `const IS_VERIFICATION_ENABLED = false;` was a compile-time constant, so shipping MVP vs. full-verification required a code edit. (The server side in `auth.ts` already read `process.env.VERIFICATION_ENABLED`.)
-- **What was implemented:** `IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true"`. Documented in a new `.env.example` and defaulted to `false` in the local `.env` so current MVP behavior is preserved.
-- **How it was tested:** `npx tsc --noEmit` passes. Default (`false`/unset) preserves the exact prior MVP routing behavior.
-- **Remaining risk:** `register.tsx` also has its own `IS_VERIFICATION_ENABLED` constant used for the registration branch; for full consistency it should read the same env var. Left as-is to avoid changing the registration flow in this pass — flagged as a follow-up. Client env vars are build-time inlined by Expo, so changing the flag requires a rebuild (expected).
+- **Root cause:** `const IS_VERIFICATION_ENABLED = false;` was a compile-time constant in both `index.tsx` and `register.tsx`, so shipping MVP vs. full-verification required a code edit. (The server side in `auth.ts` already read `process.env.VERIFICATION_ENABLED`.)
+- **What was implemented:** Both `index.tsx` and `register.tsx` now use `IS_VERIFICATION_ENABLED = process.env["EXPO_PUBLIC_VERIFICATION_ENABLED"] === "true"`, so the client flag is single-sourced by one env var. Documented in a new `.env.example` and defaulted to `false` in the local `.env` so current MVP behavior is preserved.
+- **How it was tested:** `npx tsc --noEmit` passes. Default (`false`/unset) preserves the exact prior MVP routing and registration behavior.
+- **Remaining risk:** Client env vars are build-time inlined by Expo, so changing the flag requires a rebuild (expected).
 
 ---
 
